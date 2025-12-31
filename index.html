@@ -2,11 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ELA Quest: The Synonymouse Saga</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">    <title>ELA Quest: The Synonymouse Saga</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
+
+    /* Add this to your existing <style> section */
+button, .touch-btn, .pc-item, #message-box, #battle-grid button {
+    touch-action: manipulation;
+    user-select: none; /* Prevents text highlighting while tapping rapidly */
+    -webkit-tap-highlight-color: transparent; /* Removes the blue box on tap in Safari */
+}
+
     /* --- RUN-ON VIRUS VISUALS --- */
 @keyframes glitch-red {
     0% { transform: translate(0); filter: drop-shadow(0 0 0 red); }
@@ -487,6 +494,22 @@ button { cursor: pointer; }
 
 
 <script>
+    // Prevent zooming on double-tap for the game area
+document.getElementById('game-wrapper').addEventListener('touchstart', function(e) {
+    if (e.touches.length > 1) {
+        e.preventDefault(); // Stops multi-finger zoom
+    }
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(e) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        e.preventDefault(); // Stops the double-tap zoom logic
+    }
+    lastTouchEnd = now;
+}, false);
+
     // --- FORCE RECONNECT MENU BUTTONS ---
     // Paste this at the very bottom of your script to fix the 'Close' button
     
