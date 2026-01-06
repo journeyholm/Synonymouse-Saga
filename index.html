@@ -257,11 +257,18 @@ button { cursor: pointer; }
             box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
         }
 
-        /* DESKTOP TWEAKS */
-        @media (min-width: 1024px) {
-            #touch-controls { display: none; } /* Hide mobile controls on PC */
-            .message-box { position: relative; bottom: auto; left: auto; right: auto; width: 100%; margin-top: 10px; }
-        }
+/* DESKTOP TWEAKS */
+@media (min-width: 1366px) {
+    #touch-controls { display: none; } /* This hides controls on iPads */
+    .message-box { 
+        position: relative; 
+        bottom: auto; 
+        left: auto; 
+        right: auto; 
+        width: 100%; 
+        margin-top: 10px; 
+    }
+}
         
         /* SCENE & UI STYLES */
         .ui-scene { background-color: rgba(0,0,0,0.95); z-index: 50; }
