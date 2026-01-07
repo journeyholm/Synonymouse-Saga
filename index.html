@@ -499,7 +499,6 @@ button { cursor: pointer; }
         </div>
     </div>
 
-
 <script>
     // Prevent zooming on double-tap for the game area
 document.getElementById('game-wrapper').addEventListener('touchstart', function(e) {
@@ -5191,36 +5190,72 @@ function useRedPen() {
     }, 1000);
 }
 
-// 5. UPDATE ITEM MENU (To show the button)
-// We replace showItemMenu to include the Red Pen button if valid
 function showItemMenu() {
     const choices = [];
-    
-    // RED PEN LOGIC
+
+    // Red Pen Logic for the Run-on Virus Quest
     if (gameState.inventory.redPen > 0 && currentBattle.isRunOn && !currentBattle.isEdited) {
         choices.push({ text: "Red Pen (Edit!)", callback: useRedPen });
     }
 
+    // Potion Logic
     if (gameState.inventory.potions > 0) {
         choices.push({ text: `Potion (x${gameState.inventory.potions})`, callback: usePotionInBattle });
     }
+
+    // Word Ball Logic
     if (gameState.inventory.wordballs > 0) {
-        choices.push({ text: `Word Ball (x${gameState.inventory.wordballs})`, callback: () => useBall('wordballs') });
+        choices.push({ text: `Word Ball (x${gameState.inventory.wordballs})`, callback: () => attemptCatch('wordballs') });
     }
-    // ... add other items here if you have them in battle ...
+    
+    // Oxford Comma Logic
+    if (gameState.inventory.oxfordComma > 0) {
+        choices.push({ text: `Oxford Comma (x${gameState.inventory.oxfordComma})`, callback: useOxfordComma });
+    }
     
     choices.push({ text: "Back", callback: showMainBattleMenu });
     
-    // Manually create buttons since we are in battle UI
     battleText.textContent = "Choose an item:";
     battleGrid.innerHTML = '';
+    
+    // Loop to build the buttons
     choices.forEach(choice => {
         const btn = document.createElement('button');
         btn.className = 'p-2 bg-gray-200 hover:bg-blue-300 border-2 border-gray-400 rounded text-black text-xs lg:text-sm';
         btn.textContent = choice.text;
-        btn.onclick = choice.callback;
+        btn.onclick = (e) => {
+            e.stopPropagation(); 
+            choice.callback();
+        };
         battleGrid.appendChild(btn);
     });
+}
+
+function usePotionInBattle() {
+    const p = currentBattle.playercreature;
+    if (gameState.inventory.potions > 0) {
+        gameState.inventory.potions--;
+        let healAmount = gameState.potionUpgrade ? 30 : 20; 
+        p.currentHp = Math.min(p.maxHp, p.currentHp + healAmount);
+        updateBattleUI();
+        startBattleDialogue([`You used a Potion!`, `${p.name} recovered ${healAmount} HP.`], () => {
+            currentBattle.turn = 'opponent';
+            nextBattleTurn();
+        });
+    }
+}
+
+function useOxfordComma() {
+    if (gameState.inventory.oxfordComma > 0) {
+        gameState.inventory.oxfordComma--;
+        currentBattle.playercreature.currentHp = currentBattle.playercreature.maxHp;
+        currentBattle.playercreature.status = null;
+        updateBattleUI();
+        startBattleDialogue(["You used an Oxford Comma.", "It clarified the situation!", `${currentBattle.playercreature.name} is fully healed!`], () => {
+            currentBattle.turn = 'opponent';
+            nextBattleTurn();
+        });
+    }
 }
 
 </script>
