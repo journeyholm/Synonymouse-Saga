@@ -599,35 +599,36 @@ function loadGame() {
             startDialogue("No saved game found on this device.");
         }
     }
-// Add this function anywhere in your script
 function restoreMapState() {
     // 1. Re-apply Earthquake 1 (Hole in Village)
     if (gameState.earthquake1Triggered) {
-        maps.village.layout[5][8] = 26; 
-        maps.village.objects['8,5'] = { target: 'caveLevel1', x: 2, y: 2, sprite: 'hole' };
-        if(maps.village.objects['4,5']) delete maps.village.objects['4,5'];
+        if(maps.village) {
+            maps.village.layout[5][8] = 26; 
+            maps.village.objects['8,5'] = { target: 'caveLevel1', x: 2, y: 2, sprite: 'hole' };
+            delete maps.village.objects['4,5'];
+        }
     }
     
     // 2. Re-apply Tree Removal
-    if (gameState.treeRemoved) {
-        if (maps.adjectiveWoods.objects['7,1']) delete maps.adjectiveWoods.objects['7,1'];
+    if (gameState.treeRemoved && maps.adjectiveWoods) {
+        delete maps.adjectiveWoods.objects['7,1'];
     }
 
-    // 3. Re-apply Boulder Removal
-    if (creatureDB['Lexiconstruct'].caught) {
-         maps.caveLevel1.layout[3][14] = 28; 
+    // 3. Check JOURNAL for Legendary status
+    if (gameState.journal['Lexiconstruct']?.caught) {
+         if(maps.caveLevel1) maps.caveLevel1.layout[3][14] = 28; 
     }
 
     // 4. RESTORE PYRAMID STATE (Elite 4 & Bosses)
-    // If defeated, remove them so the path is clear.
+    // This clears the fainted sprites from the map when you load your save
     if (gameState.defeatedTrainers.includes('eliteGrammarian')) delete maps.finalCave.objects['8,11'];
     if (gameState.defeatedTrainers.includes('eliteJournalist')) delete maps.finalCave.objects['11,11'];
     if (gameState.defeatedTrainers.includes('eliteDramatist')) delete maps.finalCave.objects['8,5'];
     if (gameState.defeatedTrainers.includes('elitePoet')) delete maps.finalCave.objects['11,5'];
     
-    // Remove Final Bosses if beaten
-    if (gameState.defeatedTrainers.includes('finalBoss1')) delete maps.finalCave.objects['9,2'];
-    if (gameState.defeatedTrainers.includes('finalBoss2')) delete maps.finalCave.objects['10,2'];
+    // Updated Boss Coordinates to match your map definition
+    if (gameState.defeatedTrainers.includes('finalBoss1')) delete maps.finalCave.objects['9,3'];
+    if (gameState.defeatedTrainers.includes('finalBoss2')) delete maps.finalCave.objects['9,2'];
 }
     // Connect the buttons
     document.getElementById('menu-save-btn').onclick = () => saveGame();
@@ -2841,30 +2842,25 @@ function showChoices(prompt, choices) {
         });
     }
 
-    function checkForInteraction() {
-        const { x, y } = gameState.player, dirs = [[0,-1], [0,1], [-1,0], [1,0]];
-        for (const [dx, dy] of dirs) {
-            const key = `${x + dx},${y + dy}`;
-            const obj = maps[gameState.currentMap].objects[key];
-            const tileId = getTile(maps[gameState.currentMap], x + dx, y + dy);
-            const tile = tileTypes[tileId];
+function checkForInteraction() {
+    const { x, y } = gameState.player, dirs = [[0,-1], [0,1], [-1,0], [1,0]];
+    for (const [dx, dy] of dirs) {
+        const checkX = x + dx;
+        const checkY = y + dy;
+        const key = `${checkX},${checkY}`;
+        const obj = maps[gameState.currentMap].objects[key];
+        
+        // FIX: Check if this specific item was already picked up
+        const uniqueID = `${gameState.currentMap}_${checkX}_${checkY}`;
+        if (gameState.pickedItems && gameState.pickedItems.includes(uniqueID)) continue;
 
-            if (obj && obj.interaction) { 
-                const res = typeof obj.interaction === 'function' ? obj.interaction() : obj.interaction; 
-                if (res) startDialogue(res); 
-                return;
-            }
-             if (tile && tile.isWindow) {
-                 const windowObj = Object.values(maps[gameState.currentMap].objects).find(o => o.x === (x+dx) && o.y === (y+dy));
-                 if(windowObj && windowObj.interaction) {
-                    startDialogue(windowObj.interaction());
-                 } else {
-                    startDialogue("You look out the window.");
-                 }
-                return;
-            }
+        if (obj && obj.interaction) { 
+            const res = typeof obj.interaction === 'function' ? obj.interaction() : obj.interaction; 
+            if (res) startDialogue(res); 
+            return;
         }
     }
+}
     
     function openScene(sceneElement) { closeAllMenus(true); gameState.activeScene = sceneElement.id; sceneElement.classList.remove('hidden'); }
     function closeAllMenus(silent = false) { [menuScene, inventoryScene, creatureStatsScene, journalScene, pcScene].forEach(s => s.classList.add('hidden')); if (!silent) gameState.activeScene = null; }
@@ -3402,19 +3398,29 @@ function handleLHItem() {
     function advanceBattleDialogue() { if (dialogueQueue.length > 0) { battleText.textContent = dialogueQueue.shift(); } else { const cb = dialogueCallback; gameState.inDialogue = false; battleText.textContent = ''; dialogueCallback = null; if (cb) cb(); } }
     
 
-    function handleOpponentFaint() {
-         startBattleDialogue([`${currentBattle.opponentName}'s ${currentBattle.opponentParty[currentBattle.currentOpponentIndex].name} fainted!`], () => {
-            currentBattle.currentOpponentIndex++;
-            if(currentBattle.currentOpponentIndex < currentBattle.opponentParty.length){
-                const newOpponent = currentBattle.opponentParty[currentBattle.currentOpponentIndex];
-                newOpponent.statMods = { attack: 0, defense: 0 };
-                updateBattleSprites(); updateBattleUI();
-                startBattleDialogue([`${currentBattle.opponentName} sent out ${newOpponent.name}!`], () => { currentBattle.turn = 'player'; nextBattleTurn(); });
-            } else {
-                endBattle();
+function handleOpponentFaint() {
+    startBattleDialogue([`${currentBattle.opponentName}'s ${currentBattle.opponentParty[currentBattle.currentOpponentIndex].name} fainted!`], () => {
+        currentBattle.currentOpponentIndex++;
+        if(currentBattle.currentOpponentIndex < currentBattle.opponentParty.length){
+            const newOpponent = currentBattle.opponentParty[currentBattle.currentOpponentIndex];
+            newOpponent.statMods = { attack: 0, defense: 0 };
+            updateBattleSprites(); 
+            updateBattleUI();
+
+            // FIX: Re-syncs your team and forces it to be your turn for the next wave
+            if (currentBattle.trainerId === 'senseiWu') {
+                currentBattle.participants = [gameState.playerParty.findIndex(p => p.currentHp > 0)];
             }
-         });
-    }
+
+            startBattleDialogue([`${currentBattle.opponentName} sent out ${newOpponent.name}!`], () => { 
+                currentBattle.turn = 'player'; 
+                nextBattleTurn(); 
+            });
+        } else {
+            endBattle();
+        }
+    });
+}
 
     function handlePlayercreatureFaint() {
         startBattleDialogue([`${currentBattle.playercreature.name} fainted!`], () => {
@@ -3502,9 +3508,13 @@ async function attemptCatch(ballKey) {
     await animateBallThrow(ballKey);
 
     // 4. Calculate Capture Odds
+// 4. Calculate Capture Odds
     const maxHp = opponent.maxHp;
     const currentHp = opponent.currentHp;
-    const catchRate = creatureDB[opponent.species].catchDifficulty || 45;
+    
+    // FIX: Look at 'opponent.catchDifficulty' (individual) 
+    // instead of 'creatureDB[opponent.species].catchDifficulty' (database)
+    const catchRate = opponent.catchDifficulty || creatureDB[opponent.species].catchDifficulty || 45;
     const safariMod = currentBattle.catchRateMod || 1;
 
     // The Math: (HP Factor) * (Rarity) * (Ball Quality) * (Safari Bait) * (FOCUS BONUS)
@@ -3555,17 +3565,36 @@ async function attemptCatch(ballKey) {
     }
 }
 
-    function playerChooseAttack() {
-        battleText.textContent = `Choose an attack.`; battleGrid.innerHTML = '';
-        currentBattle.playercreature.attacks.forEach(attack => {
-            const button = document.createElement('button');
-            button.className = 'p-2 bg-gray-200 hover:bg-yellow-300 border-4 border-gray-400 rounded text-gray-800 text-lg';
-            button.textContent = attack.name; button.onclick = () => { currentBattle.chosenAttack = attack; presentQuestion(); }; battleGrid.appendChild(button);
-        });
-        const backBtn = document.createElement('button');
-        backBtn.className = 'p-2 bg-yellow-400 hover:bg-yellow-500 border-4 border-gray-400 rounded text-gray-800 text-lg';
-        backBtn.textContent = 'Back'; backBtn.onclick = showMainBattleMenu; battleGrid.appendChild(backBtn);
+function playerChooseAttack() {
+    battleText.textContent = `Choose an attack.`; 
+    battleGrid.innerHTML = '';
+
+    // FIX: Add the Ultimate button at the top if focus is full
+    if (currentBattle.focus >= 3) {
+        const ultBtn = document.createElement('button');
+        ultBtn.className = 'p-2 bg-purple-600 text-white hover:bg-purple-700 border-4 border-white rounded animate-pulse text-lg col-span-2 mb-2';
+        ultBtn.textContent = "✨ ULTIMATE PROSE ✨";
+        ultBtn.onclick = () => {
+            currentBattle.chosenAttack = { ...currentBattle.playercreature.attacks[0], name: "ULTIMATE PROSE", power: 120, isUltimate: true };
+            presentQuestion();
+        };
+        battleGrid.appendChild(ultBtn);
     }
+
+    currentBattle.playercreature.attacks.forEach(attack => {
+        const button = document.createElement('button');
+        button.className = 'p-2 bg-gray-200 hover:bg-yellow-300 border-4 border-gray-400 rounded text-gray-800 text-lg';
+        button.textContent = attack.name; 
+        button.onclick = () => { currentBattle.chosenAttack = attack; presentQuestion(); }; 
+        battleGrid.appendChild(button);
+    });
+
+    const backBtn = document.createElement('button');
+    backBtn.className = 'p-2 bg-yellow-400 hover:bg-yellow-500 border-4 border-gray-400 rounded text-gray-800 text-lg';
+    backBtn.textContent = 'Back'; 
+    backBtn.onclick = showMainBattleMenu; 
+    battleGrid.appendChild(backBtn);
+}
     
     function presentQuestion() {
         const q = elaQuestions[Math.floor(Math.random() * elaQuestions.length)];
@@ -3583,30 +3612,32 @@ function handleAnswer(answer) {
     const q = currentBattle.currentQuestion;
     
     if (answer === q.c) {
-        showFloatingText('player-sprite', "NICE!", 'heal'); // <--- VISUAL FEEDBACK
+        showFloatingText('player-sprite', "NICE!", 'heal');
         messages.push(`Correct! ${q.ex || ''}`);
-        messages.push(`${currentBattle.playercreature.name} used ${currentBattle.chosenAttack.name}!`);
 
-        // Focus Bar Logic
-        if (!currentBattle.focus) currentBattle.focus = 0;
-        currentBattle.focus += 1;
-        if (currentBattle.focus >= 3) messages.push("SCHOLAR'S FOCUS IS FULL! ULTIMATE READY!");
+        // FIX: Calculate Damage Multiplier
+        let damageMult = 1.0;
+        if (currentBattle.chosenAttack.isUltimate) {
+            damageMult = 3.0; // Triple Damage for Ultimate!
+            messages.push("THE SCHOLAR'S POWER OVERWHELMS THE FOE!");
+            currentBattle.focus = 0; // Reset bar
+        } else {
+            messages.push(`${currentBattle.playercreature.name} used ${currentBattle.chosenAttack.name}!`);
+            if (!currentBattle.focus) currentBattle.focus = 0;
+            currentBattle.focus = Math.min(3, currentBattle.focus + 1);
+        }
         
-        // --- VISUALS ---
         const pSprite = document.getElementById('player-sprite');
         pSprite.classList.add('lunge-right');
         setTimeout(() => pSprite.classList.remove('lunge-right'), 300);
-        
-        // TRIGGER PARTICLES!
-        const moveType = currentBattle.chosenAttack.name.includes("ULTIMATE") ? 'ULTIMATE' : (currentBattle.chosenAttack.type || 'Normal');
-        triggerBattleFX(moveType, false);
-        // False = Hit Enemy
+        triggerBattleFX(currentBattle.chosenAttack.type || 'Normal', false);
 
         if (currentBattle.chosenAttack.power > 0) {
             const result = calculateDamage(currentBattle.chosenAttack, currentBattle.playercreature, opponent);
-            opponent.currentHp -= result.damage;
-            messages.push(`${currentBattle.opponentName}'s ${opponent.name} took ${result.damage} damage!`);
-            if(result.message) messages.push(result.message);
+            const finalDamage = Math.floor(result.damage * damageMult);
+            opponent.currentHp -= finalDamage;
+            messages.push(`${currentBattle.opponentName}'s ${opponent.name} took ${finalDamage} damage!`);
+            if(result.message && !currentBattle.chosenAttack.isUltimate) messages.push(result.message);
             
             const oSprite = document.getElementById('opponent-sprite');
             oSprite.classList.add('damage-anim'); 
@@ -3614,10 +3645,10 @@ function handleAnswer(answer) {
         }
         messages.push(...applyAttackEffect(currentBattle.chosenAttack, currentBattle.playercreature, opponent));
     } else {
-        showFloatingText('player-sprite', "MISS", 'damage'); // <--- VISUAL FEEDBACK
+        showFloatingText('player-sprite', "MISS", 'damage');
         messages.push(`Incorrect! ${q.ex || ''}`);
         messages.push(`${currentBattle.playercreature.name}'s attack missed...`);
-        currentBattle.focus = 0;
+        currentBattle.focus = 0; // Reset focus on miss
     }
     updateBattleUI();
     currentBattle.turn = 'opponent'; 
@@ -3708,145 +3739,126 @@ function applyAttackEffect(attack, attacker, target) {
     }
     
 async function endBattle(ranAway = false, caught = false) {
-        if (!currentBattle && !ranAway) return;
-        if (ranAway || caught) { gameState.inBattle = false; battleScene.classList.add('hidden'); currentBattle = null; return;
-        }
+    if (!currentBattle && !ranAway) return;
 
-        const playerWon = currentBattle.playercreature.currentHp > 0;
-        const oldBattle = currentBattle;
-        currentBattle = null;
-
-        if (!playerWon) {
-            await new Promise(res => startBattleDialogue(["You are out of usable creatures!", "You blacked out..."], res));
-            gameState.playerParty.forEach(p => p.currentHp = p.maxHp);
-            changeMap('pocketcenter', 4, 4);
-        } else {
-            const money = oldBattle.trainerId ? trainersDB[oldBattle.trainerId].reward : 15;
-            let winMsg = [];
-            gameState.money += money;
-            if (oldBattle.trainerId) {
-                winMsg = [`You defeated ${oldBattle.opponentName}!`, `You won $${money}!`];
-                if(!gameState.defeatedTrainers.includes(oldBattle.trainerId)) gameState.defeatedTrainers.push(oldBattle.trainerId);
-                
-                // --- MAP CLEANUP: REMOVE BOSSES & ELITES IMMEDIATELY ---
-                if (gameState.currentMap === 'finalCave') {
-                     // Remove Elites
-                     if (oldBattle.trainerId === 'eliteGrammarian' && maps.finalCave.objects['8,11']) delete maps.finalCave.objects['8,11'];
-                     if (oldBattle.trainerId === 'eliteJournalist' && maps.finalCave.objects['11,11']) delete maps.finalCave.objects['11,11'];
-                     if (oldBattle.trainerId === 'eliteDramatist' && maps.finalCave.objects['8,5']) delete maps.finalCave.objects['8,5'];
-                     if (oldBattle.trainerId === 'elitePoet' && maps.finalCave.objects['11,5']) delete maps.finalCave.objects['11,5'];
-                     
-                     // Remove Final Bosses (Stacked)
-                     if (oldBattle.trainerId === 'finalBoss1' && maps.finalCave.objects['9,3']) delete maps.finalCave.objects['9,3'];
-                     if (oldBattle.trainerId === 'finalBoss2' && maps.finalCave.objects['9,2']) delete maps.finalCave.objects['9,2'];
-                     
-                     draw(); // Force screen update
-                }
-                // ---------------------------------------------------
-
-            } else {
-                 winMsg = [`You defeated the wild ${oldBattle.opponentParty[0].name}!`, `You won $${money}!`];
-            }
-            
-            const xpGained = 50 * oldBattle.opponentParty.reduce((sum, p) => sum + p.level, 0) / oldBattle.opponentParty.length;
-            const uniqueParticipants = [...new Set(oldBattle.participants)].map(index => gameState.playerParty[index]).filter(p => p.currentHp > 0);
-            if (uniqueParticipants.length > 0) {
-                winMsg.push(`${uniqueParticipants.map(p => p.name).join(' and ')} gained ${Math.floor(xpGained)} XP!`);
-            }
-            
-            await new Promise(res => startBattleDialogue(winMsg, res));
-            winMsg = [];
-
-            for (const p of uniqueParticipants) {
-                p.xp += xpGained;
-                while (p.xp >= p.xpToNextLevel) {
-                    p.level++;
-                    p.xp -= p.xpToNextLevel; p.xpToNextLevel = Math.floor(p.xpToNextLevel * 1.5);
-                    p.maxHp += 5; p.attack += 2; p.defense += 1; p.currentHp = p.maxHp;
-                    winMsg.push(`${p.name} grew to level ${p.level}!`);
-                    const newMove = creatureDB[p.species]?.learnset?.find(m => m.level === p.level);
-                    if (newMove && p.attacks.length < 4) { p.attacks.push(attacksDB[newMove.move]); winMsg.push(`${p.name} learned ${newMove.move}!`);
-                    }
-                }
-            }
-            if (winMsg.length > 0) await new Promise(res => startBattleDialogue(winMsg, res));
-            
-            // EVOLUTION CHECK
-            for (let i = 0; i < gameState.playerParty.length; i++) {
-                const p = gameState.playerParty[i];
-                const speciesData = creatureDB[p.species];
-                if (speciesData && speciesData.evolvesAt && p.level >= speciesData.evolvesAt && !p.hasEvolved) {
-                    await new Promise(res => startBattleDialogue([`What? ${p.name} is evolving!`], res));
-                    const oldName = p.name; const newSpecies = speciesData.evolvesTo;
-                    const newcreature = createcreature(newSpecies, p.level); newcreature.xp = p.xp; newcreature.hasEvolved = true;
-                    gameState.playerParty[i] = newcreature;
-                    await new Promise(res => startBattleDialogue([`Congratulations! Your ${oldName} evolved into ${newSpecies}!`], res));
-                }
-            }
-
-            // --- BADGES AND STORY REWARDS ---
-            if (oldBattle.trainerId === 'gymLeaderRhonda' && !gameState.gymBadges.rhyme) {
-                gameState.gymBadges.rhyme = true;
-                await new Promise(res => startBattleDialogue(["You received the Rhyme Badge!"], res));
-            }
-            if (oldBattle.trainerId === 'gymLeaderLex' && !gameState.gymBadges.synonym) {
-                gameState.gymBadges.synonym = true;
-                await new Promise(res => startBattleDialogue(["You received the Synonym Badge!"], res));
-                triggerEarthquake(); return;
-            }
-
-            // GOBLIN GRUNT LOOT DROP (ENGINE COG)
-            if (oldBattle.trainerId === 'goblinBoss') {
-                gameState.inventory.boatPart = 1;
-                await new Promise(res => startBattleDialogue([
-                    "The Goblin dropped a heavy metal object!",
-                    "You obtained the Engine Cog!",
-                    "This looks like it belongs to a boat..."
-                ], res));
-            }
-            
-            // FINAL BOSS 2: MASTER THESIS DROP (Moved logic here just in case, though it's on the map now)
-            if (oldBattle.trainerId === 'finalBoss2') {
-                 await new Promise(res => startBattleDialogue([
-                    "The Goblin King falls!",
-                    "The path to the ultimate knowledge is open."
-                ], res));
-            }
-
-            if (oldBattle.trainerId === 'shipwreckedPilot') {
-                gameState.inventory.LH02LyricalHightail = 1;
-                await new Promise(res => startBattleDialogue(["You got LH02 Lyrical Hightail!"], res));
-                startDialogue(["Pilot: It's time for me to go home."], () => {
-                    changeMap('village', 10, 10);
-                    startDialogue("The pilot drops you off and flies away towards Lexington City.");
-                });
-                return;
-            }
-
-            // END GAME CREDITS TRIGGER
-            if (oldBattle.trainerId === 'finalRival') {
-                showCredits();
-                return;
-            }
-
-            // --- SENSEI WU LOGIC ---
-            if (oldBattle.trainerId === 'senseiWu') {
-                gameState.trainingStreak++;
-                await new Promise(res => startBattleDialogue([
-                    "Sensei Wu: Magnificent!",
-                    "I will retreat to meditate on this loss.",
-                    "Come back when you are ready for the next level."
-                ], res));
-                gameState.playerParty.forEach(p => p.currentHp = p.maxHp);
-                await new Promise(res => startBattleDialogue(["Sensei Wu healed your party as a sign of respect."], res));
-            }
-            
-            if (oldBattle.opponentName === 'Andy' && !gameState.rivalDefeated) gameState.rivalDefeated = true;
-            if (oldBattle.opponentName === 'Andy' && gameState.gymBadges.rhyme) gameState.rivalDefeatedPostGym = true;
-        }
-        gameState.inBattle = false;
-        battleScene.classList.add('hidden');
+    if (ranAway || caught) { 
+        gameState.inBattle = false; 
+        battleScene.classList.add('hidden'); 
+        currentBattle = null; 
+        return;
     }
+
+    const playerWon = currentBattle.playercreature.currentHp > 0;
+    const oldBattle = currentBattle;
+    currentBattle = null;
+
+    if (!playerWon) {
+        await new Promise(res => startBattleDialogue(["You are out of usable creatures!", "You blacked out..."], res));
+        gameState.playerParty.forEach(p => p.currentHp = p.maxHp);
+        changeMap('pocketcenter', 4, 4);
+    } else {
+        const money = oldBattle.trainerId ? trainersDB[oldBattle.trainerId].reward : 15;
+        let winMsg = [];
+        gameState.money += money;
+
+        // FIX: Progress the Run-on Virus Quest
+        if (oldBattle.isRunOn && oldBattle.isEdited) {
+            gameState.infectedFixed = (gameState.infectedFixed || 0) + 1;
+        }
+
+        if (oldBattle.trainerId) {
+            winMsg = [`You defeated ${oldBattle.opponentName}!`, `You won $${money}!`];
+            if(!gameState.defeatedTrainers.includes(oldBattle.trainerId)) gameState.defeatedTrainers.push(oldBattle.trainerId);
+        } else {
+            winMsg = [`You defeated the wild ${oldBattle.opponentParty[0].name}!`, `You won $${money}!`];
+        }
+
+        const xpGained = 50 * oldBattle.opponentParty.reduce((sum, p) => sum + p.level, 0) / oldBattle.opponentParty.length;
+        const uniqueParticipants = [...new Set(oldBattle.participants)].map(index => gameState.playerParty[index]).filter(p => p.currentHp > 0);
+        
+        if (uniqueParticipants.length > 0) {
+            winMsg.push(`${uniqueParticipants.map(p => p.name).join(' and ')} gained ${Math.floor(xpGained)} XP!`);
+        }
+        
+        await new Promise(res => startBattleDialogue(winMsg, res));
+        winMsg = [];
+
+        for (const p of uniqueParticipants) {
+            p.xp += xpGained;
+            while (p.xp >= p.xpToNextLevel) {
+                p.level++;
+                p.xp -= p.xpToNextLevel; 
+                p.xpToNextLevel = Math.floor(p.xpToNextLevel * 1.5);
+                p.maxHp += 5; p.attack += 2; p.defense += 1; p.currentHp = p.maxHp;
+                winMsg.push(`${p.name} grew to level ${p.level}!`);
+                const newMove = creatureDB[p.species]?.learnset?.find(m => m.level === p.level);
+                if (newMove && p.attacks.length < 4) { 
+                    p.attacks.push(attacksDB[newMove.move]); 
+                    winMsg.push(`${p.name} learned ${newMove.move}!`);
+                }
+            }
+        }
+        if (winMsg.length > 0) await new Promise(res => startBattleDialogue(winMsg, res));
+
+        for (let i = 0; i < gameState.playerParty.length; i++) {
+            const p = gameState.playerParty[i];
+            const speciesData = creatureDB[p.species];
+            if (speciesData && speciesData.evolvesAt && p.level >= speciesData.evolvesAt && !p.hasEvolved) {
+                await new Promise(res => startBattleDialogue([`What? ${p.name} is evolving!`], res));
+                const oldName = p.name;
+                p.species = speciesData.evolvesTo;
+                p.sprite = creatureDB[p.species].sprite;
+                p.name = p.isFirstEdition ? `✨ First Ed. ${p.species}` : p.species;
+                p.hasEvolved = true;
+                p.status = null; 
+                p.maxHp += 20; p.attack += 10; p.currentHp = p.maxHp;
+                await new Promise(res => startBattleDialogue([`Congratulations! Your ${oldName} evolved into ${p.species}!`], res));
+            }
+        }
+
+        // FIX: MAP CLEANUP FOR LEGENDARIES AND BOSSES
+        const currentOpp = oldBattle.opponentParty[0];
+        const mapObjs = maps[gameState.currentMap].objects;
+
+        if (creatureDB[currentOpp.species].isLegendary) {
+            for (const key in mapObjs) {
+                if (mapObjs[key].sprite === currentOpp.species.toLowerCase()) {
+                    delete mapObjs[key];
+                }
+            }
+        }
+
+        if (gameState.currentMap === 'finalCave') {
+            if (oldBattle.trainerId === 'eliteGrammarian') delete mapObjs['8,11'];
+            if (oldBattle.trainerId === 'eliteJournalist') delete mapObjs['11,11'];
+            if (oldBattle.trainerId === 'eliteDramatist') delete mapObjs['8,5'];
+            if (oldBattle.trainerId === 'elitePoet') delete mapObjs['11,5'];
+            if (oldBattle.trainerId === 'finalBoss1') delete mapObjs['9,3'];
+            if (oldBattle.trainerId === 'finalBoss2') delete mapObjs['9,2'];
+        }
+        draw(); 
+
+        if (oldBattle.trainerId === 'gymLeaderRhonda' && !gameState.gymBadges.rhyme) {
+            gameState.gymBadges.rhyme = true;
+            await new Promise(res => startBattleDialogue(["You received the Rhyme Badge!"], res));
+        }
+        if (oldBattle.trainerId === 'gymLeaderLex' && !gameState.gymBadges.synonym) {
+            gameState.gymBadges.synonym = true;
+            await new Promise(res => startBattleDialogue(["You received the Synonym Badge!"], res));
+            triggerEarthquake(); return;
+        }
+        if (oldBattle.trainerId === 'senseiWu') {
+            gameState.trainingStreak++;
+            await new Promise(res => startBattleDialogue(["Sensei Wu: Magnificent!", "I will retreat to meditate on this loss."], res));
+            gameState.playerParty.forEach(p => p.currentHp = p.maxHp);
+            await new Promise(res => startBattleDialogue(["Sensei Wu healed your party as a sign of respect."], res));
+        }
+        if (oldBattle.trainerId === 'finalRival') { showCredits(); return; }
+    }
+
+    gameState.inBattle = false;
+    battleScene.classList.add('hidden');
+}
 
     function addcreatureToParty(creature) {
         if (!gameState.journal[creature.species]) gameState.journal[creature.species] = { seen: true, caught: false };
@@ -4139,50 +4151,47 @@ function useFastTravel() {
     showChoices("Where would you like to fly?", choices);
 }
 
-    // --- SYNONYM ROLL LOGIC ---
-    function useSynonymRoll() {
-        if ((gameState.inventory.synonymRoll || 0) <= 0) {
-            startDialogue("You don't have any Synonym Rolls!");
-            return;
-        }
-        
-        startDialogue("Who should eat the Synonym Roll?", () => {
-            const choices = gameState.playerParty.map((p, index) => ({
-                text: `${p.name} (Lvl ${p.level})`,
-                callback: () => {
-                    gameState.inventory.synonymRoll--;
-                    
-                    // Level Up Logic
-                    p.level++;
-                    p.maxHp += 5; p.attack += 2; p.defense += 1; 
-                    p.currentHp = p.maxHp; 
-                    p.xp = 0; 
-                    p.xpToNextLevel = Math.floor(p.xpToNextLevel * 1.5);
-                    
-                    // Evolution Check
-                    const speciesData = creatureDB[p.species]; 
-                    if (speciesData && speciesData.evolvesAt && p.level >= speciesData.evolvesAt && !p.hasEvolved) {
-                        startDialogue([
-                            `${p.name} ate the roll and grew to Level ${p.level}!`,
-                            `...Wait! ${p.name} is evolving!`,
-                            `Congratulations! Your ${p.name} evolved into ${speciesData.evolvesTo}!`
-                        ], () => {
-                            const newSpecies = speciesData.evolvesTo;
-                            const newCreature = createcreature(newSpecies, p.level);
-                            newCreature.xp = p.xp; 
-                            newCreature.hasEvolved = true;
-                            gameState.playerParty[index] = newCreature;
-                            updateInventoryUI(); 
-                        });
-                    } else {
-                        startDialogue([`${p.name} ate the roll.`, `${p.name} grew to Level ${p.level}!`], () => updateInventoryUI());
-                    }
-                }
-            }));
-            choices.push({ text: "Cancel", callback: () => updateInventoryUI() });
-            showChoices("Select a creature:", choices);
-        });
+function useSynonymRoll() {
+    if ((gameState.inventory.synonymRoll || 0) <= 0) {
+        startDialogue("You don't have any Synonym Rolls!");
+        return;
     }
+    
+    startDialogue("Who should eat the Synonym Roll?", () => {
+        const choices = gameState.playerParty.map((p, index) => ({
+            text: `${p.name} (Lvl ${p.level})`,
+            callback: () => {
+                gameState.inventory.synonymRoll--;
+                p.level++;
+                p.maxHp += 5; p.attack += 2; p.defense += 1; 
+                p.currentHp = p.maxHp; 
+                p.xp = 0; 
+                p.xpToNextLevel = Math.floor(p.xpToNextLevel * 1.5);
+                
+                const speciesData = creatureDB[p.species]; 
+                if (speciesData && speciesData.evolvesAt && p.level >= speciesData.evolvesAt && !p.hasEvolved) {
+                    startDialogue([
+                        `${p.name} ate the roll and grew to Level ${p.level}!`,
+                        `...Wait! ${p.name} is evolving!`
+                    ], () => {
+                        // FIX: TRANSFORM logic preserves stats
+                        p.species = speciesData.evolvesTo;
+                        p.sprite = creatureDB[p.species].sprite;
+                        p.name = p.isFirstEdition ? `✨ First Ed. ${p.species}` : p.species;
+                        p.hasEvolved = true;
+                        p.maxHp += 20; p.attack += 10; p.currentHp = p.maxHp;
+
+                        startDialogue(`Congratulations! It evolved into ${p.species}!`, () => updateInventoryUI());
+                    });
+                } else {
+                    startDialogue([`${p.name} ate the roll.`, `${p.name} grew to Level ${p.level}!`], () => updateInventoryUI());
+                }
+            }
+        }));
+        choices.push({ text: "Cancel", callback: () => updateInventoryUI() });
+        showChoices("Select a creature:", choices);
+    });
+}
 
     function handleFishermanInteraction() {
         if (gameState.inventory.oldRod > 0) {
@@ -4507,9 +4516,10 @@ function handleSafariEntrance() {
         return null;
     }
 
-    function buySafariSteps(steps, cost) {
+function buySafariSteps(steps, cost) {
         if (gameState.money >= cost) {
             gameState.money -= cost;
+            closeAllMenus(); // FIX: Clear UI before warping
             enterSafariZone(steps);
         } else {
             startDialogue(`You need $${cost} for that package!`);
@@ -4540,19 +4550,20 @@ function enterSafariZone(steps) {
         return null;
     }
 
-    function exitSafariZone() {
-        gameState.inSafariZone = false;
-        gameState.safariSteps = 0;
-        gameState.inventory.safariBall = 0; // Remove leftover balls
-        
-        changeMap('adjectiveWoods', 13, 8); // Warp back to entrance
-        
-        startDialogue([
-            "PA: Ding-dong!",
-            "Your Jungle Adventure is over.",
-            "We hope you had a good time!"
-        ]);
-    }
+function exitSafariZone() {
+    gameState.inSafariZone = false;
+    gameState.safariSteps = 0;
+    gameState.inventory.safariBall = 0; 
+    
+    // FIX: Changed Y from 8 to 12 so you land on the open path
+    changeMap('adjectiveWoods', 13, 12); 
+    
+    startDialogue([
+        "PA: Ding-dong!",
+        "Your Jungle Adventure is over.",
+        "We hope you had a good time!"
+    ]);
+}
 
 function movePlayer(newX, newY) {
     if (gameState.inDialogue || gameState.inBattle || gameState.activeScene) return;
@@ -4594,10 +4605,11 @@ function movePlayer(newX, newY) {
     let skipEncounter = false;
     if (gameState.inSafariZone) {
         gameState.safariSteps--;
-        if (gameState.safariSteps <= 0) {
-            exitSafariZone();
-            return;
-        }
+if (gameState.safariSteps <= 0) {
+    gameState.isMoving = false; // Stop any current animation
+    exitSafariZone();
+    return;
+}
         if (gameState.safariSteps % 100 === 0) {
              startDialogue(`PA: You have ${gameState.safariSteps} steps remaining.`);
         }
@@ -5023,78 +5035,92 @@ function startWildBattle() {
     startDialogue([`A wild ${species} appeared!`], () => startBattle([createcreature(species, level)], `Wild ${species}`));
 }
 
-// 2. START BATTLE (Initializes Run-on Status)
 function startBattle(opponents, opponentName, trainerId = null) {
-    if (gameState.playerParty.length === 0) { startDialogue("You have no creatures to battle with!"); return; }
+    // 1. Safety Check: Is anyone awake?
+    const firstAlive = gameState.playerParty.find(p => p.currentHp > 0);
+    
+    if (!firstAlive) { 
+        startDialogue(["Your party is too exhausted to battle!", "Hurry to a Word Center or take a nap!"]); 
+        return; 
+    }
+    
     gameState.inBattle = true;
     const opponentParty = (Array.isArray(opponents) ? opponents : [opponents])
         .map(op => (op.species ? op : createcreature(op.species, op.level)));
+    
     const firstOpponent = opponentParty[0];
 
-    if (!gameState.journal[firstOpponent.species]) gameState.journal[firstOpponent.species] = { seen: false, caught: false };
-    gameState.journal[firstOpponent.species].seen = true;
+    // 2. Journal Entry
+    if (!gameState.journal[firstOpponent.species]) {
+        gameState.journal[firstOpponent.species] = { seen: true, caught: false };
+    } else {
+        gameState.journal[firstOpponent.species].seen = true;
+    }
     
+    // 3. Initialize Battle State
     currentBattle = { 
-        playercreature: gameState.playerParty.find(p => p.currentHp > 0), 
+        playercreature: firstAlive, 
         opponentParty: opponentParty,
         currentOpponentIndex: 0,
         opponentName, 
         trainerId, 
         turn: 'player',
         focus: 0,
-        participants: [gameState.playerParty.findIndex(p => p.currentHp > 0)],
-        // NEW FLAGS
-        isRunOn: opponentParty[0].species === 'InfectedWordworm', 
+        participants: [gameState.playerParty.indexOf(firstAlive)],
+        isRunOn: firstOpponent.species === 'InfectedWordworm', 
         isEdited: false 
     };
     
+    // Reset temporary battle stats
     currentBattle.playercreature.statMods = { attack: 0, defense: 0 };
     firstOpponent.statMods = { attack: 0, defense: 0 };
 
-    // VISUALS: Add glitch effect if infected
+    // 4. Visuals
+    battleScene.classList.remove('hidden');
     setTimeout(() => {
-        if(currentBattle.isRunOn) {
-            document.getElementById('opponent-sprite').classList.add('infected-anim');
-        }
+        if(currentBattle.isRunOn) document.getElementById('opponent-sprite').classList.add('infected-anim');
     }, 100);
 
-    battleScene.classList.remove('hidden');
     updateBattleSprites();
     updateBattleUI(); 
     nextBattleTurn();
 }
 
-// 3. NEXT BATTLE TURN (The Infinite Healing Logic)
 function nextBattleTurn() {
     if (!currentBattle) return;
 
-    // --- RUN-ON VIRUS CHECK ---
-    // If it's the Player's turn (meaning the Enemy just finished),
-    // and the enemy is infected + not fixed yet:
+    const currentOpponent = currentBattle.opponentParty[currentBattle.currentOpponentIndex];
+
+    // 1. PRIORITY FAINT CHECK
+    // We check this first so that fainted enemies cannot attack or heal
+    if (currentOpponent.currentHp <= 0) { handleOpponentFaint(); return; }
+    if (currentBattle.playercreature.currentHp <= 0) { handlePlayercreatureFaint(); return; }
+
+    // 2. RUN-ON VIRUS CHECK
+    // If enemy is infected, not edited, and damaged, they heal back to full
     if (currentBattle.isRunOn && !currentBattle.isEdited && currentBattle.turn === 'player') {
-        
-        // If they are damaged, they heal back to full
-        if (currentBattle.opponentParty[0].currentHp < currentBattle.opponentParty[0].maxHp) {
+        if (currentOpponent.currentHp < currentOpponent.maxHp) {
             startBattleDialogue([
                 "The sentence refuses to end!", 
                 "The Infected Wordworm healed back to full!"
             ], () => {
-                currentBattle.opponentParty[0].currentHp = currentBattle.opponentParty[0].maxHp;
+                currentOpponent.currentHp = currentOpponent.maxHp;
                 updateBattleUI();
-                // Restart the turn loop
+                // We don't change turns here, just restart the logic check
                 nextBattleTurn(); 
             });
             return; 
         }
     }
 
-    // 1. CHECK PLAYER (Your Turn)
+    // 3. PLAYER TURN LOGIC
     if (currentBattle.turn === 'player') {
-        // Writer's Block Check
+        // Check for Writer's Block (Paralysis)
         if (currentBattle.playercreature.status === 'writers_block') {
-            if(Math.random() < 0.5) {
+            if (Math.random() < 0.5) {
                 startBattleDialogue([`${currentBattle.playercreature.name} has Writer's Block!`], () => {
-                    currentBattle.turn = 'opponent'; nextBattleTurn(); 
+                    currentBattle.turn = 'opponent'; 
+                    nextBattleTurn(); 
                 });
                 return;
             } else {
@@ -5105,14 +5131,15 @@ function nextBattleTurn() {
         }
         showMainBattleMenu();
     } 
-    // 2. CHECK OPPONENT (Enemy Turn)
+    
+    // 4. OPPONENT TURN LOGIC
     else {
-         const currentOpponent = currentBattle.opponentParty[currentBattle.currentOpponentIndex];
-        // Writer's Block Check for Enemy
+        // Check for Writer's Block on Enemy
         if (currentOpponent.status === 'writers_block') {
-             if(Math.random() < 0.5) {
+             if (Math.random() < 0.5) {
                 startBattleDialogue([`${currentBattle.opponentName}'s ${currentOpponent.name} is blocked!`], () => {
-                    currentBattle.turn = 'player'; nextBattleTurn();
+                    currentBattle.turn = 'player'; 
+                    nextBattleTurn();
                 });
                 return;
              } else {
@@ -5120,34 +5147,39 @@ function nextBattleTurn() {
             }
         }
 
-        // Faint Checks
-        if (currentBattle.playercreature.currentHp <= 0) { handlePlayercreatureFaint(); return; }
-        if (currentOpponent.currentHp <= 0) { handleOpponentFaint(); return; }
-
+        // Execute Enemy Attack
         setTimeout(() => {
             const attacker = currentOpponent;
-            const atk = attacker.attacks[Math.floor(Math.random()*attacker.attacks.length)];
+            const atk = attacker.attacks[Math.floor(Math.random() * attacker.attacks.length)];
             
             const oppSprite = document.getElementById('opponent-sprite');
             oppSprite.classList.add('lunge-left');
             setTimeout(() => oppSprite.classList.remove('lunge-left'), 300);
 
-            triggerBattleFX(atk.type || 'Normal', true); // Hit Player
+            // Visual FX hitting the Player
+            triggerBattleFX(atk.type || 'Normal', true); 
 
             let messages = [`${currentBattle.opponentName}'s ${attacker.name} used ${atk.name}!`];
-            if(atk.power > 0) {
+            
+            if (atk.power > 0) {
                 const result = calculateDamage(atk, attacker, currentBattle.playercreature);
                 currentBattle.playercreature.currentHp -= result.damage;
                 messages.push(`${currentBattle.playercreature.name} took ${result.damage} damage!`);
-                if(result.message) messages.push(result.message);
+                if (result.message) messages.push(result.message);
                 
                 const pSprite = document.getElementById('player-sprite');
                 pSprite.classList.add('damage-anim');
                 setTimeout(() => pSprite.classList.remove('damage-anim'), 500);
             }
+            
+            // Apply buffs/debuffs from the enemy move
             messages.push(...applyAttackEffect(atk, attacker, currentBattle.playercreature));
             updateBattleUI();
-            startBattleDialogue(messages, () => { currentBattle.turn = 'player'; nextBattleTurn(); });
+            
+            startBattleDialogue(messages, () => { 
+                currentBattle.turn = 'player'; 
+                nextBattleTurn(); 
+            });
         }, 1000);
     }
 }
