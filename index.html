@@ -874,8 +874,10 @@ button { cursor: pointer; }
 <div id="menu-scene" class="hidden ui-scene absolute inset-0 p-4 flex flex-col items-center justify-center">
 <div class="w-full max-w-sm bg-white text-black rounded border-4 border-gray-600 p-4 grid grid-cols-1 gap-3" style="overflow-y:auto;max-height:90vh;">        <h2 class="text-2xl text-center mb-1 font-bold">Menu</h2>
         
-        <p id="menu-clock" class="text-center text-blue-800 font-bold text-lg mb-2 border-b-2 border-gray-300 pb-2"></p>
-
+<div class="text-center mb-2 border-b-2 border-gray-300 pb-2">
+            <p id="menu-clock" class="text-blue-800 font-bold text-lg"></p>
+            <p id="menu-lexicon" class="text-green-700 font-bold text-sm mt-1"></p>
+        </div>
         <button onclick="useFastTravel()" class="w-full p-3 bg-purple-600 text-white rounded border-2 border-white">Fly / Fast Travel</button>
         <button id="menu-achieve-btn" class="w-full p-3 bg-yellow-500 text-black rounded">🏆 Achievements</button>
         <button id="menu-journal-btn" class="w-full p-3 bg-blue-500 text-white rounded">Lexicon</button>
@@ -3579,7 +3581,7 @@ function toggleMenu() {
         hours = hours ? hours : 12; // the hour '0' should be '12'
         
         const timeString = `${hours}:${minutes} ${ampm}`;
-        const clockEl = document.getElementById('menu-clock');
+const clockEl = document.getElementById('menu-clock');
         if(clockEl) {
             clockEl.textContent = `Current Time: ${timeString}`;
             // Optional: Change color if it's Night (after 6 PM)
@@ -3590,6 +3592,12 @@ function toggleMenu() {
                 clockEl.style.color = '#ea580c'; // Orange for Day
                 clockEl.textContent += " ☀️";
             }
+        }
+        const lexiconEl = document.getElementById('menu-lexicon');
+        if(lexiconEl) {
+            const caught = Object.values(gameState.journal).filter(e => e.caught).length;
+            const total = Object.keys(creatureDB).length;
+            lexiconEl.textContent = `📖 Lexicon: ${caught}/${total} caught`;
         }
         
         openScene(menuScene);
@@ -3632,9 +3640,9 @@ function updateInventoryUI() {
             else if (key === 'peaceTreaty') {
                 btn.className = 'p-2 bg-green-500 text-white rounded-lg';
                 btn.textContent = 'Sign';
-                btn.onclick = () => {
+btn.onclick = () => {
                     if(gameState.repelSteps > 0) {
-                        startDialogue("A treaty is already in effect!");
+                        startDialogue(`A treaty is already in effect! (${gameState.repelSteps} steps remaining.)`);
                     } else {
                         gameState.inventory.peaceTreaty--;
                         gameState.repelSteps = 150;
@@ -7135,11 +7143,74 @@ if (oldBattle.trainerId === 'villageRival' && !gameState.rivalDefeated) {
             await new Promise(res => startBattleDialogue(["You received the Synonym Badge!"], res));
             triggerEarthquake(); return;
         }
-        if (oldBattle.trainerId === 'senseiWu') {
+if (oldBattle.trainerId === 'senseiWu') {
             gameState.trainingStreak++;
+            const newStreak = gameState.trainingStreak;
             await new Promise(res => startBattleDialogue(["Sensei Wu: Magnificent!", "I will retreat to meditate on this loss."], res));
             gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; });
             await new Promise(res => startBattleDialogue(["Sensei Wu healed your party as a sign of respect."], res));
+
+            // --- STREAK REWARDS ---
+            if (newStreak === 1) {
+                gameState.inventory.wordballs = (gameState.inventory.wordballs || 0) + 3;
+                await new Promise(res => startBattleDialogue([
+                    "Sensei Wu: 'A promising start.'",
+                    "He presses three Word Balls into your hand.",
+                    "You received 3 Word Balls!"
+                ], res));
+            } else if (newStreak === 2) {
+                gameState.inventory.greatphrases = (gameState.inventory.greatphrases || 0) + 2;
+                await new Promise(res => startBattleDialogue([
+                    "Sensei Wu: 'You are learning to read the rhythm of battle.'",
+                    "You received 2 Great Phrases!"
+                ], res));
+            } else if (newStreak === 3) {
+                gameState.inventory.thesaurusTeas = (gameState.inventory.thesaurusTeas || 0) + 2;
+                gameState.inventory.ultrasentences = (gameState.inventory.ultrasentences || 0) + 1;
+                await new Promise(res => startBattleDialogue([
+                    "Sensei Wu: 'Three victories. You have earned a true reward.'",
+                    "You received 2 Thesaurus Teas and 1 Ultra Sentence!"
+                ], res));
+            } else if (newStreak === 5) {
+                gameState.inventory.oxfordComma = (gameState.inventory.oxfordComma || 0) + 1;
+                await new Promise(res => startBattleDialogue([
+                    "Sensei Wu: 'Five victories. I am... impressed.'",
+                    "'Few students reach this milestone.'",
+                    "He produces a glowing punctuation mark.",
+                    "You received the Oxford Comma! (Fully restores HP!)"
+                ], res));
+            } else if (newStreak === 7) {
+                gameState.inventory.escapeVerbs = (gameState.inventory.escapeVerbs || 0) + 3;
+                await new Promise(res => startBattleDialogue([
+                    "Sensei Wu: 'Seven wins. You move with purpose now.'",
+                    "You received 3 Escape Verbs!"
+                ], res));
+            } else if (newStreak === 10) {
+                if (!gameState.journal['Shad-ode']) {
+                    gameState.journal['Shad-ode'] = { seen: true, caught: true };
+                    const shadOde = createcreature('Shad-ode', 30);
+                    gameState.playerParty.push(shadOde);
+                    await new Promise(res => startBattleDialogue([
+                        "Sensei Wu: 'Ten victories. I have nothing left to teach you... yet.'",
+                        "'Take this. It has trained beside me for years.'",
+                        "'Treat it well.'",
+                        "Sensei Wu gave you a Shad-ode! (Lv. 30)"
+                    ], res));
+                } else {
+                    gameState.inventory.ultrasentences = (gameState.inventory.ultrasentences || 0) + 3;
+                    await new Promise(res => startBattleDialogue([
+                        "Sensei Wu: 'Ten victories. Remarkable.'",
+                        "You received 3 Ultra Sentences!"
+                    ], res));
+                }
+            } else if (newStreak > 10 && newStreak % 5 === 0) {
+                gameState.inventory.oxfordComma = (gameState.inventory.oxfordComma || 0) + 1;
+                gameState.inventory.ultrasentences = (gameState.inventory.ultrasentences || 0) + 2;
+                await new Promise(res => startBattleDialogue([
+                    `Sensei Wu: 'Streak ${newStreak}. You are a true scholar of battle.'`,
+                    "You received an Oxford Comma and 2 Ultra Sentences!"
+                ], res));
+            }
         }
         if (oldBattle.trainerId === 'finalRival') { showCredits(); return; }
     }
