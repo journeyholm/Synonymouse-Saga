@@ -1164,6 +1164,7 @@ const achievementScene = document.getElementById('achievement-scene');
     canvas.width = 16 * tileSize; canvas.height = 14 * tileSize;
 
 let gameState = {
+    flags: {},
     repelSteps: 0,
         safariSteps: 0,
         inSafariZone: false,
@@ -1197,11 +1198,18 @@ oxfordComma: 0, peaceTreaty: 0, redPen: 0, lostManuscript: 0,            adjecti
         earthquake2Triggered: false,
         finalBossDefeated: false,
         trainingStreak: 0,
+        potionUpgrade: false,
+        runOnQuest: 0,
+        infectedFixed: 0,
+        seenRunOnQuestions: [],
+        powersVisitCount: 0,
         treeRemoved: false, 
         metRivalRoute1: false
     };
     
 const attacksDB = {
+    'Drip Strike': { type: 'Water', name: 'Drip Strike', power: 20, text: 'Cold cave water drips with crushing force.', effect: { type: 'stat', stat: 'defense', amount: -1, target: 'opponent' } },
+'Undertone': { type: 'Water', name: 'Undertone', power: 38, text: 'A hidden meaning surfaces and strikes hard. Lowers the foe\'s attack.', effect: { type: 'stat', stat: 'attack', amount: -1, target: 'opponent' } },
         'Blank Page': { type: 'Normal', name: 'Blank Page', power: 5, text: 'Causes Writer\'s Block!', effect: { type: 'status', status: 'writers_block', target: 'opponent' } },
         'Tackle': { type: 'Normal', name: 'Tackle', power: 8, text: 'A basic physical strike.' },
         'Word Strike': { type: 'Normal', name: 'Word Strike', power: 10, text: 'Channels knowledge into a jab.' },
@@ -1225,7 +1233,9 @@ const attacksDB = {
 'Verb Fang': { type: 'Fire', name: 'Verb Fang', power: 25, text: 'A powerful action-driven bite.' },
 'Active Voice': { type: 'Fire', name: 'Active Voice', power: 38, text: 'Strikes with direct, decisive force.' },
 'Word Crush': { type: 'Normal', name: 'Word Crush', power: 45, text: 'The ultimate vocabulary attack. Overwhelms the foe.' },
-'Royal Decree': { type: 'Fire', name: 'Royal Decree', power: 55, text: 'LexiconLord commands language itself to strike.' }
+'Royal Decree': { type: 'Fire', name: 'Royal Decree', power: 55, text: 'LexiconLord commands language itself to strike.' },
+'Restate': { type: 'Water', name: 'Restate', power: 18, text: 'Rephrases the attack for surprising impact.' },
+'Synonym Surge': { type: 'Water', name: 'Synonym Surge', power: 35, text: 'A tidal wave of equivalent words crashes into the foe.', effect: { type: 'stat', stat: 'attack', amount: -1, target: 'opponent' } }
     };
 
 const journalData = {
@@ -1252,6 +1262,8 @@ const journalData = {
     'Mid-night-oil': 'A candle flame that burns brightest when a student is studying late.',
 
     // ORIGINAL CREATURES
+    'Stalag-might': 'A cave creature formed from dripping ink and stone. It has never seen sunlight and prefers it that way.',
+'Sub-plot': 'The evolved form of Stalag-might. It lurks beneath every story, pulling strings from the shadows.',
     'Synonymouse': 'A clever creature that finds strength in words with similar meanings.',
     'ThesaurusRex': 'The evolved form of Synonymouse. Its vast vocabulary gives it immense power.',
     'Wordworm': 'Common in grassy areas, this creature consumes letters for sustenance.',
@@ -1270,6 +1282,8 @@ const journalData = {
     'VerbViper': 'This serpent moves with decisive action, striking with a powerful verb-al assault.',
     'Lexiconstruct': 'A legendary golem of pure language, said to hold the secrets of all stories.',
     'Antonymph': 'A legendary fairy of opposition, its very presence inverts the world around it.',
+    'Para-phrase': 'A clever fish that never attacks the same way twice. It rewords its strikes to keep foes guessing.',
+'Syn-tuna': 'The evolved form of Para-phrase. It commands the canal with a vast vocabulary and a crushing fin.',
 };
 
     const itemsDB = {
@@ -1336,7 +1350,11 @@ const creatureDB = {
     'Mid-night-oil': { type: 'Fire', sprite: 'mid-night-oil', catchDifficulty: 50 },
 
     // --- ORIGINAL CREATURES ---
+    'Stalag-might': { type: 'Water', sprite: 'grammargoyle', evolvesAt: 20, evolvesTo: 'Sub-plot', catchDifficulty: 75 },
+'Sub-plot': { type: 'Water', sprite: 'lexiconstruct', catchDifficulty: 40 },
     'Splash-pup': { type: 'Water', sprite: 'simileslime', evolvesAt: 14, evolvesTo: 'Tidal-hound', catchDifficulty: 60 },
+    'Para-phrase': { type: 'Water', sprite: 'simileslime', evolvesAt: 18, evolvesTo: 'Syn-tuna', catchDifficulty: 70 },
+'Syn-tuna': { type: 'Water', sprite: 'lexiconstruct', catchDifficulty: 35 },
     'Tidal-hound': { type: 'Water', sprite: 'verbviper', catchDifficulty: 40 },
     'Bubble-bard': { type: 'Water', sprite: 'haikuna', evolvesAt: 18, evolvesTo: 'Opera-whale', catchDifficulty: 70 },
     'Opera-whale': { type: 'Water', sprite: 'hyperbole', catchDifficulty: 30 },
@@ -1432,6 +1450,10 @@ const creatureDB = {
 const createcreature = (species, level) => {
         let baseHp = 15, baseAtk = 8, baseDef = 5, attacks = ['Tackle'];
         switch(species) {
+            case 'Stalag-might': baseHp = 30; baseAtk = 14; baseDef = 18; attacks = ['Tackle', 'Drip Strike', 'Growl']; break;
+case 'Sub-plot': baseHp = 55; baseAtk = 30; baseDef = 22; attacks = ['Tackle', 'Drip Strike', 'Undertone']; break;
+            case 'Para-phrase': baseHp = 28; baseAtk = 12; baseDef = 14; attacks = ['Tackle', 'Restate', 'Growl']; break;
+case 'Syn-tuna': baseHp = 50; baseAtk = 28; baseDef = 18; attacks = ['Tackle', 'Restate', 'Synonym Surge']; break;
             case 'Rhyth-mite': baseHp = 25; baseAtk = 12; baseDef = 8; attacks = ['Tackle', 'Growl']; break;
             case 'Vocal-cord': baseHp = 30; baseAtk = 15; baseDef = 5; attacks = ['Roar of Knowledge', 'Tackle']; break;
             case 'Tempo-toad': baseHp = 35; baseAtk = 10; baseDef = 15; attacks = ['Tackle', 'Sharpen']; break;
@@ -1447,6 +1469,7 @@ case 'Apostrophantom': baseHp = 40; baseAtk = 20; baseDef = 16; attacks = ['Tack
 case 'VerbViper': baseHp = 28; baseAtk = 15; baseDef = 6; attacks = ['Tackle', 'Growl']; break;
 case 'PeriodPython': baseHp = 52; baseAtk = 30; baseDef = 14; attacks = ['Tackle', 'Roar of Knowledge']; break;
             case 'Grammargoyle': baseHp = 30; baseAtk = 14; baseDef = 10; attacks = ['Tackle', 'Leer', 'Sharpen']; break;
+            case 'InfectedWordworm': baseHp = 20; baseAtk = 10; baseDef = 6; attacks = ['Tackle', 'Word Strike', 'Growl']; break;
             case 'Wordworm': baseHp = 15; baseAtk = 6; baseDef = 4; attacks = ['Tackle', 'Growl']; break;
             case 'SimileSlime': baseHp = 18; baseAtk = 7; baseDef = 8; attacks = ['Gooey Touch']; break;
             case 'CommaLeon': baseHp = 22; baseAtk = 9; baseDef = 7; attacks = ['Tackle', 'Chameleon Color']; break;
@@ -1469,8 +1492,7 @@ case 'PeriodPython': baseHp = 52; baseAtk = 30; baseDef = 14; attacks = ['Tackle
 
         // --- NEW: FIRST EDITION LOGIC (Shiny) ---
 // 5% Chance (1 in 20) to be a Shiny
-        const isFirstEd = Math.random() < 0.05;
-        
+const isFirstEd = species !== 'InfectedWordworm' && Math.random() < 0.05;        
         let finalHp = baseHp + (level * 5);
         let finalAtk = baseAtk + (level * 2);
         let finalDef = baseDef + (level * 2);
@@ -2011,7 +2033,7 @@ const maps = {
             '13,8': { sprite: 'tree', interaction: "Carved into the bark: 'LH ❤️ BH'" },
             // Langston Hughes
             '6,6': { sprite: 'hughes', interaction: handleHughesInteraction },
-           '6,9': { sprite: 'maya', interaction: ["Maya Angelou: 'There is no greater agony than bearing an untold story inside you.'", "Go! Write your own story, young trainer!"] },
+'6,9': { sprite: 'maya', interaction: handleMayaInteraction },
             '3,4': { target: 'rivalsHouse', x: 4, y: 5, symbol: '', symbolOffsetY: -2 },
             '11,4': { target: 'profHouse', x: 4, y: 5, symbol: '', symbolOffsetY: -2 },
             '5,8': { target: 'villagerHouse1', x: 4, y: 5, symbol: '', symbolOffsetY: -2 },
@@ -2164,8 +2186,7 @@ lexingtonCity: {
             '2,4': { symbol: '', symbolOffsetY: -2 }, 
             '2,5': { target: 'pocketcenter', x: 4, y: 5 }, 
             // 8. Waiting for Godot Reference (NPC at 1, 8)
-            '1,8': { sprite: 'villager', interaction: "I'm waiting for Godot. He said he'd be here yesterday... or was it tomorrow?" },
-            // Shop
+'1,8': { sprite: 'villager', interaction: handleGodotInteraction },            // Shop
             '5,4': { symbol: '', symbolOffsetY: -2 }, 
             '5,5': { target: 'shop', x: 4, y: 5 }, 
             
@@ -2191,8 +2212,7 @@ lexingtonCity: {
             '13,10': { target: 'cityHouse3', x: 4, y: 5 },
 
             '3,1': { sprite: 'poeFan', interaction: handlePoeInteraction }, 
-            '1,10': { sprite: 'poet', interaction: ["A 5-7-5 syllable structure...", "The haiku is a gentle art.", "Even a battle can be poetry."] },
-            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
+'1,10': { sprite: 'poet', interaction: handleCityPoetInteraction },            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
             '7,13': { target: 'route1', x: 7, y: 0 }, '8,13': { target: 'route1', x: 8, y: 0 },
             '9,12': { sprite: 'sign', interaction: 'Lexington City' }
         } 
@@ -2216,9 +2236,8 @@ school: {
             '7,1': { sprite: 'sign', interaction: "Assignments: 1. Read 'The Giver'. 2. Find the lost student." },
 
             // STUDENTS
-            '2,3': { sprite: 'student', interaction: "I saw a kid run towards the Adjective Woods during recess." },
-            '10,4': { sprite: 'student', interaction: "Ms. Katrina is really worried about the missing student." },
-
+'2,3': { sprite: 'student', interaction: handleSchoolStudent1Interaction },
+'10,4': { sprite: 'student', interaction: handleSchoolStudent2Interaction },
             // BOOKS
             '1,1': { sprite: 'bookshelf', interaction: "Textbooks: 'Grammar for Goblins' and 'Spelling for Sprites'." },
 
@@ -2267,7 +2286,7 @@ pocketcenter: {
             '1,1': { sprite: 'bookshelf', interaction: "Best Sellers: 'Harry Potter and the Adverb of Fire'." },
             '2,1': { sprite: 'bookshelf', interaction: "Sale! 50% off all metaphors." },
             '5,1': { sprite: 'bookshelf', interaction: "A sign reads: 'No refunds on broken pencils.'" },
-'5,3': { sprite: 'villager', interaction: ["Psst. Between you and me?", "Word Balls are fine for common creatures.", "But if you want something rare — save up for a Great Phrase Ball.", "Ultra Sentences? Those are for the truly desperate. Or the truly wealthy.", "...I am neither."] },            // Exits
+'5,3': { sprite: 'villager', interaction: handleShopTipInteraction },
             '3,5': { target: 'lexingtonCity', x: 5, y: 5 }, 
             '4,5': { target: 'lexingtonCity', x: 5, y: 5 } 
         } 
@@ -2359,7 +2378,7 @@ cityHouse3: {
             // 5. The Red Wheelbarrow (William Carlos Williams)
             '3,1': { sprite: 'bookshelf', interaction: "A painting of a red wheelbarrow, glazed with rain water, beside the white chickens." }, 
             
-'1,3': { sprite: 'villager', interaction: () => startDialogue(["Welcome to Lexington Village!", "This little town is where great trainers begin their journey.", "My advice? Talk to everyone. You never know what you might learn!"]) },            
+'1,3': { sprite: 'villager', interaction: handleWelcomeVillagerInteraction },
             '3,5': { target: 'village', x: 5, y: 9 }, '4,5': { target: 'village', x: 5, y: 9 } 
         } 
         },
@@ -2536,7 +2555,7 @@ genreJungle: {
             [8,0,19,19,0,16,0,0,0,16,0,0,16,0,0,8],
             [8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8],
             [8,3,2,2,3,16,0,0,0,16,0,0,16,0,0,8],
-            [8,8,8,8,8,8,8,0,0,8,8,8,8,8,8,8]
+[8,0,0,0,0,0,0,0,0,0,0,0,0,0,5,8],
         ],
         objects: {
             '1,2': { sprite: 'candy', interaction: () => handleCaveItem('Synonym Roll', 'synonymRoll', 1, 'synonymCity', 1, 2) },
@@ -2544,7 +2563,7 @@ genreJungle: {
             '2,8': { sprite: 'dickinson', interaction: handleDickinsonInteraction },
             '5,7': { symbol: '', symbolOffsetY: -2 }, '5,8': { target: 'synonymCityShop', x: 4, y: 5 }, 
             '10,7': { symbol: '', symbolOffsetY: -2 }, '10,8': { target: 'synonymCityCenter', x: 4, y: 5 }, 
-            '14,10': { sprite: 'bookworm', interaction: "Synonym City is famous for its library, the largest in the region!" },
+'14,10': { sprite: 'bookworm', interaction: handleSynonymBookwormInteraction },
             '7,13': { target: 'adjectiveWoods', x: 7, y: 0 },
             '8,13': { target: 'adjectiveWoods', x: 8, y: 0 },
             '9,12': { sprite: 'sign', interaction: 'Synonym City - The City of Similar Words' },
@@ -2553,7 +2572,8 @@ genreJungle: {
             '7,3': { target: 'synonymCityGym', x: 4, y: 5 },
             '1,10': { symbol: '', symbolOffsetY: -2 },
             '2,12': { target: 'library', x: 4, y: 5 },
-            '3,12': { target: 'library', x: 4, y: 5 }
+            '3,12': { target: 'library', x: 4, y: 5 },
+            '13,13': { sprite: 'fisherman', interaction: handleCityFisherInteraction }
         }
     },
 
@@ -2658,7 +2678,7 @@ desertedIsland: {
             [27,28,28,28,27,28,27,28,28,28,28,28,28,28,28,27],
             [27,28,27,28,27,28,27,27,27,27,27,28,27,27,28,27],
             [27,28,27,28,28,28,28,28,28,28,27,28,28,28,28,27],
-            [27,28,27,27,27,27,27,27,27,28,27,27,27,27,28,27],
+[27,28,27,27,27,27,27,27,27,28,27,27,27,5,28,27],
             [27,28,28,28,28,28,28,28,28,28,28,28,28,27,28,27],
             [27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27],
         ],
@@ -2667,7 +2687,8 @@ desertedIsland: {
             '4,8': { sprite: 'hiker', interaction: () => handleTrainerBattle('caveExplorerDon') },
             '10,2': { sprite: 'goblin', interaction: () => handleTrainerBattle('goblinBoss') },
             '14,2': { sprite: 'boulder', interaction: handleBoulderInteraction },
-            '14,3': { sprite: 'lexiconstruct', interaction: handleLegendaryBattle }
+            '14,3': { sprite: 'lexiconstruct', interaction: handleLegendaryBattle },
+            '13,10': { sprite: 'fisherman', interaction: handleCaveFisherInteraction }
         },
         encounters: ['Grammargoyle', 'VerbViper']
     },
@@ -3196,43 +3217,104 @@ function triggerBattleFX(type, targetIsPlayer) {
     }
 
 function handleDrPowersInteraction() {
-    // STATE 2: Quest Complete (Potions Upgraded)
+    const fixed = gameState.infectedFixed || 0;
+
+    // STATE 2: Quest Complete — rotating post-quest dialogue
     if (gameState.runOnQuest === 2) {
-        return "Dr. Powers: 'The virus is contained! Your potions are now 50% more effective thanks to my research.'";
+        if (!gameState.powersVisitCount) gameState.powersVisitCount = 0;
+        gameState.powersVisitCount++;
+        const postLines = [
+            ["Dr. Powers: 'Ah, you again! The virus is fully contained.'",
+             "'I've written three papers on your technique. They call it The Period Principle.'",
+             "'My potions formula is still upgraded, by the way. You're welcome.'"],
+            ["Dr. Powers: 'A run-on sentence is like a train with no brakes.'",
+             "'It just keeps going and going and going — much like this sentence — until someone puts a period in the way.'",
+             "'You were that period. Metaphorically speaking.'"],
+            ["Dr. Powers: 'I've been studying the Infected Wordworms you fixed.'",
+             "'Fascinating. They now write in complete sentences. Every single one.'",
+             "'One of them even used a semicolon correctly. I nearly fainted.'"],
+            ["Dr. Powers: 'You know, most trainers just attack. You EDITED.'",
+             "'That is the rarest instinct in the wild.'",
+             "'Hold onto that. It will take you far.'"]
+        ];
+        return postLines[(gameState.powersVisitCount - 1) % postLines.length];
     }
 
-    // STATE 1: Quest In Progress
+    // STATE 1: Quest In Progress — granular check-in dialogue
     if (gameState.runOnQuest === 1) {
-        if ((gameState.infectedFixed || 0) >= 3) {
-            // Quest Completion Trigger
+
+        // All 3 fixed — completion scene
+        if (fixed >= 3) {
             gameState.runOnQuest = 2;
-            gameState.potionUpgrade = true; // Flag for improved healing
-            return [
-                "Dr. Powers: 'You did it! You edited the chaos into order!'",
-                "Dr. Powers: 'The Wordworms are back to normal.'",
-                "Dr. Powers: 'As a reward, I've used the data to improve your healing items.'",
-                "Your Potions are now REVISED POTIONS! (They heal 50% more HP!)"
-            ];
-        } else {
-            return `Dr. Powers: 'You've fixed ${gameState.infectedFixed || 0}/3 run-on sentences. Keep checking Route 2!'`;
+            gameState.potionUpgrade = true;
+            startDialogue([
+                "Dr. Powers spins around as you enter, eyes wide.",
+                "Dr. Powers: 'The readings — they've stabilized! All three?'",
+                "Dr. Powers: 'You actually did it. You EDITED three infected Wordworms!'",
+                "Dr. Powers: 'Do you understand what you just did?'",
+                "Dr. Powers: 'A run-on sentence has no endpoint. No breath. No pause.'",
+                "'It overwhelms the reader — just like those Wordworms overwhelmed you.'",
+                "'But a period? A period is a declaration. It says: this thought is complete.'",
+                "'You gave those creatures structure. You gave them an ending.'",
+                "Dr. Powers wipes his glasses, visibly moved.",
+                "Dr. Powers: 'I've upgraded your Potions using the recovery data.'",
+                "Dr. Powers: 'They now heal 30 HP instead of 20. Every battle, forever.'",
+                "Your Potions are now REVISED POTIONS! (Heal 30 HP!)"
+            ]);
+            return null;
         }
+
+        // 2 fixed
+        if (fixed === 2) {
+            return [
+                "Dr. Powers: 'Two down! One more Infected Wordworm on Route 2.'",
+                "'I can feel the interference weakening from here.'",
+                "'The last one is always the hardest. Stay sharp.'"
+            ];
+        }
+
+        // 1 fixed
+        if (fixed === 1) {
+            return [
+                "Dr. Powers: 'One fixed! Good — the pattern is working.'",
+                "'Remember: damage alone won't stop them. You need the Red Pen FIRST.'",
+                "'Insert the period. Then attack. Two more to go!'"
+            ];
+        }
+
+        // 0 fixed — reminder
+        return [
+            "Dr. Powers: 'You haven't fixed any yet!'",
+            "'Head to Route 2 — the tall grass is crawling with Infected Wordworms.'",
+            "'Use the Red Pen from your Items menu during battle. Don't forget!'"
+        ];
     }
 
-    // STATE 0: Start Quest
+    // STATE 0: Quest intro
     startDialogue([
-        "Dr. Powers is pacing nervously, surrounded by glitching text.",
-        "Dr. Powers: 'Oh, thank goodness you're here!'",
-        "Dr. Powers: 'My research on the Infinite Run-on Sentence has leaked!'",
-        "Dr. Powers: 'It has infected the Wordworms on Route 2. They won't stop! They have infinite health!'",
-        "Dr. Powers: 'Take this. It's the only way to stop them.'"
-    ], () => {
+        "A frantic professor nearly knocks you over as you enter.",
+        "Dr. Powers: 'Oh! A trainer! Perfect — I need your help immediately.'",
+        "Dr. Powers: 'I am Dr. Powers. I study dangerous grammatical phenomena.'",
+        "Dr. Powers: 'Last week, I was researching the Infinite Run-on Sentence —'",
+        "'— a sentence so long it never ends. It just keeps adding clauses forever.'",
+        "'Think about it: two complete thoughts, smashed together with no punctuation.'",
+        "'\"I love pizza it is delicious\" — do you see the problem?'",
+        "'That sentence has TWO complete ideas fused into one. It never breathes.'",
+        "Dr. Powers: 'My research LEAKED. The Wordworms on Route 2 got infected.'",
+        "'Now THEY never stop either. Damage them and they just heal back to full.'",
+        "Dr. Powers: 'The only cure is punctuation. Specifically — a period.'",
+        "Dr. Powers: 'Take this Red Pen. In battle, use it from your Items menu first.'",
+        "'It inserts a period and breaks the loop. THEN you can defeat them.'",
+        "Dr. Powers: 'Fix 3 Infected Wordworms on Route 2. Please. Hurry.'"
+], () => {
         gameState.inventory.redPen = 1;
         gameState.runOnQuest = 1;
         gameState.infectedFixed = 0;
+        gameState.flags.isRunOnActive = true; // <--- ADD ONLY THIS LINE
         startDialogue([
             "You received the RED PEN!",
-            "Dr. Powers: 'Use the Red Pen in battle to insert a Period and stop their healing loop!'",
-            "Dr. Powers: 'Go to Route 2 and fix 3 Infected Wordworms!'"
+            "Dr. Powers: 'Remember — Items menu, Red Pen, THEN attack.'",
+            "'The period ends the sentence. You end the battle. Go!'"
         ]);
     });
     return null;
@@ -3665,8 +3747,8 @@ else if (key === 'treeFlute') {
                 btn.className = 'p-2 bg-green-500 text-white rounded-lg';
                 btn.textContent = 'Fish';
                 btn.onclick = () => {
-                    if (gameState.currentMap !== 'homeBay') {
-                        startDialogue(["You need to be at the bay to fish!"]);
+if (!['homeBay', 'synonymCity', 'caveLevel1'].includes(gameState.currentMap)) {
+    startDialogue(["You need to be near water to fish!"]);
                     } else {
                         closeAllMenus(); // <-- Added this to hide the menu
                         useOldRod();
@@ -4254,6 +4336,186 @@ function handleShopInteraction() {
         "Like a welcome summer rain, humor may suddenly cleanse and cool the earth, the air and you."
     ];
     function handleHughesInteraction() { return hughesQuotes[Math.floor(Math.random() * hughesQuotes.length)]; }
+function handleMayaInteraction() {
+    if (gameState.defeatedTrainers.includes('finalRival')) {
+        return [
+            "Maya Angelou: 'You have finished your story, young trainer.'",
+            "'But remember — every ending is just the beginning of the next chapter.'",
+            "'I am proud of you.'"
+        ];
+    }
+    if (gameState.gymBadges.synonym) {
+        return [
+            "Maya Angelou: 'Two badges. You are writing your own legend now.'",
+            "'There is no greater agony than bearing an untold story inside you.'",
+            "'Yours is being told. Keep going.'"
+        ];
+    }
+    if (gameState.gymBadges.rhyme) {
+        return [
+            "Maya Angelou: 'A Rhyme Badge! You found your rhythm.'",
+            "'Now find your meaning. The next gym awaits.'"
+        ];
+    }
+    return [
+        "Maya Angelou: 'There is no greater agony than bearing an untold story inside you.'",
+        "'Go! Write your own story, young trainer!'"
+    ];
+}
+
+function handleHughesInteraction() {
+    const quotes = [
+        "Hold fast to dreams, for if dreams die, life is a broken-winged bird that cannot fly.",
+        "My soul has grown deep like the rivers.",
+        "Life is for the living.",
+        "Humor is your own unconscious therapy."
+    ];
+    if (gameState.defeatedTrainers.includes('goblinBoss')) {
+        return [
+            "Langston Hughes: 'You cleared the cave. That took courage.'",
+            "'Life is for the living — and you are living it well.'"
+        ];
+    }
+    if (gameState.gymBadges.rhyme) {
+        return [
+            "Langston Hughes: 'A Rhyme Badge! Now THAT is poetry in motion.'",
+            "'Hold fast to dreams, young trainer. Hold fast.'"
+        ];
+    }
+    return quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+function handleCityPoetInteraction() {
+    if (gameState.gymBadges.synonym && gameState.gymBadges.rhyme) {
+        return [
+            "Poet: 'Two badges. Your journey has rhythm AND meaning now.'",
+            "'That is the mark of a true writer.'",
+            "'5-7-5... the haiku is complete. So are you — for now.'"
+        ];
+    }
+    if (gameState.gymBadges.rhyme) {
+        return [
+            "Poet: 'You earned the Rhyme Badge! You understand rhythm.'",
+            "'Now go find meaning in Synonym City. A haiku needs both.'"
+        ];
+    }
+    return [
+        "Poet: 'A 5-7-5 syllable structure...'",
+        "'The haiku is a gentle art.'",
+        "'Even a battle can be poetry.'"
+    ];
+}
+
+function handleGodotInteraction() {
+    if (gameState.defeatedTrainers.includes('finalRival')) {
+        return "Godot Watcher: 'You did it. You actually finished. I'm still waiting, but... I'm glad someone arrived.'";
+    }
+    if (gameState.gymBadges.synonym) {
+        return "Godot Watcher: 'Two badges now? Maybe Godot will show up before you finish your journey. Maybe not.'";
+    }
+    if (gameState.gymBadges.rhyme) {
+        return "Godot Watcher: 'A badge! Something happened to you. Nothing ever happens to me. I'm still waiting for Godot.'";
+    }
+    return "Godot Watcher: 'I'm waiting for Godot. He said he'd be here yesterday... or was it tomorrow?'";
+}
+
+function handleShopTipInteraction() {
+    if (gameState.defeatedTrainers.includes('goblinBoss')) {
+        return [
+            "Shopper: 'Psst. You beat the Goblin? Impressive.'",
+            "'Between you and me — save your Ultra Sentences for the Pyramid.'",
+            "'You are going to need them up there.'"
+        ];
+    }
+    if (gameState.gymBadges.rhyme) {
+        return [
+            "Shopper: 'Psst. One badge down, one to go.'",
+            "'Great Phrase Balls are worth every penny for the stronger creatures ahead.'",
+            "'Trust me on this one.'"
+        ];
+    }
+    return [
+        "Shopper: 'Psst. Between you and me?'",
+        "'Word Balls are fine for common creatures.'",
+        "'But if you want something rare — save up for a Great Phrase Ball.'",
+        "'Ultra Sentences? Those are for the truly desperate. Or the truly wealthy.'",
+        "'...I am neither.'"
+    ];
+}
+
+function handleSynonymBookwormInteraction() {
+    if (gameState.gymBadges.synonym) {
+        return [
+            "Bookworm: 'You beat Gym Leader Lex! Even the library is buzzing about it.'",
+            "'They say your vocabulary is college-ready now.'",
+            "'Come browse the shelves anytime — scholars are always welcome.'"
+        ];
+    }
+    if (gameState.gymBadges.rhyme) {
+        return [
+            "Bookworm: 'Synonym City is famous for its library, the largest in the region!'",
+            "'One badge already? The Synonym Gym is your next stop.'",
+            "'The library has resources if you want to study up first.'"
+        ];
+    }
+    return "Bookworm: 'Synonym City is famous for its library, the largest in the region!'";
+}
+
+function handleWelcomeVillagerInteraction() {
+    if (gameState.defeatedTrainers.includes('finalRival')) {
+        return [
+            "Villager: 'Champion! You actually did it!'",
+            "'We always knew this village would produce someone great.'",
+            "'Come back and visit anytime. This will always be home.'"
+        ];
+    }
+    if (gameState.gymBadges.synonym) {
+        return [
+            "Villager: 'Two badges! The whole village is talking about you.'",
+            "'Not bad for someone who started right here in Lexington Village!'"
+        ];
+    }
+    if (gameState.gymBadges.rhyme) {
+        return [
+            "Villager: 'A Rhyme Badge! We heard the news all the way back here.'",
+            "'Keep going — Synonym City is waiting for you!'"
+        ];
+    }
+    if (gameState.defeatedTrainers.includes('villageRival')) {
+        return [
+            "Villager: 'Welcome to Lexington Village!'",
+            "'You beat Andy already? This town hasn't seen a battle like that in years.'",
+            "'Lexington City is just up Route 1. Good luck!'"
+        ];
+    }
+    return [
+        "Villager: 'Welcome to Lexington Village!'",
+        "'This little town is where great trainers begin their journey.'",
+        "'My advice? Talk to everyone. You never know what you might learn!'"
+    ];
+}
+
+function handleSchoolStudent1Interaction() {
+    if (gameState.katrinaQuest >= 3) {
+        return "Student: 'You found the missing kid! Ms. Katrina was so relieved. You're basically a hero now.'";
+    }
+    if (gameState.katrinaQuest >= 1) {
+        return "Student: 'Still looking for the missing student? I heard they went deep into the Adjective Woods.'";
+    }
+    return "Student: 'I saw a kid run towards the Adjective Woods during recess.'";
+}
+
+function handleSchoolStudent2Interaction() {
+    if (gameState.katrinaQuest >= 3) {
+        return "Student: 'Ms. Katrina is so happy now. She keeps saying you have a gift for narrative resolution.'";
+    }
+    if (gameState.gymBadges.rhyme) {
+        return "Student: 'You got a gym badge?! Ms. Katrina would be so proud. She always said you had potential.'";
+    }
+    return "Student: 'Ms. Katrina is really worried about the missing student.'";
+}
+
+
 function handleDeathMasheenInteraction() {
         // Stage 3: Already became principal
         if (gameState.tomBecamePrincipal) {
@@ -4541,6 +4803,16 @@ createBtn('Item', showItemMenu, 'bb bb-item');
 createBtn('Pokémon', () => showSwitchcreatureMenu(false), 'bb bb-swap');
 createBtn('Run', () => {
     if(!currentBattle.trainerId) {
+        // Gap 1 Fix: Warn the student if they flee an unedited Run-On
+        if (currentBattle.isRunOn && !currentBattle.isEdited) {
+            startBattleDialogue([
+                "You ran away!",
+                "But the Wordworm is still infected...",
+                "⚠️ Dr. Powers needs you to use the Red Pen BEFORE fleeing to get credit!",
+                "Find another Infected Wordworm on Route 2 and try again."
+            ], () => endBattle(true));
+            return;
+        }
         const playerSpeed = currentBattle.playercreature.attack;
         const oppSpeed = currentBattle.opponentParty[currentBattle.currentOpponentIndex].attack;
         const escapeChance = (playerSpeed * 32) / (oppSpeed + 1) + 30;
@@ -5694,7 +5966,27 @@ p.currentHp = p.maxHp;
         }
         return "Fisherman: 'Sigh... I lost my lucky lure years ago. It was swept out to sea by a giant wave. I can't catch a thing without it.'";
     }
-
+function handleCityFisherInteraction() {
+    if (gameState.inventory.oldRod <= 0) {
+        return "City Angler: 'The canal runs beneath the whole city. Strange creatures live down there, I'm sure of it.'";
+    }
+    return [
+        "City Angler: 'An Old Rod! Perfect for the city canal.'",
+        "'These creatures adapted to life surrounded by words and synonyms.'",
+        "'Very different from what you'd find out in the bay.'"
+    ];
+}
+function handleCaveFisherInteraction() {
+    if (gameState.inventory.oldRod <= 0) {
+        return "Cave Hermit: 'I've been down here so long I started fishing in the dark. Haven't caught anything... yet.'";
+    }
+    return [
+        "Cave Hermit: 'You found a rod?! I've been waiting years for someone to bring one down here.'",
+        "'This underground lake is completely cut off from the surface.'",
+        "'The creatures in there have never seen sunlight. They evolved differently.'",
+        "'Cast your line into the dark water. See what finds you.'"
+    ];
+}
     function handleTutorialNPC() {
         startDialogue([
             "Welcome to the Village of Beginnings!",
@@ -6304,8 +6596,13 @@ function throwSafariBall() {
             { q: "A story written in the form of letters or documents is...", a: ["Epistolary", "Narrative", "Expository"], c: "Epistolary" }
         ];
 
-        const q = genres[Math.floor(Math.random() * genres.length)];
-        
+if (!gameState.seenGenreQuestions) gameState.seenGenreQuestions = [];
+if (gameState.seenGenreQuestions.length >= genres.length) gameState.seenGenreQuestions = [];
+const availableGenreQuestions = genres.filter((_, i) => !gameState.seenGenreQuestions.includes(i));
+const genreIndex = genres.indexOf(availableGenreQuestions[Math.floor(Math.random() * availableGenreQuestions.length)]);
+gameState.seenGenreQuestions.push(genreIndex);
+const q = genres[genreIndex];
+
         battleText.textContent = q.q;
         battleGrid.innerHTML = '';
         q.a.forEach(ans => {
@@ -6568,6 +6865,10 @@ function startWildBattle() {
 }
 
 function startBattle(opponents, opponentName, trainerId = null) {
+    if (gameState.flags && gameState.flags.isRunOnActive && !trainerId) {
+        currentBattle.isRunOn = true;
+        gameState.flags.isRunOnActive = false; 
+    }
     // 1. Safety Check: Is anyone awake?
     const firstAlive = gameState.playerParty.find(p => p.currentHp > 0);
     
@@ -6817,7 +7118,7 @@ function useRedPen() {
             "The Wordworm is vulnerable now!"
         ], () => {
             // End turn, allowing you to attack next
-            nextBattleTurn();
+showMainBattleMenu(); 
         });
     }, 1000);
 }
@@ -6888,12 +7189,40 @@ btn.className = 'bb bb-move';
     });
 }
 function useOldRod() {
-    const waterPool = ['Lun-artic', 'Star-syntax'];
-    const species = waterPool[Math.floor(Math.random() * waterPool.length)];
-    const level = Math.floor(Math.random() * 3) + 8;
-    startDialogue(["You cast the Old Rod...", "Something bit!"], () => {
-        startBattle([createcreature(species, level)], `Wild ${species}`);
-    });
+    
+    let waterPool = [];
+    let locationFlavor = "";
+
+    if (gameState.currentMap === 'homeBay') {
+        waterPool = ['Splash-pup', 'Bubble-bard', 'Kelp-ie'];
+        locationFlavor = "the bay...";
+    } else if (gameState.currentMap === 'synonymCity') {
+waterPool = ['Para-phrase', 'Syn-tuna', 'SimileSlime'];
+        locationFlavor = "the city canal...";
+    } else if (gameState.currentMap === 'caveLevel1') {
+    waterPool = ['Stalag-might', 'Sub-plot', 'Lun-artic'];
+        locationFlavor = "the underground lake...";
+    } else {
+        startDialogue(["You need to be near water to fish!"]);
+        return;
+    }
+
+const species = waterPool[Math.floor(Math.random() * waterPool.length)];
+const level = Math.floor(Math.random() * 3) + 8;
+
+const waitMessages = [
+    ["You cast the Old Rod into " + locationFlavor, "..."],
+    ["You cast the Old Rod into " + locationFlavor, "...", "..."],
+    ["You cast the Old Rod into " + locationFlavor, "...", "...", "..."],
+    ["You cast the Old Rod into " + locationFlavor, "...", "...", "...", "..."],
+];
+
+const randomWait = waitMessages[Math.floor(Math.random() * waitMessages.length)];
+randomWait.push("🎣 GOT ONE!");
+
+startDialogue(randomWait, () => {
+    startBattle([createcreature(species, level)], `Wild ${species}`);
+});
 }
 
 function usePotionInBattle() {
