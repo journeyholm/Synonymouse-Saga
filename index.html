@@ -603,17 +603,19 @@ button { cursor: pointer; }
     100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
 }
 /* Battle button styles */
-.bb { font-family:'Press Start 2P',monospace; font-size:.65rem; font-weight:700; border:none; border-radius:10px; cursor:pointer; color:#ffffff !important; padding:1rem .5rem; text-align:center; line-height:1.4; white-space:nowrap; overflow:hidden; transition:transform .12s,filter .12s; }
-.bb:hover { filter:brightness(1.15); transform:translateY(-2px); }
+.bb { font-family:'Press Start 2P',monospace; font-size:.65rem; font-weight:700; border:none; border-radius:10px; cursor:pointer; color:#ffffff !important; padding:1rem .5rem; text-align:center; line-height:1.4; white-space:nowrap; overflow:hidden; transition:transform .12s; }
+@media (hover: hover) {
+    .bb:hover { filter:brightness(1.15); transform:translateY(-2px); }
+}
 .bb:active { transform:translateY(1px); }
 .bb-fight  { background:#9333ea; box-shadow:0 3px 0 #5b21b6; }
 .bb-item   { background:#2563eb; box-shadow:0 3px 0 #1d4ed8; }
 .bb-swap   { background:#059669; box-shadow:0 3px 0 #047857; }
 .bb-run    { background:#dc2626; box-shadow:0 3px 0 #b91c1c; }
 .bb-move   { background:#4338ca; box-shadow:0 3px 0 #3730a3; font-size:.4rem; white-space:normal; line-height:1.3; }
-.bb-move:hover { background:#6d28d9; }
+@media (hover: hover) { .bb-move:hover { background:#6d28d9; } }
 .bb-answer { background:#047857; box-shadow:0 3px 0 #065f46; font-size:.4rem; white-space:normal; line-height:1.3; }
-.bb-answer:hover { background:#059669; }
+@media (hover: hover) { .bb-answer:hover { background:#059669; } }
 .bb-back   { background:#4b5563; box-shadow:0 3px 0 #374151; }
 
 .damage-number {
@@ -1468,17 +1470,14 @@ case 'CommaLeon': baseHp = 22; baseAtk = 9; baseDef = 7; attacks = ['Tackle', 'C
 case 'Apostrophantom': baseHp = 40; baseAtk = 20; baseDef = 16; attacks = ['Tackle', 'Chameleon Color']; break;
 case 'VerbViper': baseHp = 28; baseAtk = 15; baseDef = 6; attacks = ['Tackle', 'Growl']; break;
 case 'PeriodPython': baseHp = 52; baseAtk = 30; baseDef = 14; attacks = ['Tackle', 'Roar of Knowledge']; break;
-            case 'Grammargoyle': baseHp = 30; baseAtk = 14; baseDef = 10; attacks = ['Tackle', 'Leer', 'Sharpen']; break;
             case 'InfectedWordworm': baseHp = 20; baseAtk = 10; baseDef = 6; attacks = ['Tackle', 'Word Strike', 'Growl']; break;
             case 'Wordworm': baseHp = 15; baseAtk = 6; baseDef = 4; attacks = ['Tackle', 'Growl']; break;
             case 'SimileSlime': baseHp = 18; baseAtk = 7; baseDef = 8; attacks = ['Gooey Touch']; break;
-            case 'CommaLeon': baseHp = 22; baseAtk = 9; baseDef = 7; attacks = ['Tackle', 'Chameleon Color']; break;
             case 'Adjectlizard': baseHp = 30; baseAtk = 12; baseDef = 9; attacks = ['Tackle', 'Leer', 'Scale Shot']; break;
             case 'Haiku-na': baseHp = 20; baseAtk = 11; baseDef = 6; break;
             case 'Metaphorpillar': baseHp = 16; baseAtk = 5; baseDef = 12; break;
             case 'Hyper-bole': baseHp = 12; baseAtk = 14; baseDef = 3; break;
             case 'PronounProwler': baseHp = 25; baseAtk = 13; baseDef = 7; attacks = ['Tackle', 'Leer']; break;
-            case 'VerbViper': baseHp = 28; baseAtk = 15; baseDef = 6; attacks = ['Tackle', 'Growl']; break;
             case 'Lexiconstruct': baseHp = 100; baseAtk = 50; baseDef = 50; attacks = ['Cosmic Prose', 'Synonym Slam']; break;
             case 'Antonymph': baseHp = 100; baseAtk = 50; baseDef = 50; attacks = ['Cosmic Prose', 'Word Strike']; break;
             // Safari Creatures
@@ -1852,7 +1851,7 @@ const elaQuestions = [
         { q: "Identify the verb: 'The cat quickly climbed the tree.'", a: ["climbed", "quickly", "cat", "tree"], c: "climbed", ex: "A verb is an action word. 'Climbed' is the action." },
         { q: "'The wind whispered' is an example of...?", a: ["Personification", "Metaphor", "Simile", "Hyperbole"], c: "Personification", ex: "Personification gives human qualities (whispering) to non-human things." },
         { q: "Which word is an antonym for 'begin'?", a: ["Finish", "Start", "Create", "Open"], c: "Finish", ex: "Antonyms are opposites. Finish is the opposite of Begin." },
-        { q: "Which is spelled correctly?", a: ["Definitely", "Definately", "Definitly", "Definantly"], c: "Definitely", ex: "Remember: De-finite-ly." },
+        { q: "Which word is spelled correctly?", a: ["Definitely", "Definately", "Definitly", "Definantly"], c: "Definitely", ex: "Remember: De-finite-ly." },
         { q: "What is the main idea of a story?", a: ["Theme", "Plot", "Setting", "Conflict"], c: "Theme", ex: "The Theme is the central message or lesson of the story." },
         { q: "'As brave as a lion' is an example of...?", a: ["Simile", "Metaphor", "Allusion", "Irony"], c: "Simile", ex: "Similes compare two things using the words 'like' or 'as'." },
         { q: "Choose the correct pronoun: '___ and I went to the store.'", a: ["He", "Him", "His", "Them"], c: "He", ex: "Use the subject pronoun 'He' when it is doing the action." },
@@ -1870,7 +1869,7 @@ const elaQuestions = [
         { q: "Which word is a synonym for 'brave'?", a: ["Courageous", "Cowardly", "Meek", "Timid"], c: "Courageous", ex: "Courageous and brave both mean ready to face danger." },
         { q: "What is a 'protagonist'?", a: ["The main character", "The villain", "The narrator", "A side character"], c: "The main character", ex: "The protagonist is the leading character of a story." },
         { q: "'The car engine coughed and sputtered' is an example of...?", a: ["Personification", "Simile", "Metaphor", "Onomatopoeia"], c: "Personification", ex: "Engines can't actually cough; that is a human trait." },
-        { q: "Which is spelled correctly?", a: ["Separate", "Seperate", "Saperate", "Seperete"], c: "Separate", ex: "Remember: There is 'a rat' in sep-a-rat-e." },
+        { q: "Which one is spelled correctly?", a: ["Separate", "Seperate", "Saperate", "Seperete"], c: "Separate", ex: "Remember: There is 'a rat' in sep-a-rat-e." },
         { q: "A 'biography' is a story of a person's life written by...", a: ["Someone else", "The person themselves", "A novelist", "An unknown author"], c: "Someone else", ex: "If they wrote it themselves, it would be an autobiography." },
         { q: "What is the setting of a story?", a: ["When and where it takes place", "The main problem", "The list of characters", "The lesson learned"], c: "When and where it takes place", ex: "Setting includes both the time period and the physical location." },
         { q: "Which word is an antonym for 'ancient'?", a: ["Modern", "Old", "Aged", "Past"], c: "Modern", ex: "Ancient means very old; Modern means new or recent." },
@@ -1879,7 +1878,7 @@ const elaQuestions = [
         { q: "Identify the noun: 'The quick brown fox jumps.'", a: ["fox", "quick", "brown", "jumps"], c: "fox", ex: "A noun is a person, place, or thing. A fox is a thing." },
         { q: "What does 'hyperbole' mean?", a: ["Exaggeration for effect", "A comparison using 'like'", "Giving human qualities to objects", "A question with no answer"], c: "Exaggeration for effect", ex: "Hyperbole is extreme exaggeration not meant to be taken literally." },
         { q: "'I'm so hungry I could eat a horse' is an example of...?", a: ["Hyperbole", "Simile", "Understatement", "Irony"], c: "Hyperbole", ex: "You cannot actually eat a horse; it is an exaggeration." },
-        { q: "Which is spelled correctly?", a: ["Necessary", "Necesary", "Neccessary", "Necassary"], c: "Necessary", ex: "One C, two S's. It is necessary to remember that." },
+        { q: "Which vocabulary word is spelled correctly?", a: ["Necessary", "Necesary", "Neccessary", "Necassary"], c: "Necessary", ex: "One C, two S's. It is necessary to remember that." },
         { q: "A story's sequence of events is its...", a: ["Plot", "Theme", "Setting", "Character arc"], c: "Plot", ex: "The Plot is the organized pattern or sequence of events." },
         { q: "What is a 'haiku'?", a: ["A three-line poem with a 5-7-5 syllable structure", "A four-line rhyming poem", "A long epic story", "A funny short story"], c: "A three-line poem with a 5-7-5 syllable structure", ex: "Haikus are a traditional Japanese poetic form." },
         { q: "Which word is a synonym for 'look'?", a: ["Gaze", "Speak", "Listen", "Feel"], c: "Gaze", ex: "To gaze means to look steadily and intently." },
@@ -3310,7 +3309,6 @@ function handleDrPowersInteraction() {
         gameState.inventory.redPen = 1;
         gameState.runOnQuest = 1;
         gameState.infectedFixed = 0;
-        gameState.flags.isRunOnActive = true; // <--- ADD ONLY THIS LINE
         startDialogue([
             "You received the RED PEN!",
             "Dr. Powers: 'Remember — Items menu, Red Pen, THEN attack.'",
@@ -4690,9 +4688,10 @@ function handleLHItem() {
     
     function handlePCInteraction() {
         const choices = [
-            { text: "Access Storage", callback: () => {
+{ text: "Access Storage", callback: () => {
                 gameState.inDialogue = false;
                 messageText.textContent = '';
+                messageBox.classList.add('hidden');
                 updatePCUI();
                 openScene(pcScene);
             }}
@@ -6865,10 +6864,6 @@ function startWildBattle() {
 }
 
 function startBattle(opponents, opponentName, trainerId = null) {
-    if (gameState.flags && gameState.flags.isRunOnActive && !trainerId) {
-        currentBattle.isRunOn = true;
-        gameState.flags.isRunOnActive = false; 
-    }
     // 1. Safety Check: Is anyone awake?
     const firstAlive = gameState.playerParty.find(p => p.currentHp > 0);
     
