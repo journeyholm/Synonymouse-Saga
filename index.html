@@ -1180,9 +1180,10 @@ let gameState = {
 potions: 3, wordballs: 5, greatphrases: 0, ultrasentences: 0, masterthesis: 0,
 oxfordComma: 0, peaceTreaty: 0, redPen: 0, lostManuscript: 0,            adjectiveElixirs: 0, thesaurusTeas: 0, escapeVerbs: 0, 
             LH01LuminousHyperbole: 0, LH02LyricalHightail: 0, boatPart: 0,
-            synonymRoll: 0, luckyLure: 0, oldRod: 0, treeFlute: 0, safariBall: 0
+            synonymRoll: 0, luckyLure: 0, oldRod: 0, treeFlute: 0, safariBall: 0, powersAntidote: 0
         },
         rivalDefeated: false,
+        viralSpecimenCollected: false,
         rivalDefeatedPostGym: false,
         rivalDefeatedInSynonymCity: false,
         defeatedTrainers: [],
@@ -1210,6 +1211,8 @@ oxfordComma: 0, peaceTreaty: 0, redPen: 0, lostManuscript: 0,            adjecti
     };
     
 const attacksDB = {
+    'Viral Strike': { type: 'Fire', name: 'Viral Strike', power: 28, text: 'A fast-replicating attack that spreads through the foe\'s defenses.', effect: { type: 'stat', stat: 'defense', amount: -1, target: 'opponent' } },
+'Mutate': { type: 'Fire', name: 'Mutate', power: 0, text: 'Path-ogen rewrites its own code. Sharply raises Attack.', effect: { type: 'stat', stat: 'attack', amount: 2, target: 'self' } },
     'Drip Strike': { type: 'Water', name: 'Drip Strike', power: 20, text: 'Cold cave water drips with crushing force.', effect: { type: 'stat', stat: 'defense', amount: -1, target: 'opponent' } },
 'Undertone': { type: 'Water', name: 'Undertone', power: 38, text: 'A hidden meaning surfaces and strikes hard. Lowers the foe\'s attack.', effect: { type: 'stat', stat: 'attack', amount: -1, target: 'opponent' } },
         'Blank Page': { type: 'Normal', name: 'Blank Page', power: 5, text: 'Causes Writer\'s Block!', effect: { type: 'status', status: 'writers_block', target: 'opponent' } },
@@ -1241,6 +1244,7 @@ const attacksDB = {
     };
 
 const journalData = {
+    'Path-ogen': 'A one-of-a-kind viral creature synthesized by Dr. Powers himself. It cannot be found in the wild. Its loyalty is absolute — it only bonds with those who helped contain the outbreak.',
     // NIGHT EXCLUSIVES
     'Ink-ling': 'A small droplet of raw idea. It leaves messy stains wherever it goes.',
     'Ink-blot': 'It constantly changes shape. What you see in it reflects your own mind.',
@@ -1289,6 +1293,7 @@ const journalData = {
 };
 
     const itemsDB = {
+        'powersAntidote': { name: "Powers' Antidote", description: "A masterwork cure synthesized by Dr. Powers. A trophy of your partnership. It hums with contained viral energy.", keyItem: true },
         'redPen': { name: 'Red Pen', description: 'A powerful editing tool. Stops run-on sentences in their tracks.', price: 0, keyItem: true },
         // ... inside itemsDB ...
 'peaceTreaty': { name: 'Peace Treaty', description: 'Prevents wild arguments for 150 steps.', price: 150 },
@@ -1353,6 +1358,7 @@ const creatureDB = {
 
     // --- ORIGINAL CREATURES ---
     'Stalag-might': { type: 'Water', sprite: 'grammargoyle', evolvesAt: 20, evolvesTo: 'Sub-plot', catchDifficulty: 75 },
+'Path-ogen': { type: 'Fire', sprite: 'path-ogen', catchDifficulty: 255 },
 'Sub-plot': { type: 'Water', sprite: 'lexiconstruct', catchDifficulty: 40 },
     'Splash-pup': { type: 'Water', sprite: 'simileslime', evolvesAt: 14, evolvesTo: 'Tidal-hound', catchDifficulty: 60 },
     'Para-phrase': { type: 'Water', sprite: 'simileslime', evolvesAt: 18, evolvesTo: 'Syn-tuna', catchDifficulty: 70 },
@@ -1452,6 +1458,7 @@ const creatureDB = {
 const createcreature = (species, level) => {
         let baseHp = 15, baseAtk = 8, baseDef = 5, attacks = ['Tackle'];
         switch(species) {
+            case 'Path-ogen': baseHp = 55; baseAtk = 32; baseDef = 20; attacks = ['Tackle', 'Viral Strike', 'Mutate']; break;
             case 'Stalag-might': baseHp = 30; baseAtk = 14; baseDef = 18; attacks = ['Tackle', 'Drip Strike', 'Growl']; break;
 case 'Sub-plot': baseHp = 55; baseAtk = 30; baseDef = 22; attacks = ['Tackle', 'Drip Strike', 'Undertone']; break;
             case 'Para-phrase': baseHp = 28; baseAtk = 12; baseDef = 14; attacks = ['Tackle', 'Restate', 'Growl']; break;
@@ -1930,7 +1937,7 @@ syntaxstone: '🏛️', periodpython: '🔥', apostrophantom: '👻', lexiconlor
     'choral-reef': '🪸', 'lyrical-loon': '🦆',
     'splash-pup': '🐶', 'tidal-hound': '🐕', 'bubble-bard': '🫧', 'opera-whale': '🐋',
     'coral-scribe': '🦀', 'reef-reader': '🐠', 'fin-fiction': '🦈', 'shark-tale': '🦈',
-    'kelp-ie': '🐎', 'squid-pro-quo': '🦑',
+    'kelp-ie': '🐎', 'squid-pro-quo': '🦑', 'path-ogen': '🦠',
 
     // --- NPCS & OBJECTS ---
     player: '🙂', mom: '👩', professor: '👨‍🏫', rival: '🙎‍♂️', villager: '🧔', villager2: '👵', 
@@ -2684,6 +2691,7 @@ desertedIsland: {
         objects: {
             '2,2': { sprite: 'ladder', target: 'village', x: 4, y: 7 },
             '4,8': { sprite: 'hiker', interaction: () => handleTrainerBattle('caveExplorerDon') },
+            '7,9': { sprite: 'wordworm', interaction: handleViralSpecimenInteraction },
             '10,2': { sprite: 'goblin', interaction: () => handleTrainerBattle('goblinBoss') },
             '14,2': { sprite: 'boulder', interaction: handleBoulderInteraction },
             '14,3': { sprite: 'lexiconstruct', interaction: handleLegendaryBattle },
@@ -3218,31 +3226,86 @@ function triggerBattleFX(type, targetIsPlayer) {
 function handleDrPowersInteraction() {
     const fixed = gameState.infectedFixed || 0;
 
-    // STATE 2: Quest Complete — rotating post-quest dialogue
-    if (gameState.runOnQuest === 2) {
+    // STATE 4: Full quest complete — ongoing friendship dialogue
+    if (gameState.runOnQuest === 4) {
         if (!gameState.powersVisitCount) gameState.powersVisitCount = 0;
         gameState.powersVisitCount++;
         const postLines = [
-            ["Dr. Powers: 'Ah, you again! The virus is fully contained.'",
-             "'I've written three papers on your technique. They call it The Period Principle.'",
-             "'My potions formula is still upgraded, by the way. You're welcome.'"],
-            ["Dr. Powers: 'A run-on sentence is like a train with no brakes.'",
-             "'It just keeps going and going and going — much like this sentence — until someone puts a period in the way.'",
-             "'You were that period. Metaphorically speaking.'"],
-            ["Dr. Powers: 'I've been studying the Infected Wordworms you fixed.'",
-             "'Fascinating. They now write in complete sentences. Every single one.'",
-             "'One of them even used a semicolon correctly. I nearly fainted.'"],
-            ["Dr. Powers: 'You know, most trainers just attack. You EDITED.'",
-             "'That is the rarest instinct in the wild.'",
-             "'Hold onto that. It will take you far.'"]
+            [
+                "Dr. Powers: 'Ah, my favorite field assistant is back.'",
+                "'Path-ogen looks healthy. You've been taking good care of it.'",
+                "'Remember — that creature carries the only stable sample of the original virus.'",
+                "'It is, quite literally, one of a kind.'"
+            ],
+            [
+                "Dr. Powers: 'I've been writing a paper on our findings.'",
+                "'Working title: Linguistic Pathogens and the Grammar Cave Outbreak.'",
+                "'You'll be in the acknowledgements, of course.'"
+            ],
+            [
+                "Dr. Powers: 'Science and language have more in common than people think.'",
+                "'Both spread. Both mutate. Both need defenders.'",
+                "'You are one of those defenders now.'"
+            ],
+            [
+                "Dr. Powers: 'You know, most trainers just attack. You EDITED.'",
+                "'That is the rarest instinct in the wild.'",
+                "'Hold onto that. It will take you far.'"
+            ]
         ];
         return postLines[(gameState.powersVisitCount - 1) % postLines.length];
     }
 
-    // STATE 1: Quest In Progress — granular check-in dialogue
-    if (gameState.runOnQuest === 1) {
+    // STATE 3: Stage 2 complete — give Path-ogen and Antidote
+    if (gameState.runOnQuest === 3) {
+        gameState.runOnQuest = 4;
+        gameState.inventory.powersAntidote = 1;
+        const pathogen = createcreature('Path-ogen', 25);
+        startDialogue([
+            "Dr. Powers: 'The analysis is complete.'",
+            "'The mutated specimen you retrieved gave me everything I needed.'",
+            "'I have synthesized a complete antidote. The outbreak is over.'",
+            "Dr. Powers holds up a glowing vial.",
+            "'This is the Powers Antidote. The only one in existence.'",
+            "'Keep it. You earned it as much as I did.'",
+            "You received the POWERS' ANTIDOTE! ✨",
+            "Dr. Powers: 'One more thing...'",
+            "'In the process of synthesizing the cure, I stabilized one final specimen.'",
+            "'It is completely tame. Completely loyal.'",
+            "'And it exists nowhere else in the world.'",
+            "'I want you to have it.'",
+            "Dr. Powers places a glowing 🦠 creature into your hands.",
+            "You received PATH-OGEN! (Lv. 25)"
+        ], () => {
+            addcreatureToParty(pathogen);
+        });
+        return null;
+    }
 
-        // All 3 fixed — completion scene
+    // STATE 2: Stage 1 complete — send to cave for specimen
+    if (gameState.runOnQuest === 2) {
+        if (gameState.viralSpecimenCollected) {
+            gameState.runOnQuest = 3;
+            return [
+                "Dr. Powers: 'You found it! The mutated specimen!'",
+                "'This is extraordinary. The virus didn't just replicate — it evolved.'",
+                "'It adapted to the cave environment, incorporated cave mineral data into its RNA...'",
+                "'This is the most significant linguistic pathogen discovery in history.'",
+                "'Give me a moment to run the analysis. Come back soon.'"
+            ];
+        }
+        return [
+            "Dr. Powers: 'The Route 2 outbreak is contained, but I'm reading anomalous data.'",
+            "'The virus mutated. A stronger strain has taken root deeper underground.'",
+            "'In Grammar Cave — there is a specimen. More evolved than anything on the surface.'",
+            "'I need a sample to synthesize a true antidote.'",
+            "'Find it in the cave and confront it. Your Red Pen should still work.'",
+            "'Be careful. This one will hit harder than anything you faced on Route 2.'"
+        ];
+    }
+
+    // STATE 1: Quest in progress
+    if (gameState.runOnQuest === 1) {
         if (fixed >= 3) {
             gameState.runOnQuest = 2;
             gameState.potionUpgrade = true;
@@ -3258,12 +3321,14 @@ function handleDrPowersInteraction() {
                 "Dr. Powers wipes his glasses, visibly moved.",
                 "Dr. Powers: 'I've upgraded your Potions using the recovery data.'",
                 "Dr. Powers: 'They now heal 30 HP instead of 20. Every battle, forever.'",
-                "Your Potions are now REVISED POTIONS! (Heal 30 HP!)"
+                "Your Potions are now REVISED POTIONS! (Heal 30 HP!)",
+                "Dr. Powers: 'But... wait.'",
+                "'I'm still reading elevated viral signatures. Deeper. Underground.'",
+                "'The cave. It spread to the cave.'",
+                "'Come back after you've entered Grammar Cave. I may need your help again.'"
             ]);
             return null;
         }
-
-        // 2 fixed
         if (fixed === 2) {
             return [
                 "Dr. Powers: 'Two down! One more Infected Wordworm on Route 2.'",
@@ -3271,8 +3336,6 @@ function handleDrPowersInteraction() {
                 "'The last one is always the hardest. Stay sharp.'"
             ];
         }
-
-        // 1 fixed
         if (fixed === 1) {
             return [
                 "Dr. Powers: 'One fixed! Good — the pattern is working.'",
@@ -3280,8 +3343,6 @@ function handleDrPowersInteraction() {
                 "'Insert the period. Then attack. Two more to go!'"
             ];
         }
-
-        // 0 fixed — reminder
         return [
             "Dr. Powers: 'You haven't fixed any yet!'",
             "'Head to Route 2 — the tall grass is crawling with Infected Wordworms.'",
@@ -3289,7 +3350,7 @@ function handleDrPowersInteraction() {
         ];
     }
 
-    // STATE 0: Quest intro
+    // STATE 0: First meeting — start the quest
     startDialogue([
         "A frantic professor nearly knocks you over as you enter.",
         "Dr. Powers: 'Oh! A trainer! Perfect — I need your help immediately.'",
@@ -3305,7 +3366,7 @@ function handleDrPowersInteraction() {
         "Dr. Powers: 'Take this Red Pen. In battle, use it from your Items menu first.'",
         "'It inserts a period and breaks the loop. THEN you can defeat them.'",
         "Dr. Powers: 'Fix 3 Infected Wordworms on Route 2. Please. Hurry.'"
-], () => {
+    ], () => {
         gameState.inventory.redPen = 1;
         gameState.runOnQuest = 1;
         gameState.infectedFixed = 0;
@@ -3314,6 +3375,31 @@ function handleDrPowersInteraction() {
             "Dr. Powers: 'Remember — Items menu, Red Pen, THEN attack.'",
             "'The period ends the sentence. You end the battle. Go!'"
         ]);
+    });
+    return null;
+}
+
+function handleViralSpecimenInteraction() {
+    if (gameState.viralSpecimenCollected) {
+        return "An empty cave alcove. The specimen is gone — collected and cured.";
+    }
+    if (gameState.runOnQuest < 2) {
+        return "Something glitches in the corner. The air feels wrong here. You should tell Dr. Powers about this.";
+    }
+    startDialogue([
+        "Something pulses in the dark...",
+        "A Wordworm — but wrong. Larger. Glowing red.",
+        "The cave walls around it are covered in endless, looping text.",
+        "It never stops. It never ends. It never—",
+        "A MUTATED WORDWORM appeared!"
+    ], () => {
+        const mutant = createcreature('InfectedWordworm', 22);
+        mutant.name = '⚠️ Mutated Wordworm';
+        mutant.maxHp = 80;
+        mutant.currentHp = 80;
+        mutant.attack = 28;
+        mutant.defense = 15;
+        startBattle([mutant], 'Viral Specimen', 'viralSpecimen');
     });
     return null;
 }
@@ -3690,8 +3776,13 @@ const clockEl = document.getElementById('menu-clock');
     document.getElementById('menu-journal-btn').onclick = () => { updatejournalUI(); openScene(journalScene); };
     document.getElementById('menu-achieve-btn').onclick = () => { updateAchievementsUI(); openScene(achievementScene); };
     document.querySelectorAll('.ui-back-btn').forEach(btn => btn.onclick = () => openScene(menuScene));
-    document.getElementById('pc-close-btn').onclick = () => closeAllMenus();
-
+document.getElementById('pc-close-btn').onclick = () => {
+    closeAllMenus();
+    gameState.inDialogue = false;
+    gameState.activeScene = null;
+    messageText.textContent = '';
+    messageBox.classList.add('hidden');
+};
 
 function updateInventoryUI() {
     document.getElementById('inventory-money').textContent = `$${gameState.money}`;
@@ -4803,15 +4894,22 @@ createBtn('Pokémon', () => showSwitchcreatureMenu(false), 'bb bb-swap');
 createBtn('Run', () => {
     if(!currentBattle.trainerId) {
         // Gap 1 Fix: Warn the student if they flee an unedited Run-On
-        if (currentBattle.isRunOn && !currentBattle.isEdited) {
-            startBattleDialogue([
-                "You ran away!",
-                "But the Wordworm is still infected...",
-                "⚠️ Dr. Powers needs you to use the Red Pen BEFORE fleeing to get credit!",
-                "Find another Infected Wordworm on Route 2 and try again."
-            ], () => endBattle(true));
-            return;
-        }
+if (currentBattle.isRunOn && !currentBattle.isEdited) {
+    const isSpecimen = currentBattle.trainerId === 'viralSpecimen';
+    startBattleDialogue([
+        "You ran away!",
+        isSpecimen
+            ? "⚠️ The Mutated Wordworm is still out there. Dr. Powers needs that specimen!"
+            : "But the Wordworm is still infected...",
+        isSpecimen
+            ? "Return to the cave and try again. Use the Red Pen first!"
+            : "⚠️ Dr. Powers needs you to use the Red Pen BEFORE fleeing to get credit!",
+        isSpecimen
+            ? "Find it deep in Grammar Cave."
+            : "Find another Infected Wordworm on Route 2 and try again."
+    ], () => endBattle(true));
+    return;
+}
         const playerSpeed = currentBattle.playercreature.attack;
         const oppSpeed = currentBattle.opponentParty[currentBattle.currentOpponentIndex].attack;
         const escapeChance = (playerSpeed * 32) / (oppSpeed + 1) + 30;
@@ -7331,6 +7429,15 @@ async function endBattle(ranAway = false, caught = false) {
         if (oldBattle.isRunOn && oldBattle.isEdited) {
             gameState.infectedFixed = (gameState.infectedFixed || 0) + 1;
         }
+        if (oldBattle.trainerId === 'viralSpecimen') {
+    gameState.viralSpecimenCollected = true;
+    await new Promise(res => startBattleDialogue([
+        "The Mutated Wordworm stops glitching.",
+        "Its text freezes mid-sentence.",
+        "You carefully collect the specimen in the Red Pen's casing.",
+        "Dr. Powers will want to see this."
+    ], res));
+}
 if (oldBattle.trainerId === 'postGymRival' && !gameState.rivalDefeatedPostGym) {
     gameState.rivalDefeatedPostGym = true;
 }
