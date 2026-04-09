@@ -88,7 +88,7 @@ animation: ts-float-mouse 4s ease-in-out infinite;
   <!-- Main content -->
   <div style="position:relative;z-index:1;width:100%;max-width:700px;padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;margin:0 auto;height:100%;justify-content:center;">
 
-    <div class="ts-badge">&#9670; Version 1.0 &#9670; Classroom Edition &#9670;</div>
+    <div class="ts-badge">&#9670; Version 2.0 &#9670; Classroom Edition &#9670;</div>
 
     <div style="text-align:center;margin-bottom:.5rem;">
       <span class="ts-ela">ELA</span>
@@ -1487,8 +1487,7 @@ const attacksDB = {
 'Worn Phrase': { type: 'Normal', name: 'Worn Phrase', power: 8, text: 'An attack so predictable the opponent can see it coming. Inflicts Cliché.', effect: { type: 'status', status: 'cliche', target: 'opponent' } },
         'Tackle': { type: 'Normal', name: 'Tackle', power: 8, text: 'A basic physical strike.' },
         'Word Strike': { type: 'Normal', name: 'Word Strike', power: 10, text: 'Channels knowledge into a jab.' },
-        'Synonym Slam': { type: 'Normal', name: 'Synonym Slam', power: 15, text: 'A blow backed by similar words.' },
-        'Roar of Knowledge': { type: 'Fire', name: 'Roar of Knowledge', power: 22, text: 'A stunning cry of ancient truths.'}, // Fire move!
+'Synonym Slam': { type: 'Normal', name: 'Synonym Slam', power: 20, text: 'A vocabulary-powered strike. Has a chance to raise the user\'s Attack.', effect: { type: 'stat', stat: 'attack', amount: 1, target: 'self', chance: 0.3 } },        'Roar of Knowledge': { type: 'Fire', name: 'Roar of Knowledge', power: 22, text: 'A stunning cry of ancient truths.'}, // Fire move!
         'Gooey Touch': { type: 'Water', name: 'Gooey Touch', power: 7, text: 'A sticky, weak jab.'}, // Water move!
         'Chameleon Color': { type: 'Grass', name: 'Chameleon Color', power: 12, text: 'Changes color to land a surprising hit.'},
         'Scale Shot': { type: 'Normal', name: 'Scale Shot', power: 18, text: 'Fires sharp scales at the foe.'},
@@ -2111,10 +2110,11 @@ const creatureDB = {
     { level: 30, move: 'Royal Decree' }
 ] },
 'Synonymouse': { type: 'Normal', sprite: 'synonymouse', evolvesAt: 18, evolvesTo: 'ThesaurusRex', catchDifficulty: 45, learnset: [
-    { level: 5,  move: 'Synonym Slam' },
-    { level: 9,  move: 'Sharpen' },
+    { level: 2,  move: 'Synonym Slam' },
+    { level: 7,  move: 'Sharpen' },
+    { level: 10, move: 'Word Crush' },
     { level: 14, move: 'Cosmic Prose' },
-    { level: 17, move: 'Word Crush' }
+    { level: 17, move: 'Roar of Knowledge' }
 ] },
 'Grammargoyle': { type: 'Normal', sprite: 'grammargoyle', evolvesAt: 28, evolvesTo: 'SyntaxStone', catchDifficulty: 45,
     learnset: [
@@ -2997,9 +2997,7 @@ encounters: []    },
             ];
             const v = notes[(gameState.profNoteVisits - 1) % notes.length];
             return Array.isArray(v) ? v : [v];
-        }},
-        '3,3': { sprite: 'wordorb', interaction: () => handleCaveItem('Word Ball', 'wordballs', 1, 'profHouse', 3, 3) },
-        
+        }},        
 '3,5': { target: 'village', x: 11, y: 5 }, 
 '4,5': { target: 'village', x: 12, y: 5 }
     }
@@ -5195,6 +5193,62 @@ else if (key === 'lostManuscript') {
                     useRedHerring();
                 };
             }
+else if (key === 'potions') {
+                btn.className = 'p-2 bg-green-500 text-white rounded-lg';
+                btn.textContent = 'Use';
+                btn.onclick = () => {
+                    if (gameState.inBattle) { closeAllMenus(); usePotionInBattle(); return; }
+                    const healTargets = gameState.playerParty.filter(p => p.currentHp < p.maxHp);
+                    if (healTargets.length === 0) { startDialogue("Your party is already at full health!"); return; }
+                    closeAllMenus();
+                    showChoices("Heal which creature? (Potion +35 HP)", gameState.playerParty.map(p => ({
+                        text: `${p.name} (${Math.ceil(p.currentHp)}/${p.maxHp} HP)`,
+                        callback: () => {
+                            if (p.currentHp >= p.maxHp) { startDialogue(`${p.name} is already at full health!`); return; }
+                            gameState.inventory.potions--;
+                            const healed = Math.min(p.maxHp - p.currentHp, 35);
+                            p.currentHp = Math.min(p.maxHp, p.currentHp + 35);
+                            startDialogue([`Used a Potion on ${p.name}!`, `${p.name} recovered ${healed} HP.`]);
+                        }
+                    })));
+                };
+            }
+            else if (key === 'greatphrases') {
+                btn.className = 'p-2 bg-green-500 text-white rounded-lg';
+                btn.textContent = 'Use';
+                btn.onclick = () => {
+                    if (gameState.inBattle) { closeAllMenus(); attemptCatch('greatphrases'); return; }
+                    const healTargets = gameState.playerParty.filter(p => p.currentHp < p.maxHp);
+                    if (healTargets.length === 0) { startDialogue("Your party is already at full health!"); return; }
+                    closeAllMenus();
+                    showChoices("Heal which creature? (Great Phrase +60 HP)", gameState.playerParty.map(p => ({
+                        text: `${p.name} (${Math.ceil(p.currentHp)}/${p.maxHp} HP)`,
+                        callback: () => {
+                            gameState.inventory.greatphrases--;
+                            const healed = Math.min(p.maxHp - p.currentHp, 60);
+                            p.currentHp = Math.min(p.maxHp, p.currentHp + 60);
+                            startDialogue([`Used a Great Phrase on ${p.name}!`, `${p.name} recovered ${healed} HP.`]);
+                        }
+                    })));
+                };
+            }
+            else if (key === 'ultrasentences') {
+                btn.className = 'p-2 bg-purple-600 text-white rounded-lg';
+                btn.textContent = 'Use';
+                btn.onclick = () => {
+                    if (gameState.inBattle) { closeAllMenus(); attemptCatch('ultrasentences'); return; }
+                    closeAllMenus();
+                    showChoices("Full heal which creature? (Ultra Sentence)", gameState.playerParty.map(p => ({
+                        text: `${p.name} (${Math.ceil(p.currentHp)}/${p.maxHp} HP)`,
+                        callback: () => {
+                            gameState.inventory.ultrasentences--;
+                            p.currentHp = p.maxHp;
+                            p.status = null;
+                            startDialogue([`Used an Ultra Sentence on ${p.name}!`, `${p.name} was fully restored!`]);
+                        }
+                    })));
+                };
+            }
             else {
                 btn.className = 'p-2 bg-blue-500 text-white rounded-lg';
                 btn.textContent = 'Info';
@@ -6481,8 +6535,8 @@ function handleShopInteraction() {
         { text: "Word Ball ($50)", callback: () => confirmPurchase("Word Ball", 50, itemsDB.wordballs.description, () => gameState.inventory.wordballs++) },
         { text: "Peace Treaty ($150)", callback: () => confirmPurchase("Peace Treaty", 150, itemsDB.peaceTreaty.description, () => gameState.inventory.peaceTreaty++) },
         { text: "Oxford Comma ($100)", callback: () => confirmPurchase("Oxford Comma", 100, itemsDB.oxfordComma.description, () => gameState.inventory.oxfordComma++) },
-{ text: "Great Phrase Ball ($200)", callback: () => confirmPurchase("Great Phrase Ball", 200, "A stronger Word Ball. Better chance of catching creatures!", () => gameState.inventory.greatphrases++) },
-        { text: "Ultra Sentence Ball ($500)", callback: () => confirmPurchase("Ultra Sentence Ball", 500, "The strongest catch ball in the shop. Very high capture rate!", () => gameState.inventory.ultrasentences++) },
+{ text: "Great Phrase ($200)", callback: () => confirmPurchase("Great Phrase", 200, "Stronger catch ball AND heals 60 HP from your inventory. A versatile trainer's tool.", () => gameState.inventory.greatphrases++) },
+        { text: "Ultra Sentence ($500)", callback: () => confirmPurchase("Ultra Sentence", 500, "The strongest catch ball in the shop. Also fully heals any creature from your inventory!", () => gameState.inventory.ultrasentences++) },
         { text: "Leave", callback: () => startDialogue("Come again!") }
     ]);
     return null;
@@ -7693,8 +7747,10 @@ async function attemptCatch(ballKey) {
     const safariMod = currentBattle.catchRateMod || 1;
 
     // The Math: (HP Factor) * (Rarity) * (Ball Quality) * (Safari Bait) * (FOCUS BONUS)
-    let a = (((3 * maxHp - 2 * currentHp) * catchRate * ball.bonus * safariMod * focusMultiplier) / (3 * maxHp));
-    
+const hpFactor = Math.pow(1 - (currentHp / maxHp), 2);
+    let a = catchRate * ball.bonus * safariMod * focusMultiplier * (0.3 + hpFactor * 2.5);
+    a = Math.max(a, 20);
+    a = Math.min(a, 254);
     if (ball.bonus === 255) a = 255; // Master Thesis always catches
 
     const shakeCheck = () => a >= 255 || Math.floor(Math.random() * 256) < a;
@@ -11590,11 +11646,17 @@ function showItemMenu() {
         choices.push({ text: `Word Ball (x${gameState.inventory.wordballs})`, callback: () => attemptCatch('wordballs') });
     }
     
-    if (gameState.inventory.greatphrases > 0) {
-    choices.push({ text: `Great Phrase (x${gameState.inventory.greatphrases})`, callback: () => attemptCatch('greatphrases') });
+if (gameState.inventory.greatphrases > 0) {
+    choices.push({ text: `Great Phrase (x${gameState.inventory.greatphrases}) — Catch or Heal 60HP`, callback: () => showChoices('Use Great Phrase as:', [
+        { text: '🎯 Throw (catch)', callback: () => attemptCatch('greatphrases') },
+        { text: '💊 Heal 60 HP', callback: () => { gameState.inventory.greatphrases--; const p = currentBattle.playercreature; p.currentHp = Math.min(p.maxHp, p.currentHp + 60); updateBattleUI(); startBattleDialogue([`Great Phrase used! ${p.name} recovered 60 HP.`], () => { currentBattle.turn = 'opponent'; nextBattleTurn(); }); } }
+    ]) });
 }
 if (gameState.inventory.ultrasentences > 0) {
-    choices.push({ text: `Ultra Sentence (x${gameState.inventory.ultrasentences})`, callback: () => attemptCatch('ultrasentences') });
+    choices.push({ text: `Ultra Sentence (x${gameState.inventory.ultrasentences}) — Catch or Full Heal`, callback: () => showChoices('Use Ultra Sentence as:', [
+        { text: '🎯 Throw (catch)', callback: () => attemptCatch('ultrasentences') },
+        { text: '💊 Full Heal', callback: () => { gameState.inventory.ultrasentences--; const p = currentBattle.playercreature; p.currentHp = p.maxHp; p.status = null; updateBattleUI(); startBattleDialogue([`Ultra Sentence used! ${p.name} was fully restored!`], () => { currentBattle.turn = 'opponent'; nextBattleTurn(); }); } }
+    ]) });
 }
 if (gameState.inventory.masterthesis > 0) {
     choices.push({ text: `Master Thesis (x${gameState.inventory.masterthesis})`, callback: () => attemptCatch('masterthesis') });
@@ -11881,7 +11943,7 @@ function usePotionInBattle() {
     const p = currentBattle.playercreature;
     if (gameState.inventory.potions > 0) {
         gameState.inventory.potions--;
-        let healAmount = gameState.potionUpgrade ? 30 : 20; 
+        let healAmount = gameState.potionUpgrade ? 50 : 35;
         p.currentHp = Math.min(p.maxHp, p.currentHp + healAmount);
         updateBattleUI();
         startBattleDialogue([`You used a Potion!`, `${p.name} recovered ${healAmount} HP.`], () => {
