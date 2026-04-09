@@ -1116,9 +1116,11 @@ button { cursor: pointer; }
     </div>
     <div id="quest-scene" class="hidden ui-scene absolute inset-0 p-4 flex flex-col items-center justify-center">
     <div class="w-full max-w-md rounded border-4 p-4" style="background:#1a0f00;border-color:rgba(251,191,36,.4);overflow-y:auto;max-height:90vh;">
-        <h2 style="font-family:'Press Start 2P',monospace;font-size:0.8rem;color:#fbbf24;text-align:center;margin-bottom:1rem;">📋 QUEST LOG</h2>
-        <div id="quest-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button class="ui-back-btn" style="margin-top:1.5rem;width:100%;padding:10px;background:#4b5563;color:white;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;font-size:0.5rem;cursor:pointer;">← Back</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;position:sticky;top:0;background:#1a0f00;padding-bottom:8px;z-index:10;border-bottom:1px solid rgba(251,191,36,0.2);">
+            <h2 style="font-family:'Press Start 2P',monospace;font-size:0.75rem;color:#fbbf24;margin:0;">📋 QUEST LOG</h2>
+            <button class="ui-back-btn" style="padding:6px 14px;background:#4b5563;color:white;border:none;border-radius:6px;font-family:'Press Start 2P',monospace;font-size:0.45rem;cursor:pointer;">← Back</button>
+        </div>
+        <div id="quest-list" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
     </div>
 
@@ -3186,7 +3188,7 @@ lexingtonCity: {
 '1,10': { sprite: 'poet', interaction: handleCityPoetInteraction },            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
             '7,13': { target: 'route1', x: 7, y: 0 }, '8,13': { target: 'route1', x: 8, y: 0 },
             '9,12': { sprite: 'sign', interaction: 'Lexington City' },
-            '11,6': { sprite: 'hiker', interaction: () => {
+            '11,7': { sprite: 'hiker', interaction: () => {
                 if (!gameState.lexCityHikerVisits) gameState.lexCityHikerVisits = 0;
                 gameState.lexCityHikerVisits++;
                 if (!gameState.gymBadges.rhyme) return [
@@ -3408,8 +3410,8 @@ cityHouse1: {
             ];
             return l[(gameState.fishHouseShelf2 - 1) % l.length];
         }},
-        // FISHING ROD ON WALL
-        '3,1': { sprite: 'fisherman', interaction: "A magnificent fishing rod mounted on the wall. Engraved: 'For the one who catches the rarest words.' It is not for sale." },
+// MOUNTED FISH ON WALL
+        '3,1': { sprite: 'shell', interaction: "A magnificent Syn-tuna mounted on the wall. The plaque reads: 'Caught in the Synonym City Canal. Vocabulary: exceptional.' Crane's proudest catch." },
         // LOOSE FLOORBOARD (Poe tribute, repurposed)
         '4,3': { sprite: 'wood_floor', interaction: "A loose floorboard. You lift it. Underneath: a hand-drawn map of every fishing location in the region, and a note — 'The rarest fish appear where the vocabulary is deepest.'" },
         // THE MERCHANT
@@ -6455,8 +6457,21 @@ function handleShopInteraction() {
 }
 
     const poeQuotes = [ "Quoth the Raven, 'Nevermore.'", "All that we see or seem is but a dream within a dream.", "The boundaries which divide Life from Death are at best shadowy and vague.", "I was never really insane except upon occasions when my heart was touched.", "Words have no power to impress the mind without the exquisite horror of their reality.", "To be buried alive is, beyond question, the most terrific of these extremes which has ever fallen to the lot of mere mortality.", "I have great faith in fools - self-confidence my friends call it.", "The true genius shudders at incompleteness.", "I became insane, with long intervals of horrible sanity.", "Beauty of whatever kind, in its supreme development, invariably excites the sensitive soul to tears.", "Believe nothing you hear, and only one half that you see.", "The death of a beautiful woman is, unquestionably, the most poetical topic in the world.", "Men have called me mad; but the question is not yet settled.", "That which you mistake for madness is but over-acuteness of the senses.", "From childhood's hour I have not been as others were.", "I have no faith in human perfectibility. I think that human exertion will have no appreciable effect upon humanity.", "Sleep, those little slices of death — how I loathe them.", "The scariest monsters are the ones that lurk within our souls.", "There is no exquisite beauty without some strangeness in the proportion.", "To vilify a great man is the readiest way in which a little man can himself attain greatness." ];
-    function handlePoeInteraction() { return poeQuotes[Math.floor(Math.random() * poeQuotes.length)]; }
-    // --- NEW AUTHOR INTERACTIONS ---
+function handlePoeInteraction() {
+    if (!gameState.poeVisits) gameState.poeVisits = 0;
+    gameState.poeVisits++;
+    const visits = [
+        ["Poe: 'I am Edgar Allan Poe. Poet. Critic. Inventor of the detective story. Sufferer of many things.'", "'I came to this city because I heard it had a library. I have not left the street.'", "'The library intimidates me. That is not something I say lightly.'"],
+        ["Poe: 'I wrote a poem about a raven. It says one word. Nevermore.'", "'People asked what it meant. I said: whatever you need it to mean.'", "'The raven is grief. The raven is guilt. The raven is a raven. All three are correct.'"],
+        ["Poe: 'Do you know what Gothic literature is?'", "'It is not simply darkness. Any fool can write darkness.'", "'Gothic is about DREAD — the feeling something is wrong before you can name it.'", "'When the setting feels alive — that is Gothic.'"],
+        ["Poe: 'Have you read The Tell-Tale Heart?'", "'The narrator insists, repeatedly, that he is not mad.'", "'Then he confesses to murder in extraordinary detail.'", "'A narrator who protests too much is never reliable. Watch what people feel compelled to deny.'"],
+        ["Poe: 'I invented the detective story. Few people know this.'", "'C. Auguste Dupin. 1841. The Murders in the Rue Morgue.'", "'Before Sherlock Holmes. Before Poirot. There was Dupin.'", "'Holmes is my grandson, in a sense. Doyle admitted it.'"],
+        ["Poe: 'Know what feeling you want to create BEFORE you write.'", "'Then every word, every image is a tool toward that single effect.'", "'Unity of effect. That is everything.'"],
+    ];
+    if (gameState.finalBossDefeated && gameState.poeVisits >= 4) return ["Poe: 'Champion. I heard.'", "'You did not hide from the world. That is the only story worth telling.'"];
+    if (gameState.gymBadges.rhyme && gameState.poeVisits >= 3) return ["Poe: 'A Rhyme Badge. Rhyme is not decoration — it is MEMORY.'", "'Alliteration, assonance, rhyme — the architecture of the memorable.'"];
+    return visits[Math.min(gameState.poeVisits - 1, visits.length - 1)];
+}    // --- NEW AUTHOR INTERACTIONS ---
     
     const dickinsonQuotes = [
         "Hope is the thing with feathers that perches in the soul.",
@@ -9137,6 +9152,7 @@ function handleCityFishMerchant() {
             "'Moby-Dick. The Old Man and the Sea. The Great Gatsby. Huckleberry Finn.'",
             "'Water is where meaning lives. I decided to get closer to it.'",
             "'Bring me what you catch. I pay the best prices in the region.'",
+            "'To get started: find the Lucky Lure on the Deserted Island, return it to the fisherman at Home Bay, and he will give you a rod.'",
             "'Come back when your bag is full.'"
         ]);
     }
