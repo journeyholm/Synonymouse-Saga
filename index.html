@@ -233,6 +233,11 @@ button, .touch-btn, .pc-item, #message-box, #battle-grid button {
 .lunge-right { animation: attack-lunge-right 0.3s ease-in-out; }
 .lunge-left { animation: attack-lunge-left 0.3s ease-in-out; }
 .shake-catch { animation: catch-shake 0.5s ease-in-out infinite; }
+        @keyframes shinyShimmer {
+            0%,100% { filter: drop-shadow(0 0 18px gold) drop-shadow(0 0 6px #fff700) brightness(1.15); }
+            50%     { filter: drop-shadow(0 0 30px gold) drop-shadow(0 0 14px #ffffff) brightness(1.35); }
+        }
+        .shiny-sprite { animation: shinyShimmer 2s ease-in-out infinite; }
     /* FALLBACK STYLES (In case School Wifi blocks Tailwind) */
 body { background-color: #1a202c; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
 #game-wrapper { width: 100%; max-width: 600px; position: relative; }
@@ -1509,6 +1514,7 @@ const attacksDB = {
 'Royal Decree': { type: 'Fire', name: 'Royal Decree', power: 55, text: 'LexiconLord commands language itself to strike.' },
 'Restate': { type: 'Water', name: 'Restate', power: 18, text: 'Rephrases the attack for surprising impact.' },
 'Synonym Surge': { type: 'Water', name: 'Synonym Surge', power: 35, text: 'A tidal wave of equivalent words crashes into the foe.', effect: { type: 'stat', stat: 'attack', amount: -1, target: 'opponent' } },
+        'Lexical Bolt': { type: 'Fire', name: 'Lexical Bolt', power: 90, text: "The OmniScribe channels the full power of language into a searing bolt of meaning. Strikes before the opponent can act.", animation: 'lightning' },
 'Nature\'s Draft': { type: 'Grass', name: 'Nature\'s Draft', power: 30, text: 'A surge of organic imagery crashes into the foe.', effect: { type: 'stat', stat: 'defense', amount: -1, target: 'opponent' } },
 'Overgrowth': { type: 'Grass', name: 'Overgrowth', power: 48, text: 'Unstoppable natural language overwhelms all defenses.' },
 'Meter Break': { type: 'Poetry', name: 'Meter Break', power: 0, text: 'Disrupts the foe\'s rhythm, sharply lowering their Attack.', effect: { type: 'stat', stat: 'attack', amount: -2, target: 'opponent' } },'Inkblot Surge': { type: 'Ghost', name: 'Inkblot Surge', power: 25, text: 'A spreading stain of dark ink overwhelms the foe\'s defenses.', effect: { type: 'stat', stat: 'defense', amount: -1, target: 'opponent' } },
@@ -1551,6 +1557,7 @@ const journalData = {
     'Grammargoyle': 'A stoic opponent that strictly adheres to the rules of language.',
     'SyntaxStone': 'An ancient Grammargoyle that has absorbed so many rules it became living stone.',
     'LexiconLord': 'The final form of Synonymouse. It has mastered every word ever written and commands the power of language itself.',
+    'OmniScribe': 'The true final form of Synonymouse, achieved only by the rarest. It has read every book ever written, in every language, across all of time. When it speaks, sentences become reality.',
 'PeriodPython': 'The fully evolved VerbViper. Its strikes end sentences — permanently.',
 'Apostrophantom': 'A ghostly CommaLeon that haunts possessive nouns and contractions.',
     'SimileSlime': 'A gooey creature that is *like* a puddle but *as* solid as a rock.',
@@ -1603,6 +1610,7 @@ const elaConnectionData = {
     'Synonymouse':    'Represents synonyms — words with the same meaning. A strong vocabulary starts here.',
     'ThesaurusRex':  'Evolved form — now commands entire categories of synonymous language.',
     'LexiconLord':   'The master of the lexicon: the complete vocabulary of a language. Every word, every meaning.',
+    'OmniScribe':    'Omniscient narration: knowing all, seeing all, telling all. The highest form of literary voice — the author who commands the entire story.',
     'Wordworm':      'Represents the humble building block of language: the word itself.',
     'Grammargoyle':  'Represents grammar rules — strict, unyielding, and ultimately protective of meaning.',
     'SyntaxStone':   'Syntax: the arrangement of words and phrases to create well-formed sentences.',
@@ -1701,6 +1709,7 @@ const locationData = {
     'Kelp-ie':                 '🎣 Home Bay (fishing) · 🏝️ Deserted Island',
     'Legend-ary':              '🌿 Genre Jungle Safari – Area 3 · 🔄 Evolves from Mytho-log at Lv.25',
     'LexiconLord':             '🔄 Evolves from ThesaurusRex at Lv.40',
+    'OmniScribe':              '🔄 Evolves from LexiconLord at Lv.55 · Extremely rare — the rarest evolution in the region',
     'Lexiconstruct':           '⛏️ Grammar Cave (legendary encounter) · 🏛️ Pyramid of the Void',
     'Lun-artic':               '⛏️ Grammar Cave (fishing) · 🌙 Home Bay (night) · 🌙 Deserted Island (night)',
     'Lyrical-loon':            '🌿 Route 2 · 🌿 Adjective Woods',
@@ -2077,7 +2086,7 @@ const creatureDB = {
     { level: 32, move: 'Word Crush' },
     { level: 35, move: 'Verb Fang' }
 ] },
-'LexiconLord': { type: 'Fire', sprite: 'lexiconlord', catchDifficulty: 5, learnset: [
+'LexiconLord': { type: 'Fire', sprite: 'lexiconlord', evolvesAt: 55, evolvesTo: 'OmniScribe', catchDifficulty: 5, learnset: [
     { level: 38, move: 'Word Crush' },
     { level: 42, move: 'Iron Defense' },
     { level: 46, move: 'Roar of Knowledge' },
@@ -2085,6 +2094,14 @@ const creatureDB = {
     { level: 55, move: 'Active Voice' },
     { level: 62, move: 'Synonym Surge' },
     { level: 70, move: 'Grand Narrative' }
+] },
+'OmniScribe': { type: 'Fire', sprite: 'omniscribe', catchDifficulty: 3, learnset: [
+    { level: 56, move: 'Grand Narrative' },
+    { level: 60, move: 'Roar of Knowledge' },
+    { level: 65, move: 'Lexical Bolt' },
+    { level: 70, move: 'Royal Decree' },
+    { level: 75, move: 'Active Voice' },
+    { level: 80, move: 'Word Crush' },
 ] },
 'Hyper-bole': { type: 'Fire', sprite: 'hyperbole', catchDifficulty: 120, learnset: [
     { level: 8,  move: 'Roar of Knowledge' },
@@ -2112,7 +2129,7 @@ const creatureDB = {
 'Synonymouse': { type: 'Normal', sprite: 'synonymouse', evolvesAt: 18, evolvesTo: 'ThesaurusRex', catchDifficulty: 45, learnset: [
     { level: 2,  move: 'Synonym Slam' },
     { level: 7,  move: 'Sharpen' },
-    { level: 10, move: 'Word Crush' },
+    { level: 11, move: 'Word Crush' },
     { level: 14, move: 'Cosmic Prose' },
     { level: 17, move: 'Roar of Knowledge' }
 ] },
@@ -2188,6 +2205,7 @@ case 'Choral-reef': baseHp = 40; baseAtk = 10; baseDef = 18; attacks = ['Gooey T
 case 'Synonymouse': baseHp = 22; baseAtk = 10; baseDef = 8; attacks = ['Tackle', 'Word Strike', 'Synonym Slam']; break;
 case 'ThesaurusRex': baseHp = 40; baseAtk = 20; baseDef = 15; attacks = ['Tackle', 'Word Strike', 'Synonym Slam']; break;
 case 'LexiconLord': baseHp = 70; baseAtk = 38; baseDef = 28; attacks = ['Tackle', 'Word Strike', 'Synonym Slam', 'Roar of Knowledge']; break;
+case 'OmniScribe': baseHp = 95; baseAtk = 55; baseDef = 40; attacks = ['Grand Narrative', 'Roar of Knowledge', 'Lexical Bolt', 'Word Crush']; break;
 case 'Grammargoyle': baseHp = 30; baseAtk = 14; baseDef = 10; attacks = ['Tackle', 'Leer', 'Sharpen']; break;
 case 'SyntaxStone': baseHp = 55; baseAtk = 28; baseDef = 22; attacks = ['Tackle', 'Leer', 'Sharpen']; break;
 case 'CommaLeon': baseHp = 22; baseAtk = 9; baseDef = 7; attacks = ['Tackle', 'Chameleon Color']; break;
@@ -2697,6 +2715,10 @@ const sprites = {
     player_bowie: '👨‍🎤', player_green: '🥷', player_boy: '👦', 
     player_girl: '👧', player_dog: '🐶', player_cat: '🐱', 
     
+    // --- WORLD OBJECTS ---
+    campfire: '🔥',
+    omniscribe: '📖',
+
     // --- SAFARI ---
     safariLion: '🦁',
     // --- CREATURES ---
@@ -2905,7 +2927,7 @@ const maps = {
             // TUTORIAL NPC (Updated from generic villager)
             '2,9': { sprite: 'villager', interaction: handleTutorialNPC },
             '4,9': { sprite: 'sign', interaction: handleVillageNoticeBoard },
-            '5,9': { sprite: 'flower', interaction: handleVillageCampfire },
+            '5,9': { sprite: 'campfire', interaction: handleVillageCampfire },
             '7,0': { sprite: 'gate', interaction: handleGateInteraction },
             '8,0': { sprite: 'gate', interaction: handleGateInteraction },
             '10,10': { sprite: 'sign', interaction: 'Village of Beginnings' },
@@ -3126,6 +3148,20 @@ rivalsRoom: {
             '5,0': { target: 'lexingtonCity', x: 7, y: 13 }, '6,0': { target: 'lexingtonCity', x: 8, y: 13 }, 
             '7,0': { target: 'lexingtonCity', x: 7, y: 13 }, '8,0': { target: 'lexingtonCity', x: 8, y: 13 }, 
             '7,3': { sprite: 'rival', interaction: handleRoute1Rival },
+            '7,1': { sprite: 'campfire', interaction: handleRoute1Campfire },
+            '6,1': { sprite: 'hiker', interaction: () => {
+                if (!gameState.route1CamperVisits) gameState.route1CamperVisits = 0;
+                gameState.route1CamperVisits++;
+                const lines = [
+                    ["Camper: 'Oh! A fellow traveler.'", "'I always stop here before heading into the city.'", "'Jack London wrote about the power of fire in a story called To Build a Fire.'", "'A man alone in the Yukon, trying desperately to light one.'", "'He fails. London wasn't being cruel — he was being honest.'", "'Fire is civilization. Fire is survival. Fire is this.'"],
+                    ["Camper: 'Ray Bradbury wrote a whole novel about burning books. Fahrenheit 451.'", "'The title is the temperature at which paper ignites.'", "'In that world, firefighters don't put out fires — they START them.'", "'Bradbury said the book was really about television killing reading.'", "'He wrote it in a library basement, on a typewriter that cost him ten cents per half hour.'"],
+                    ["Camper: 'In The Hobbit, Tolkien used fire as the breath of Smaug — destruction and greed.'", "'But the dwarves' hearth fire is home. Memory. Identity.'", "'Same element. Two meanings. That's what literature does with symbols.'"],
+                    ["Camper: 'Prometheus stole fire from the gods to give to humanity.'", "'The gods punished him forever for it.'", "'Every story about knowledge and consequence goes back to that myth.'", "'Frankenstein is a Prometheus story. So is every story about a scientist who goes too far.'"],
+                    ["Camper: 'There's a campfire in the cave up ahead too.'", "'And one in the village behind you.'", "'Whenever you see one — rest. This world is long.'"],
+                ];
+                const v = lines[(gameState.route1CamperVisits - 1) % lines.length];
+                return Array.isArray(v) ? v : [v];
+            }},
             '8,4': { sprite: 'sign', interaction: 'Route 1' }
             
         }, 
@@ -3589,7 +3625,25 @@ adjectiveWoods: {
 objects: {
     // 13. Into the Wild / Walden (Thoreau)
             '1,2': { sprite: 'sign', interaction: "I went to the woods because I wished to live deliberately." },
-'8,2': { sprite: 'shakespeare', interaction: () => handleScholar('poet') },            '14,11': { sprite: 'safariLion', interaction: handleSafariEntrance },
+'8,2': { sprite: 'shakespeare', interaction: () => handleScholar('poet') },
+
+            // Campfire — top-right rest spot
+            '9,3': { sprite: 'campfire', interaction: handleCaveCampfire },
+            '10,2': { sprite: 'hiker', interaction: () => {
+                if (!gameState.woodsCamperVisits) gameState.woodsCamperVisits = 0;
+                gameState.woodsCamperVisits++;
+                const lines = [
+                    ["Wanderer: 'Good — you found it.'", "'Most trainers rush through the Woods without stopping.'", "'Thoreau said: Not till we are lost — not till we have lost the world — do we begin to find ourselves.'", "'He meant it. He spent two years alone in the woods to prove it.'", "'You cannot rush a forest. You have to let it change you.'"],
+                    ["Wanderer: 'Into the Woods — the Sondheim musical.'", "'Every fairy tale character steps into the woods to get what they want.'", "'And they get it. And then things fall apart.'", "'The woods aren't the obstacle. The woods are where you find out what you really wanted.'", "'That's Adjective Woods in a sentence.'"],
+                    ["Wanderer: 'This campfire has been burning since before I arrived.'", "'Someone lit it for the next traveler.'", "'I'll keep it going for the one after you.'", "'That's what campfires are — a chain of kindness across time.'"],
+                    ["Wanderer: 'A Midsummer Night's Dream. The forest outside Athens.'", "'Shakespeare used it as a place where rules break down.'", "'Identities switch. People fall in love with the wrong person.'", "'The woods made them honest. The city had made them polite.'"],
+                    ["Wanderer: 'Robert Frost. Stopping by Woods on a Snowy Evening.'", "'The speaker stops. Watches snow fall into a dark forest.'", "'And then: But I have promises to keep, and miles to go before I sleep.'", "'He wanted to stay. He chose to keep going.'", "'Every rest stop is also a decision to rise again.'"],
+                ];
+                const v = lines[(gameState.woodsCamperVisits - 1) % lines.length];
+                return Array.isArray(v) ? v : [v];
+            }},
+
+            '14,11': { sprite: 'safariLion', interaction: handleSafariEntrance },
 
             // The Luminous Hyperbole Item
             '12,8': { sprite: 'lightbulb', interaction: handleLHItem },
@@ -3875,7 +3929,7 @@ encounters: ['Haiku-na', 'Hyper-bole', 'SimileSlime', 'Coral-scribe', 'Squid-pro
             '14,2': { sprite: 'boulder', interaction: handleBoulderInteraction },
             '14,3': { sprite: 'lexiconstruct', interaction: handleLegendaryBattle },
             '13,10': { sprite: 'fisherman', interaction: handleCaveFisherInteraction },
-            '3,5':  { sprite: 'flower', interaction: handleCaveCampfire },
+            '3,5':  { sprite: 'campfire', interaction: handleCaveCampfire },
             '1,5':  { sprite: 'candy', interaction: () => handleCaveItem('Great Phrase', 'greatphrases', 1, 'caveLevel1', 1, 5) },
             '11,9': { sprite: 'candy', interaction: () => handleCaveItem('Synonym Roll', 'synonymRoll', 1, 'caveLevel1', 11, 9) },
             '5,3':  { sprite: 'wordorb', interaction: () => handleCaveItem('Ultra Sentence', 'ultrasentences', 1, 'caveLevel1', 5, 3) },
@@ -6175,6 +6229,62 @@ function handleVillageCampfire() {
 }
     
     function handleProfessorInteraction() {
+        // Check if player has evolved forms of Synonymouse
+        const allCreatures = [...(gameState.playerParty || []), ...(gameState.creatureBox || [])];
+        const hasOmniScribe   = allCreatures.some(p => p.species === 'OmniScribe');
+        const hasLexiconLord  = allCreatures.some(p => p.species === 'LexiconLord');
+        const hasThesaurusRex = allCreatures.some(p => p.species === 'ThesaurusRex');
+
+        if (hasOmniScribe) {
+            if (!gameState.profSawOmniScribe) {
+                gameState.profSawOmniScribe = true;
+                return [
+                    "Prof. Lexicon freezes when he sees your party.",
+                    "Prof. Lexicon: 'Is that — an OmniScribe?'",
+                    "'I have been studying this region for thirty years.'",
+                    "'I have never seen one. Not once.'",
+                    "'The OmniScribe is not just evolved — it is transformed.'",
+                    "'It represents omniscient narration: a voice that knows every character's inner world simultaneously.'",
+                    "'The greatest literary works use it sparingly. Because knowing everything is a burden.'",
+                    "'Take care of it. And perhaps... let me photograph it for my research.'"
+                ];
+            }
+            return [
+                "Prof. Lexicon: 'The OmniScribe. Still magnificent.'",
+                "'Every time I see it I think of Tolstoy. Dickens. The authors who dared to know everything.'",
+                "'You are carrying a piece of literary history.'"
+            ];
+        }
+
+        if (hasLexiconLord) {
+            if (!gameState.profSawLexiconLord) {
+                gameState.profSawLexiconLord = true;
+                return [
+                    "Prof. Lexicon: 'A LexiconLord! You actually did it!'",
+                    "'The lexicon — the complete vocabulary of a language. Every word, every meaning, every shade of nuance.'",
+                    "'Your creature has internalized all of it.'",
+                    "'Did you know most people use only about 20,000 words in daily speech?'",
+                    "'Shakespeare used 31,000. The English language has over 170,000.'",
+                    "'Your LexiconLord knows every single one.'",
+                    "'Keep training. There are reports of a form beyond this — but I have never confirmed it.'"
+                ];
+            }
+        }
+
+        if (hasThesaurusRex) {
+            if (!gameState.profSawThesaurusRex) {
+                gameState.profSawThesaurusRex = true;
+                return [
+                    "Prof. Lexicon: 'Your Synonymouse evolved into ThesaurusRex!'",
+                    "'A ThesaurusRex — Fire-type, strong-willed, with access to more moves than almost any creature in the region.'",
+                    "'The thesaurus was invented by Peter Mark Roget in 1852.'",
+                    "'He spent his whole life categorizing words by meaning.'",
+                    "'He believed that having the right word for something was the beginning of understanding it.'",
+                    "'Your creature embodies that. Treat it well.'",
+                    "'It will evolve once more. Keep going.'"
+                ];
+            }
+        }
 if (gameState.finalBossDefeated) {
             return [
                 "Prof. Lexicon: 'Champion! I knew you had it in you.'",
@@ -6933,23 +7043,33 @@ function handleArgumentQuest() {
 
         const current = debate[step];
         startDialogue([current.statement], () => {
-            showChoices(`What part of an argument is this?`, current.options.map(opt => ({
-                text: opt,
-                callback: () => {
-                    if (opt === current.correct) {
-                        score++;
-                        startDialogue([
-                            `✅ Correct! That's the ${current.correct}.`,
-                            `📖 ${current.explanation}`
-                        ], () => { step++; askArgumentStep(); });
-                    } else {
-                        startDialogue([
-                            `❌ Not quite. That was the ${current.correct}.`,
-                            `📖 ${current.explanation}`
-                        ], () => { step++; askArgumentStep(); });
+            const showAnswerChoices = () => {
+                const answerChoices = [
+                    ...current.options.map(opt => ({
+                        text: opt,
+                        callback: () => {
+                            if (opt === current.correct) {
+                                score++;
+                                startDialogue([
+                                    `✅ Correct! That's the ${current.correct}.`,
+                                    `📖 ${current.explanation}`
+                                ], () => { step++; askArgumentStep(); });
+                            } else {
+                                startDialogue([
+                                    `❌ Not quite. That was the ${current.correct}.`,
+                                    `📖 ${current.explanation}`
+                                ], () => { step++; askArgumentStep(); });
+                            }
+                        }
+                    })),
+                    {
+                        text: '🔁 Re-read the statement',
+                        callback: () => startDialogue([current.statement], showAnswerChoices)
                     }
-                }
-            })));
+                ];
+                showChoices(`What part of an argument is this?`, answerChoices);
+            };
+            showAnswerChoices();
         });
     }
 
@@ -7900,6 +8020,10 @@ let damageMult = currentBattle.statusDamageMod || 1.0;
         triggerBattleFX(currentBattle.chosenAttack.type || 'Normal', false);
 
 if (currentBattle.chosenAttack.power > 0) {
+            // Lightning animation for Lexical Bolt
+            if (currentBattle.chosenAttack.animation === 'lightning') {
+                animateLightningBolt();
+            }
             const result = calculateDamage(currentBattle.chosenAttack, currentBattle.playercreature, opponent);
             const finalDamage = Math.floor(result.damage * damageMult);
             opponent.currentHp -= finalDamage;
@@ -8121,7 +8245,26 @@ document.getElementById('player-xp-text').textContent = `EXP: ${Math.floor(p.xp)
     function updateBattleSprites() {
         if (!currentBattle) return;
         document.getElementById('player-sprite').textContent = sprites[currentBattle.playercreature.sprite];
-        document.getElementById('opponent-sprite').textContent = sprites[currentBattle.opponentParty[currentBattle.currentOpponentIndex].sprite];
+        const oppSprite = document.getElementById('opponent-sprite');
+        const opp = currentBattle.opponentParty[currentBattle.currentOpponentIndex];
+        oppSprite.textContent = sprites[opp.sprite];
+        // Shiny sparkle visual — golden glow + shimmer on the sprite
+        if (opp.isFirstEdition) {
+            oppSprite.classList.add('shiny-sprite');
+            oppSprite.title = '✨ Shiny!';
+        } else {
+            oppSprite.classList.remove('shiny-sprite');
+            oppSprite.style.filter = 'drop-shadow(0 10px 24px rgba(0,0,0,.8))';
+            oppSprite.title = '';
+        }
+        // Player shiny
+        const playerSprite = document.getElementById('player-sprite');
+        if (currentBattle.playercreature.isFirstEdition) {
+            playerSprite.classList.add('shiny-sprite');
+        } else {
+            playerSprite.classList.remove('shiny-sprite');
+            playerSprite.style.filter = '';
+        }
     }
 
 
@@ -10234,7 +10377,26 @@ startDialogue([
     return null;
 }
 
-    function handleRoute1Rival() {
+    function handleRoute1Campfire() {
+    if (gameState.playerParty.length === 0) {
+        return ["🔥 A campfire burns on the side of the path.", "'Someone left it lit for passing travelers.'"];
+    }
+    const allFull = gameState.playerParty.every(p => p.currentHp >= p.maxHp);
+    if (allFull) {
+        return ["🔥 The campfire crackles warmly.", "Your team is already at full health.", "'Rest here anytime you need it.'"];
+    }
+    startDialogue([
+        "🔥 A campfire burns steadily beside the path.",
+        "'You sit for a moment. Your creatures recover.'"
+    ], () => {
+        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; });
+        if (gameState.schoolQuizDone) gameState.schoolQuizDone = false;
+        startDialogue(["✨ All creatures fully healed.", "The road ahead is long — rest when you can."]);
+    });
+    return null;
+}
+
+function handleRoute1Rival() {
         if (gameState.metRivalRoute1) {
             return "Andy: 'Stop dawdling. The Gym Leader in the city is tough.'";
         }
@@ -10248,10 +10410,13 @@ startDialogue([
             gameState.inventory.potions++;
             startDialogue([
                 "You put the Potion in your bag.",
-                "Andy: 'Don't faint on me, okay? You're my rival, don't be boring!'",
+                "Andy: 'Oh — and see that campfire up the path?'",
+                "Andy: 'There are campfires scattered all over this region.'",
+                "Andy: 'Walk up to one and your whole team heals. Free. No questions asked.'",
+                "Andy: 'There's one in the village, one in Grammar Cave, and a few more you'll find.'",
+                "Andy: 'Don't faint on me, okay? You're my rival — don't be boring!'",
                 "Andy dashes ahead toward Lexington City."
             ], () => {
-                // Andy disappears from Route 1
                 if (maps.route1 && maps.route1.objects['7,3']) {
                     delete maps.route1.objects['7,3'];
                 }
@@ -11076,6 +11241,36 @@ function resetGameData() {
         ]);
     });
 }
+function animateLightningBolt() {
+    return new Promise(res => {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;pointer-events:none;overflow:hidden;';
+        // Three bolt paths for visual drama
+        overlay.innerHTML = `
+            <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);font-size:6rem;animation:boltDrop 0.15s ease-in forwards;">⚡</div>
+            <div style="position:absolute;top:25%;left:40%;font-size:4rem;animation:boltDrop 0.15s 0.08s ease-in forwards;opacity:0;">⚡</div>
+            <div style="position:absolute;top:25%;left:58%;font-size:4rem;animation:boltDrop 0.15s 0.1s ease-in forwards;opacity:0;">⚡</div>
+            <div style="position:absolute;inset:0;background:rgba(255,220,50,0.35);animation:boltFlash 0.4s ease-out forwards;"></div>
+        `;
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes boltDrop {
+                0%   { opacity:0; transform:translateX(-50%) scaleY(0); }
+                40%  { opacity:1; transform:translateX(-50%) scaleY(1.2); filter:brightness(3) drop-shadow(0 0 12px #ffe000); }
+                100% { opacity:0; transform:translateX(-50%) scaleY(1) translateY(20px); }
+            }
+            @keyframes boltFlash {
+                0%   { opacity:0; }
+                15%  { opacity:1; }
+                100% { opacity:0; }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(overlay);
+        setTimeout(() => { overlay.remove(); style.remove(); res(); }, 600);
+    });
+}
+
 function animateBallThrow(ballType = 'wordorb') {
     return new Promise(resolve => {
         const battleScene = document.getElementById('battle-scene');
@@ -12189,16 +12384,54 @@ if (oldBattle.trainerId) {
             if (speciesData && speciesData.evolvesAt && p.level >= speciesData.evolvesAt && !p.hasEvolved) {
                 await new Promise(res => startBattleDialogue([`What? ${p.name} is evolving!`], res));
                 const oldName = p.name;
+                const oldSpecies = p.species;
                 p.species = speciesData.evolvesTo;
                 p.sprite = creatureDB[p.species].sprite;
                 p.name = p.isFirstEdition ? `✨ Shiny ${p.species}` : p.species;
                 p.hasEvolved = true;
                 p.status = null; 
                 p.maxHp += Math.floor(p.level * 1.5); 
-p.attack += Math.floor(p.level * 0.8);
-p.defense += Math.floor(p.level * 0.3);
-p.currentHp = p.maxHp;
-                await new Promise(res => startBattleDialogue([`Congratulations! Your ${oldName} evolved into ${p.species}!`], res));
+                p.attack += Math.floor(p.level * 0.8);
+                p.defense += Math.floor(p.level * 0.3);
+                p.currentHp = p.maxHp;
+
+                // Unique evolution cutscenes for the Synonymouse line
+                if (oldSpecies === 'Synonymouse' && p.species === 'ThesaurusRex') {
+                    await new Promise(res => startBattleDialogue([
+                        `Congratulations! Your ${oldName} evolved into ThesaurusRex! 🔥`,
+                        `The screen flashes. A voice crackles through the air —`,
+                        `Andy: "Wait — is that a THESAURUSREX?!"`,
+                        `Andy: "I've read about those. I've never actually seen one."`,
+                        `Andy: "...Nice. Okay. That's actually nice."`,
+                        `📖 A ThesaurusRex commands every synonym for power — and right now, it means all of them.`,
+                        `Prof. Lexicon (distant): "Remarkable. The Synonymouse line's second stage — Fire-type, vast vocabulary, near-unstoppable. Train it well."`
+                    ], res));
+                } else if (oldSpecies === 'ThesaurusRex' && p.species === 'LexiconLord') {
+                    await new Promise(res => startBattleDialogue([
+                        `Congratulations! Your ${oldName} evolved into LexiconLord! 🔥`,
+                        `A deep silence falls over the battlefield.`,
+                        `Andy: "LexiconLord. I didn't think I'd see one of those outside of the Pyramid."`,
+                        `Andy: "My Grammargoyle is shaking. It can feel the vocabulary difference."`,
+                        `Prof. Lexicon (distant): "The lexicon — the complete vocabulary of a language."`,
+                        `Prof. Lexicon: "Your creature now holds every word. Every meaning. Every nuance."`,
+                        `Prof. Lexicon: "This is what mastery looks like."`
+                    ], res));
+                } else if (oldSpecies === 'LexiconLord' && p.species === 'OmniScribe') {
+                    await new Promise(res => startBattleDialogue([
+                        `What?! Your ${oldName} is evolving beyond LexiconLord...`,
+                        `The battlefield goes dark. Then blazing white.`,
+                        `A shape forms — ancient, luminous, impossible.`,
+                        `Congratulations! Your ${oldName} evolved into OmniScribe! ✨`,
+                        `Andy: "...I don't have words for this."`,
+                        `Andy: "Which is ironic, given what just happened."`,
+                        `Prof. Lexicon (voice shaking): "OmniScribe. It — I thought they were mythological."`,
+                        `Prof. Lexicon: "It has read everything. It knows every story. Every ending."`,
+                        `Prof. Lexicon: "Do not waste this. A creature like that carries the weight of all of literature."`,
+                        `📖 ELA Connection: Omniscient narration — a narrator who knows all, sees all, tells all. Your creature has become the voice above all voices.`
+                    ], res));
+                } else {
+                    await new Promise(res => startBattleDialogue([`Congratulations! Your ${oldName} evolved into ${p.species}!`], res));
+                }
             }
         }
 
