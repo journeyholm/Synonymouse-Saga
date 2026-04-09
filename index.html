@@ -321,6 +321,12 @@ button { cursor: pointer; }
         /* Enable clicking ON the buttons */
         #touch-controls button { pointer-events: auto; }
 
+        #touch-controls {
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
         .d-pad-grid {
             display: grid;
             grid-template-columns: repeat(3, 60px);
@@ -1458,8 +1464,7 @@ seenFocusTutorial: false,
 seenTypeChart: false,
         dayCount: 1,
         argumentQuestDone: false,
-        writingQuestDone: false,
-        playerName: ''
+        writingQuestDone: false
     };
     
 const attacksDB = {
@@ -2654,34 +2659,27 @@ const elaQuestions = [
         { q: "Spot the correctly spelled word:", a: ["Weird", "Wierd", "Wiered", "Weired"], c: "Weird", ex: "Weird is weird because it breaks the 'I before E' rule." },
         { q: "A hint or clue about what will happen later in a story is...", a: ["Foreshadowing", "Flashback", "Symbolism", "Imagery"], c: "Foreshadowing", ex: "Foreshadowing gives the reader a hint of future events." },
 
-    // --- PASSAGE-BASED COMPREHENSION (15 Questions) ---
-    { q: "Read: 'The library was silent except for the soft hum of the ventilation system. Mara pulled out her notebook and opened to a blank page. She had been staring at it for twenty minutes.'\n\nWhat can you INFER about Mara?", a: ["She is struggling to start writing", "She doesn't like the library", "She finished her work quickly", "She forgot her pencil"], c: "She is struggling to start writing", ex: "Inference = text clues + reasoning. She has a blank page after 20 minutes — she hasn't started yet." },
-    { q: "Read: 'The fire had burned for three days. When it was finally out, the forest looked like the surface of the moon — gray, silent, and completely still.'\n\nThe comparison to the moon's surface is an example of...", a: ["Simile", "Metaphor", "Personification", "Alliteration"], c: "Simile", ex: "The word 'like' signals a simile — a direct comparison using 'like' or 'as.'" },
-    { q: "Read: 'Unlike tigers, which hunt alone, lions live and hunt in groups called prides. This social structure helps them take down prey much larger than themselves.'\n\nWhat is the TEXT STRUCTURE of this passage?", a: ["Compare and Contrast", "Cause and Effect", "Chronological", "Problem and Solution"], c: "Compare and Contrast", ex: "'Unlike' is a signal word for compare and contrast — it shows how two things differ." },
-    { q: "Read: 'Scientists believe the dinosaurs died because an asteroid struck Earth 66 million years ago. The impact sent dust into the atmosphere, blocking sunlight. Without sunlight, plants died. Without plants, herbivores starved. Without prey, carnivores followed.'\n\nWhat is the MAIN TEXT STRUCTURE?", a: ["Cause and Effect", "Compare and Contrast", "Problem and Solution", "Description"], c: "Cause and Effect", ex: "Each event causes the next — asteroid → dust → no sunlight → plants die → animals die. That's a chain of causes and effects." },
-    { q: "Read: 'Maya had never missed a day of school in four years. On Thursday she arrived late, said nothing to anyone, and left before lunch. Something had happened.'\n\nWhat can the reader INFER?", a: ["Something is wrong in Maya's life", "Maya dislikes her teacher", "Maya forgot her homework", "The school schedule changed"], c: "Something is wrong in Maya's life", ex: "Her unusual behavior (late, silent, leaving early) combined with her 4-year perfect attendance suggests a significant personal event." },
-    { q: "Read: 'Thomas Edison made over 1,000 attempts before successfully inventing the light bulb. When a reporter asked if he felt like a failure, Edison replied: \"I have not failed. I've just found 10,000 ways that won't work.\"'\n\nWhat is the AUTHOR'S PURPOSE?", a: ["To inspire readers with a lesson about persistence", "To inform readers about how electricity works", "To persuade readers to become inventors", "To entertain readers with a funny story"], c: "To inspire readers with a lesson about persistence", ex: "The anecdote about Edison's quote reframes failure as progress — the author wants readers to see persistence as valuable." },
-    { q: "Read: 'The school cafeteria served pizza on Fridays. This was the one day everyone agreed on. The quiet kids ate it. The loud kids ate it. Even the teachers could be seen sneaking slices.'\n\nThe author's use of 'even the teachers' is meant to...", a: ["Show that pizza had universal appeal", "Criticize the teachers", "Explain school food policy", "Compare students and teachers"], c: "Show that pizza had universal appeal", ex: "By extending the pizza love to teachers — an unexpected group — the author emphasizes that absolutely everyone agreed." },
-    { q: "Read: 'First, gather your materials. Next, mix the dry ingredients in a large bowl. Then, slowly add the wet ingredients while stirring. Finally, pour the batter into a greased pan and bake at 350 degrees for 30 minutes.'\n\nThe signal words 'First,' 'Next,' 'Then,' and 'Finally' indicate which text structure?", a: ["Sequence/Chronological", "Compare and Contrast", "Problem and Solution", "Cause and Effect"], c: "Sequence/Chronological", ex: "These signal words show steps in order — that's chronological/sequence structure." },
-    { q: "Read: 'The wind howled through the empty streets. Trash cans rolled and clattered. A shutter banged against a wall, again and again. The town felt like it was holding its breath.'\n\nWhat is the MOOD of this passage?", a: ["Eerie and tense", "Warm and peaceful", "Joyful and exciting", "Sad and hopeless"], c: "Eerie and tense", ex: "The imagery — howling wind, clattering cans, banging shutters — creates an unsettling, tense atmosphere. That's the mood." },
-    { q: "Read: 'While electric cars produce no tailpipe emissions, critics argue that the electricity used to charge them often comes from coal-burning power plants. Supporters counter that even accounting for this, electric cars produce significantly less carbon over their lifetime.'\n\nThis passage BEST represents...", a: ["A balanced argument with claim and counterclaim", "A persuasive essay supporting electric cars", "A factual report with no opinion", "A narrative story about transportation"], c: "A balanced argument with claim and counterclaim", ex: "The passage presents both a criticism (electricity from coal) and a rebuttal (less carbon overall) — that's the structure of argument with counterclaim." },
-    { q: "Read: 'Langston Hughes grew up during the Harlem Renaissance, a period of extraordinary Black artistic and cultural achievement. His poems celebrated everyday Black life and used the rhythms of jazz and blues. He became one of the most important voices of the 20th century.'\n\nAccording to this passage, what influenced Hughes's poetry?", a: ["Jazz, blues, and everyday Black life", "European classical literature", "His experience as a soldier", "His travels to Africa"], c: "Jazz, blues, and everyday Black life", ex: "The passage directly states his poems 'used the rhythms of jazz and blues' and 'celebrated everyday Black life.'" },
-    { q: "Read: 'The word \"salary\" comes from the Latin word \"salarium,\" which referred to payments made to Roman soldiers in salt. Salt was so valuable in the ancient world that it was used as currency.'\n\nWhat is the MAIN IDEA of this passage?", a: ["The origin of the word 'salary' connects to the historical value of salt", "Roman soldiers were paid unfairly", "Salt is no longer valuable today", "Latin is the origin of all English words"], c: "The origin of the word 'salary' connects to the historical value of salt", ex: "Every sentence supports the central idea: the word 'salary' comes from salt's historical role as a form of payment." },
-    { q: "Read: 'She walked into the room and everyone went quiet. Not a bad quiet — an anticipating one. The kind that meant something important was about to happen.'\n\nThe author distinguishes between types of quiet to...", a: ["Show that the character's arrival was significant", "Explain that the room was loud before", "Suggest the character was frightening", "Describe the setting in detail"], c: "Show that the character's arrival was significant", ex: "By clarifying it was an 'anticipating' quiet, the author signals that the character commands respect and attention — her arrival matters." },
-    { q: "Read: 'Scientists have discovered a species of jellyfish that appears to age in reverse. When stressed or injured, it reverts to its juvenile form and begins its life cycle again. Researchers call this process transdifferentiation.'\n\nWhat would be the BEST follow-up question for a reader to ask?", a: ["Could this process ever apply to humans?", "Why are jellyfish slimy?", "What do jellyfish eat?", "How big do jellyfish get?"], c: "Could this process ever apply to humans?", ex: "Good readers ask questions that connect the text to bigger ideas. The passage about biological immortality naturally leads to wondering about human applications." },
-    { q: "Read: 'Marcus trained every day for two years. He gave up weekends, missed parties, skipped meals. On the day of the competition, he stood at the starting line and thought: I have already won. Whatever happens next is just proof.'\n\nWhat does Marcus mean by 'I have already won'?", a: ["His dedication and preparation are the real victory", "He knows the result before it happens", "He cheated to guarantee a win", "He plans to quit after one race"], c: "His dedication and preparation are the real victory", ex: "Marcus's thinking reflects theme: the process of becoming — the sacrifice and growth — matters more than the outcome." },
+    // --- WRITING PROCESS (8 Questions) ---
+    { q: "Which stage of the writing process comes FIRST?", a: ["Drafting", "Prewriting", "Editing", "Publishing"], c: "Prewriting", ex: "Prewriting is the planning stage — brainstorming, outlining, and organizing ideas before you write a single sentence." },
+    { q: "During DRAFTING, a writer should...", a: ["Fix all grammar errors first", "Get ideas down without worrying about perfection", "Publish immediately", "Delete anything that seems weak"], c: "Get ideas down without worrying about perfection", ex: "A first draft is meant to be rough. The goal is to capture your ideas — you revise and edit later." },
+    { q: "What is the difference between REVISING and EDITING?", a: ["They are the same thing", "Revising fixes spelling; editing fixes ideas", "Revising improves content and structure; editing fixes grammar and mechanics", "Editing comes before revising"], c: "Revising improves content and structure; editing fixes grammar and mechanics", ex: "Revising = big picture (ideas, organization, clarity). Editing = small picture (spelling, punctuation, grammar). Always revise before you edit." },
+    { q: "After finishing a first draft, what should a writer do NEXT?", a: ["Publish it immediately", "Revise for clarity and organization", "Fix spelling errors first", "Start a completely new topic"], c: "Revise for clarity and organization", ex: "After drafting, you revise — strengthen your argument, reorganize paragraphs, improve word choice. Editing comes after." },
+    { q: "What is the CORRECT order of the writing process?", a: ["Draft → Prewrite → Revise → Edit → Publish", "Prewrite → Draft → Revise → Edit → Publish", "Edit → Draft → Revise → Prewrite → Publish", "Prewrite → Edit → Draft → Publish → Revise"], c: "Prewrite → Draft → Revise → Edit → Publish", ex: "This order ensures you plan before writing, improve content before fixing mechanics, and only share your best work." },
+    { q: "PEER REVIEW means...", a: ["A teacher grades your paper", "You proofread your own work", "Another student reads and gives feedback on your writing", "You search for information online"], c: "Another student reads and gives feedback on your writing", ex: "Peer review gives you a reader's perspective. A fresh set of eyes catches things the writer misses." },
+    { q: "Which activity belongs in the PREWRITING stage?", a: ["Fixing comma errors", "Submitting your final essay", "Creating a graphic organizer or outline", "Reading the draft aloud to check flow"], c: "Creating a graphic organizer or outline", ex: "Prewriting tools — webs, outlines, brainstorm lists — help you organize ideas before you begin drafting." },
+    { q: "A strong CONCLUSION should...", a: ["Introduce a brand new argument", "Restate the thesis and leave the reader with a final thought", "Copy the introduction word for word", "End with a question the reader must research"], c: "Restate the thesis and leave the reader with a final thought", ex: "A conclusion echoes your thesis in new words and closes the essay memorably — a call to action, a reflection, or a wider connection." },
 
     // --- ARGUMENT WRITING (10 Questions) ---
-    { q: "A CLAIM in an argument is...", a: ["The main position or belief the writer is defending", "A fact proven by scientific research", "A question the writer wants to explore", "A summary of the opposing view"], c: "The main position or belief the writer is defending", ex: "A claim is your argument's foundation — the statement you will spend the entire essay supporting." },
-    { q: "Which of these is the STRONGEST thesis statement?", a: ["Social media harms teenagers because it increases anxiety and disrupts sleep.", "Social media is bad.", "This essay will discuss social media.", "Some people think social media is harmful."], c: "Social media harms teenagers because it increases anxiety and disrupts sleep.", ex: "A strong thesis makes a specific claim AND gives a reason. Vague statements like 'Social media is bad' don't tell the reader what you'll prove." },
-    { q: "EVIDENCE in an argument should be...", a: ["Specific, relevant, and from a credible source", "Emotional and personal", "Vague enough to apply to many situations", "The writer's own opinion stated strongly"], c: "Specific, relevant, and from a credible source", ex: "Good evidence directly supports your claim and comes from a trustworthy source — statistics, expert quotes, or documented examples." },
-    { q: "What is REASONING in argument writing?", a: ["The explanation of WHY the evidence supports the claim", "A fact that proves your point", "The opposing side's argument", "The conclusion of the essay"], c: "The explanation of WHY the evidence supports the claim", ex: "Evidence alone isn't enough — you must explain the connection. Reasoning is the logical bridge between your evidence and your claim." },
-    { q: "A COUNTERCLAIM is...", a: ["An argument that opposes or challenges your claim", "More evidence supporting your main point", "The topic sentence of a body paragraph", "Your conclusion restated differently"], c: "An argument that opposes or challenges your claim", ex: "Addressing the counterclaim shows you understand the full debate. Ignoring the other side weakens your argument." },
-    { q: "A REBUTTAL does which of the following?", a: ["Responds to the counterclaim and explains why your claim is still stronger", "Repeats your original claim word for word", "Introduces a completely new argument", "Summarizes the entire essay"], c: "Responds to the counterclaim and explains why your claim is still stronger", ex: "A rebuttal doesn't ignore the opposing view — it answers it directly, showing why your position holds up even when challenged." },
-    { q: "Which sentence is a COUNTERCLAIM to the claim: 'School uniforms should be required'?", a: ["Uniforms restrict students' ability to express their individuality.", "Studies show uniforms reduce disciplinary incidents.", "Many schools across the country have adopted uniform policies.", "School uniforms create a sense of belonging and equality."], c: "Uniforms restrict students' ability to express their individuality.", ex: "A counterclaim argues AGAINST the main claim. The other options support the claim — only this one challenges it." },
-    { q: "In the PIE paragraph structure, what does the 'E' stand for?", a: ["Explanation — connecting the evidence back to the point", "Evidence — the facts or quotes you use", "Example — a story that illustrates your claim", "Ending — the final sentence of the paragraph"], c: "Explanation — connecting the evidence back to the point", ex: "PIE = Point (your claim), Illustration (evidence), Explanation (why it matters). The E is where you do the reasoning — the most important and most often skipped step." },
-    { q: "Which transition word BEST signals a counterclaim or opposing view?", a: ["While some argue that...", "Furthermore...", "As a result...", "For example..."], c: "While some argue that...", ex: "'While some argue' signals you are about to present the opposing side. 'Furthermore' adds more support; 'As a result' shows cause-effect; 'For example' introduces evidence." },
-    { q: "A well-structured argumentative essay should include...", a: ["A claim, evidence, reasoning, a counterclaim, and a rebuttal", "Only facts — no opinions", "A story, a poem, and a summary", "Three body paragraphs with no introduction"], c: "A claim, evidence, reasoning, a counterclaim, and a rebuttal", ex: "Strong arguments address all sides. Claim + evidence + reasoning shows your position. Counterclaim + rebuttal shows you understand the full debate and can respond to it." },
+    { q: "A CLAIM in an argument essay is...", a: ["A fact everyone agrees with", "The writer's main position being defended", "A question the writer wants to explore", "A summary of the opposing side"], c: "The writer's main position being defended", ex: "The claim is your argument's foundation — the statement you will spend the rest of the essay supporting with evidence and reasoning." },
+    { q: "Which is the STRONGEST thesis statement?", a: ["Social media is bad.", "This essay will discuss social media.", "Social media harms teenagers because it increases anxiety and disrupts sleep.", "Some people think social media is harmful."], c: "Social media harms teenagers because it increases anxiety and disrupts sleep.", ex: "A strong thesis makes a specific CLAIM and gives a REASON. Vague statements like 'Social media is bad' don't tell the reader what you'll prove." },
+    { q: "In argument writing, EVIDENCE should be...", a: ["The writer's personal feelings", "Vague enough to apply to any topic", "Specific, relevant, and from a credible source", "Copied from any website"], c: "Specific, relevant, and from a credible source", ex: "Good evidence directly supports your claim and comes from a trustworthy source — statistics, expert quotes, or documented examples." },
+    { q: "REASONING in an argument is...", a: ["The opposing side's best point", "A statistic that proves your point", "The explanation of WHY the evidence supports the claim", "The conclusion paragraph"], c: "The explanation of WHY the evidence supports the claim", ex: "Reasoning is the logical bridge between your evidence and your claim. It's the 'so what' step — without it, evidence just sits there." },
+    { q: "A COUNTERCLAIM is...", a: ["More evidence for your main point", "An argument that challenges or opposes your claim", "The topic sentence of a body paragraph", "Your restated conclusion"], c: "An argument that challenges or opposes your claim", ex: "Addressing the counterclaim shows you understand the full debate. Ignoring the other side actually weakens your argument." },
+    { q: "A REBUTTAL does which of the following?", a: ["Repeats the claim word for word", "Introduces a completely new topic", "Responds to the counterclaim and explains why your position is still stronger", "Summarizes the entire essay"], c: "Responds to the counterclaim and explains why your position is still stronger", ex: "A rebuttal doesn't ignore the opposing view — it directly answers it, showing why your position holds up even when challenged." },
+    { q: "In the PIE paragraph structure, what does the 'E' stand for?", a: ["Evidence", "Example", "Explanation", "Ending"], c: "Explanation", ex: "PIE = Point (your claim for that paragraph), Illustration (evidence), Explanation (why the evidence supports the point). The E is where the reasoning happens." },
+    { q: "Which transition BEST signals a counterclaim?", a: ["Furthermore, studies show...", "For example, in 2020...", "While some argue that uniforms limit self-expression...", "As a result, schools have changed..."], c: "While some argue that uniforms limit self-expression...", ex: "'While some argue' signals you're presenting the opposing side. 'Furthermore' adds support; 'For example' introduces evidence; 'As a result' shows cause-effect." },
+    { q: "What makes an argument PERSUASIVE?", a: ["Using emotional language only", "Making the claim as vague as possible", "Combining a clear claim, specific evidence, logical reasoning, and a rebuttal", "Writing as many paragraphs as possible"], c: "Combining a clear claim, specific evidence, logical reasoning, and a rebuttal", ex: "Strong arguments work on multiple levels — they state a position clearly, back it up with evidence, explain the logic, and acknowledge the other side." },
+    { q: "What is the CLAIM in this argument: 'Schools should extend lunch because students who eat slowly feel rushed and distracted in afternoon classes.'?", a: ["Students who eat slowly feel rushed", "Schools should extend lunch periods", "Students are distracted in afternoon classes", "Lunch periods cause poor grades"], c: "Schools should extend lunch periods", ex: "The CLAIM is the position being argued — what the writer wants to prove. The 'because' introduces the reasoning that supports it." },
     ];
     let currentBattle = null;
 
@@ -2952,7 +2950,45 @@ encounters: []    },
         // FIX: Changed these from "Empty Cases" to actual items so they disappear when clicked
         '2,3': { sprite: 'wordorb', interaction: () => handleCaveItem('Potion', 'potions', 1, 'profHouse', 2, 3) }, 
         '4,3': { sprite: 'wordorb', interaction: () => handleCaveItem('Word Ball', 'wordballs', 1, 'profHouse', 4, 3) }, 
-        '6,3': { sprite: 'wordorb', interaction: () => handleCaveItem('Potion', 'potions', 1, 'profHouse', 6, 3) }, 
+        '6,3': { sprite: 'wordorb', interaction: () => handleCaveItem('Potion', 'potions', 1, 'profHouse', 6, 3) },
+
+        '1,1': { sprite: 'bookshelf', interaction: () => {
+            if (!gameState.profShelf1) gameState.profShelf1 = 0;
+            gameState.profShelf1++;
+            const l = [
+                "Linguistics texts: 'The Language Instinct,' 'Words and Rules,' 'The Origin of Speech.'",
+                "A heavily annotated Strunk & White. Page 1 underlined: 'Omit needless words.'",
+                "'Story' by Robert McKee. A note inside: 'Structure is not a cage. It is a skeleton. Without it, everything collapses.'",
+                "The professor's own thesis: 'ELA Creatures as Pedagogical Metaphor.' 847 pages. Self-published.",
+                "A children's book: 'The Very Hungry Caterpillar.' Sticky note: 'Perfect narrative arc. He wants, he acts, he transforms. That is all any story is.'",
+            ];
+            return l[(gameState.profShelf1 - 1) % l.length];
+        }},
+        '6,1': { sprite: 'bookshelf', interaction: () => {
+            if (!gameState.profShelf2) gameState.profShelf2 = 0;
+            gameState.profShelf2++;
+            const l = [
+                "Field notebooks labeled by year. The first one says: 'Year 1 — Everything went wrong.'",
+                "A guide: 'Identifying ELA Creatures by Type.' Margin note: 'Water types near figurative language zones. Ghost types near ambiguity.'",
+                "A framed quote: 'The limits of my language mean the limits of my world.' — Wittgenstein. Below in pencil: 'Expand your vocabulary. Expand your world.'",
+                "A creature sketch pad. Every species, detailed drawings. Synonymouse entry: 'Remarkably adaptable. Good starter.'",
+                "A worn paperback: 'Tuesdays with Morrie.' Dog-eared: 'Once you learn how to die, you learn how to live.' The professor wrote: 'Theme.'",
+            ];
+            return l[(gameState.profShelf2 - 1) % l.length];
+        }},
+        '3,3': { sprite: 'wordorb', interaction: () => {
+            if (!gameState.profNoteVisits) gameState.profNoteVisits = 0;
+            gameState.profNoteVisits++;
+            const notes = [
+                ["Professor's Research Notes:", "'Hypothesis: creatures in the wild reflect the vocabulary density of the local environment.'", "'Grammar Cave produces evolved species. Language and habitat are inseparable.'"],
+                ["A rubric covered in red pen:", "'This student confuses main idea with theme — very common error.'", "'Theme is universal. Main idea is specific to the text.'"],
+                ["Lab Journal, Day 112:", "'The Lexiconstruct appeared in the deepest chamber today. It did not attack. It observed.'", "'I believe it is the physical manifestation of all grammar rules combined. Publishing immediately.'"],
+                ["A printed email, framed:", "'Dear Professor Lexicon — your paper has been accepted to the Journal of Linguistic Ecology.'", "'He printed it. He framed it. Good for him.'"],
+                ["Sticky note — TO DO:", "'— Finish creature database'", "'— Stop letting rare species escape during observation'", "'— Call mom (on this list for six weeks)'"],
+            ];
+            const v = notes[(gameState.profNoteVisits - 1) % notes.length];
+            return Array.isArray(v) ? v : [v];
+        }},
         
 '3,5': { target: 'village', x: 11, y: 5 }, 
 '4,5': { target: 'village', x: 12, y: 5 }
@@ -3123,7 +3159,7 @@ lexingtonCity: {
             '10,5': { target: 'gym', x: 4, y: 5 }, 
             
             // House 1 (Rhyme Hint)
-            '13,4': { symbol: '', symbolOffsetY: -2 }, 
+            '13,4': { symbol: '🐟', symbolOffsetY: -2 }, 
             '13,5': { target: 'cityHouse1', x: 4, y: 5 }, 
             
             // --- THE FIX: SCHOOL IS HERE (Replaces CityHouse2) ---
@@ -3143,7 +3179,7 @@ lexingtonCity: {
             '9,9': { symbol: '🏡', symbolOffsetY: -2 },
             '9,10': { target: 'parentsCottage', x: 3, y: 5 },
 
-'3,1': { sprite: 'sign', interaction: "Crane & Associates — Aquatic Specimen Buyers. Est. Recently. Ring the bell." },
+'3,1': { sprite: 'sign', interaction: "🐟 CRANE & ASSOCIATES — Aquatic Specimen Buyers. Shop entrance: the building just south of here." },
 '1,10': { sprite: 'poet', interaction: handleCityPoetInteraction },            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
             '7,13': { target: 'route1', x: 7, y: 0 }, '8,13': { target: 'route1', x: 8, y: 0 },
             '9,12': { sprite: 'sign', interaction: 'Lexington City' },
@@ -3472,6 +3508,26 @@ cityHouse3: {
             // 5. The Red Wheelbarrow (William Carlos Williams)
 '3,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.villHouseShelf) gameState.villHouseShelf=0; gameState.villHouseShelf++; const l=["A painting of a red wheelbarrow, glazed with rain water, beside the white chickens.","The poem is called 'The Red Wheelbarrow' by William Carlos Williams. The whole poem is 16 words. He believed a poem could be built from a single ordinary image.","'So much depends upon' — the opening line. Everything after it is the answer. Williams never explains. He just shows you.","Williams was also a doctor. He wrote poems on prescription pads between patients. He said poetry was about attention — noticing what everyone else walks past.","The painting has no frame. The villager says that's intentional. 'Williams wouldn't have framed it either.'"]; return l[(gameState.villHouseShelf-1)%l.length]; }},            
 '1,3': { sprite: 'villager', interaction: handleWelcomeVillagerInteraction },
+'5,3': { sprite: 'villager2', interaction: () => {
+    if (!gameState.villHouseGuestVisits) gameState.villHouseGuestVisits = 0;
+    gameState.villHouseGuestVisits++;
+    const lines = [
+        ["Guest: 'Williams said: no ideas but in things.'", "'Don't tell me about sadness. Show me the empty chair.'", "'Concrete images over abstract statements. Every time.'"],
+        ["Guest: 'Did you know Williams was also a doctor?'", "'He wrote poems on prescription pads between patients.'", "'He said poetry was about attention — noticing what everyone else walks past.'"],
+        ["Guest: 'Imagery means creating a picture with words.'", "'Williams: just the wheelbarrow. Just the rain. Just the chickens.'", "'No metaphor. No explanation. Just the thing itself. Perfect.'"],
+        ["Guest: 'The difference between show and tell:'", "'TELL: She was sad. SHOW: She stared at the door for an hour without moving.'", "'Always show. Let the reader feel it themselves.'"],
+        ["Guest: 'You keep coming back. That means you notice things.'", "'Good. That's what writing asks of you — attention.'"],
+    ];
+    const v = lines[(gameState.villHouseGuestVisits - 1) % lines.length];
+    return Array.isArray(v) ? v : [v];
+}},
+'5,1': { sprite: 'candy', interaction: () => {
+    if (gameState.pickedItems && gameState.pickedItems.includes('villHouse_5_1')) return "An empty windowsill.";
+    if (!gameState.pickedItems) gameState.pickedItems = [];
+    gameState.pickedItems.push('villHouse_5_1');
+    gameState.inventory.potions = (gameState.inventory.potions || 0) + 1;
+    return ["You spot something on the windowsill — a Potion, still sealed.", "Someone left it for travelers.", "You received a POTION!"];
+}},
 '3,5': { target: 'village', x: 5, y: 10 }, '4,5': { target: 'village', x: 6, y: 10 }
         } 
         },
@@ -6388,7 +6444,38 @@ function handleShopInteraction() {
         "Brevity is the soul of wit.",
         "Go wisely and slowly. Those who rush stumble and fall."
     ];
-    function handleShakespeareInteraction() { return shakespeareQuotes[Math.floor(Math.random() * shakespeareQuotes.length)]; }
+    function handleShakespeareInteraction() {
+    if (!gameState.shakespeareVisits) gameState.shakespeareVisits = 0;
+    gameState.shakespeareVisits++;
+
+    if (gameState.finalBossDefeated) {
+        return [
+            "Shakespeare: 'All's well that ends well.'",
+            "'You have written a story worth telling.'",
+            "'The course of true love never did run smooth — nor did the course of any great journey.'",
+            "'But you ran it anyway. That is what matters.'"
+        ];
+    }
+    if (gameState.gymBadges.synonym) {
+        return [
+            "Shakespeare: 'What's in a name? That which we call a rose by any other name would smell as sweet.'",
+            "'You understand synonyms now. Different words, same meaning.'",
+            "'But choose carefully — connotation changes everything.'",
+            "'A rose and a weed may both be plants. Only one gets a poem.'"
+        ];
+    }
+
+    const visits = [
+        ["Shakespeare: 'All the world's a stage, and all the men and women merely players.'", "'Seven ages of man. Infant. Schoolboy. Lover. Soldier. Judge. Pantaloon. Second childhood.'", "'You are in the schoolboy stage. Make the most of it.'"],
+        ["Shakespeare: 'To be, or not to be — that is the question.'", "'Hamlet asks whether it is better to endure suffering or to act.'", "'Most people quote the line. Few finish the speech.'", "'Always read beyond the famous part. The meaning is usually a few lines later.'"],
+        ["Shakespeare: 'The lady doth protest too much, methinks.'", "'This is almost always misquoted. It means she is overdoing her insistence.'", "'Excessive denial is a form of confession. In life as in literature.'"],
+        ["Shakespeare: 'We are such stuff as dreams are made on.'", "'The Tempest. Prospero. His entire island was an illusion he created.'", "'When he breaks his staff and drowns his books, he gives up magic for reality.'", "'The question is: which was more real?'"],
+        ["Shakespeare: 'Brevity is the soul of wit.'", "'Polonius says this. Ironically, he cannot stop talking.'", "'When a character's advice contradicts their behavior — that is dramatic irony.'", "'Shakespeare does this constantly. Pay attention to who says what.'"],
+        ["Shakespeare: 'The fault, dear Brutus, is not in our stars, but in ourselves.'", "'Julius Caesar. Cassius, recruiting Brutus to the conspiracy.'", "'He is saying: stop blaming fate. We have agency.'", "'Three hundred lines later, both of them are dead. Irony noted.'"],
+    ];
+    const v = visits[(gameState.shakespeareVisits - 1) % visits.length];
+    return Array.isArray(v) ? v : [v];
+}
 
 function handleMayaInteraction() {
     if (gameState.defeatedTrainers.includes('finalRival')) {
@@ -6504,16 +6591,41 @@ function handleCityPoetInteraction() {
 }
 
 function handleGodotInteraction() {
+    if (!gameState.godotVisits) gameState.godotVisits = 0;
+    gameState.godotVisits++;
+
     if (gameState.defeatedTrainers.includes('finalRival')) {
-        return "Godot Watcher: 'You did it. You actually finished. I'm still waiting, but... I'm glad someone arrived.'";
+        return [
+            "Godot Watcher: 'You did it. You actually finished.'",
+            "'I am still waiting. But I am glad someone arrived.'",
+            "'Beckett wrote this play to ask: what do people do while they wait for meaning?'",
+            "'You found out. You went and made your own.'"
+        ];
     }
     if (gameState.gymBadges.synonym) {
-        return "Godot Watcher: 'Two badges now? Maybe Godot will show up before you finish your journey. Maybe not.'";
+        return [
+            "Godot Watcher: 'Two badges. You keep moving.'",
+            "'Vladimir says: We have kept our appointment. We are not saints — but we kept our appointment.'",
+            "'Showing up is not nothing. It is, in fact, everything.'"
+        ];
     }
     if (gameState.gymBadges.rhyme) {
-        return "Godot Watcher: 'A badge! Something happened to you. Nothing ever happens to me. I'm still waiting for Godot.'";
+        return [
+            "Godot Watcher: 'A badge! Something happened to you. Nothing ever happens to me.'",
+            "'Beckett wrote: Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.'",
+            "'That is not giving up. That is the most defiant sentence ever written.'"
+        ];
     }
-    return "Godot Watcher: 'I'm waiting for Godot. He said he'd be here yesterday... or was it tomorrow?'";
+
+    const visits = [
+        "Godot Watcher: 'I am waiting for Godot. He said he would be here. Yesterday. Or was it tomorrow?'",
+        ["Godot Watcher: 'Samuel Beckett wrote a play about two men waiting on a road.'", "'They talk. They argue. They consider leaving. They stay.'", "'At the end of each act, a boy comes: Godot will not come today. But surely tomorrow.'", "'That is the whole play.'"],
+        ["Godot Watcher: 'Beckett won the Nobel Prize in 1969. He did not attend the ceremony.'", "'I believe he would have appreciated the irony.'"],
+        ["Godot Watcher: 'Absurdist literature asks: what if life has no inherent meaning?'", "'Not hopelessly — freely. If nothing means anything by itself, YOU decide what matters.'", "'That is the point of waiting for someone who never arrives.'"],
+        ["Godot Watcher: 'People always ask: who IS Godot?'", "'God. Hope. Purpose. A deadline that never comes.'", "'Beckett said he did not know. He was not being modest.'", "'Some questions are not meant to have answers. Just to be held.'"],
+    ];
+    const v = visits[(gameState.godotVisits - 1) % visits.length];
+    return Array.isArray(v) ? v : [v];
 }
 
 function handleShopTipInteraction() {
@@ -7193,6 +7305,27 @@ function handleTrainerBattle(trainerId) {
                             "The pilot drops you off and flies away towards Lexington City."
                         ]);
                     });
+                });
+            } else if (['hikerTom', 'readerSue', 'bookwormBarry', 'artistAdeline'].includes(trainerId)) {
+                // Rematch trainers — scale to player's best level
+                const playerMaxLevel = gameState.playerParty.length > 0
+                    ? Math.max(...gameState.playerParty.map(p => p.level)) : 10;
+                const rematchLevel = Math.max(playerMaxLevel, 8);
+
+                const rematchData = {
+                    'hikerTom':      { species: ['Wordworm','CommaLeon'], name: "Hiker Tom",      line: ["Tom: 'You're back! I've been training hard since our last fight.'", "'Let's see how much stronger you've gotten!'"] },
+                    'readerSue':     { species: ['SimileSlime','Metaphorpillar'], name: "Reader Sue", line: ["Sue: 'Oh, a rematch! My creatures have read every strategy guide!'", "'Let's battle like a well-structured essay — with a strong conclusion!'" ] },
+                    'bookwormBarry': { species: ['PronounProwler','Adjectlizard'], name: "Bookworm Barry", line: ["Barry: 'I've studied your style thoroughly.'", "'Chapter Two of our rivalry begins now!'"] },
+                    'artistAdeline': { species: ['VerbViper','ThesaurusRex'], name: "Artist Adeline",  line: ["Adeline: 'I've been painting battle strategies since we last met.'", "'This rematch will be my masterpiece!'"] },
+                };
+
+                const rd = rematchData[trainerId];
+                if (!gameState.rematchCounts) gameState.rematchCounts = {};
+                gameState.rematchCounts[trainerId] = (gameState.rematchCounts[trainerId] || 0) + 1;
+
+                startDialogue(rd.line, () => {
+                    const team = rd.species.map(s => createcreature(s, rematchLevel));
+                    startBattle(team, rd.name, null); // null trainerId so it doesn't re-add to defeatedTrainers
                 });
             } else {
                 startDialogue(trainersDB[trainerId].postBattle);
@@ -8088,28 +8221,13 @@ function showCredits() {    // 1. Calculate Score (Grade) based on Journal Compl
     const qLog = gameState.questionLog || [];
     const accuracy = qLog.length > 0 ? Math.round((qLog.filter(q => q.gotIt).length / qLog.length) * 100) : 0;
     let grade = "C";
-    let comment = "Keep practicing!";
+    let comment = "Good effort!";
     
-    // Base grade on Lexicon completion
-    if (totalCaught >= 15) { grade = "C+"; comment = "Getting started!"; }
-    if (totalCaught >= 25) { grade = "B"; comment = "Good work!"; }
-    if (totalCaught >= 40) { grade = "B+"; comment = "Strong effort!"; }
-    if (totalCaught >= 55) { grade = "A"; comment = "Excellent!"; }
-    if (totalCaught >= 65) { grade = "A+"; comment = "Outstanding!"; }
+if (totalCaught >= 15) { grade = "B-"; comment = "Good start!"; }
+    if (totalCaught >= 25) { grade = "B+"; comment = "Strong work!"; }
+    if (totalCaught >= 40) { grade = "A"; comment = "Excellent!"; }
+    if (totalCaught >= 55) { grade = "A+"; comment = "Near master!"; }
     if (totalCaught >= 70) { grade = "S"; comment = "Full Lexicon — Legendary!"; }
-
-    // Boost grade if accuracy is high (70%+), lower if below 50%
-    const gradeScale = ["C","C+","B","B+","A","A+","S"];
-    let gradeIdx = gradeScale.indexOf(grade);
-    if (gradeIdx >= 0) {
-        if (accuracy >= 70 && gradeIdx < gradeScale.length - 1) {
-            grade = gradeScale[gradeIdx + 1];
-            comment += " Great accuracy too!";
-        } else if (accuracy < 50 && gradeIdx > 0) {
-            grade = gradeScale[gradeIdx - 1];
-            comment += " Focus on accuracy next time.";
-        }
-    }
 
     // 2. Build the Certificate HTML
     const overlay = document.createElement('div');
@@ -8185,48 +8303,53 @@ const newGameBtn = document.getElementById('new-game-btn');
                 const CATCHABLE_TOTAL = Object.keys(creatureDB).filter(s => !UNCATCHABLE.has(s)).length;
                 const caught = Object.values(gameState.journal).filter(e => e.caught).length;
                 const wrongQ = qLog.filter(q => !q.gotIt);
-
+                const badges = [gameState.gymBadges?.rhyme ? 'Rhyme' : null, gameState.gymBadges?.synonym ? 'Synonym' : null].filter(Boolean).join(', ') || 'None';
+                const quests = [
+                    gameState.katrinaQuest >= 3 ? 'Lost Student' : null,
+                    gameState.runOnQuest >= 4 ? 'Run-On Outbreak' : null,
+                    gameState.manuscriptQuest?.done ? 'Lost Manuscript' : null,
+                    gameState.islandQuest ? 'Island Survival' : null,
+                    gameState.argumentQuestDone ? 'Argument Quest' : null,
+                    gameState.writingQuestDone ? 'Writing Process Quest' : null,
+                ].filter(Boolean).join(', ') || 'None';
                 const report = [
                     '═══════════════════════════════════════',
-                    '         ELA QUEST — TEACHER REPORT',
+                    '        ELA QUEST — TEACHER REPORT',
                     '═══════════════════════════════════════',
-                    `Student Name:      ${gameState.playerName || 'Not entered'}`,
-                    `Date:              ${new Date().toLocaleDateString()}`,
-                    `Days Played:       ${gameState.dayCount || 1}`,
+                    `Student:            ${gameState.playerName || 'Not entered'}`,
+                    `Date:               ${new Date().toLocaleDateString()}`,
+                    `Days Played:        ${gameState.dayCount || 1}`,
                     '───────────────────────────────────────',
                     'PERFORMANCE',
                     `Questions Answered: ${qLog.length}`,
-                    `Correct:           ${correct}`,
-                    `Incorrect:         ${qLog.length - correct}`,
-                    `Accuracy:          ${accuracy}%`,
+                    `Correct:            ${correct}`,
+                    `Incorrect:          ${qLog.length - correct}`,
+                    `Accuracy:           ${accuracy}%`,
                     '───────────────────────────────────────',
                     'PROGRESS',
-                    `Lexicon:           ${caught}/${CATCHABLE_TOTAL} creatures (${Math.round(caught/CATCHABLE_TOTAL*100)}%)`,
-                    `Achievements:      ${gameState._lastAchievementCount || 0} unlocked`,
-                    `Gym Badges:        ${[gameState.gymBadges?.rhyme ? 'Rhyme' : null, gameState.gymBadges?.synonym ? 'Synonym' : null].filter(Boolean).join(', ') || 'None'}`,
-                    `Champion:          ${gameState.defeatedTrainers?.includes('finalRival') ? 'Yes' : 'No'}`,
-                    `Quests Completed:  ${[gameState.katrinaQuest >= 3 ? 'Lost Student' : null, gameState.runOnQuest >= 4 ? 'Run-On Outbreak' : null, gameState.manuscriptQuest?.done ? 'Lost Manuscript' : null, gameState.islandQuest && gameState.inventory?.LH02LyricalHightail > 0 ? 'Island Survival' : null, gameState.argumentQuestDone ? 'Argument Quest' : null, gameState.writingQuestDone ? 'Writing Process Quest' : null].filter(Boolean).join(', ') || 'None'}`,
+                    `Lexicon:            ${caught}/${CATCHABLE_TOTAL} (${Math.round(caught/CATCHABLE_TOTAL*100)}%)`,
+                    `Achievements:       ${gameState._lastAchievementCount || 0}`,
+                    `Badges:             ${badges}`,
+                    `Champion:           ${gameState.defeatedTrainers?.includes('finalRival') ? 'Yes' : 'No'}`,
+                    `Quests Completed:   ${quests}`,
                     '───────────────────────────────────────',
-                    wrongQ.length > 0 ? 'MISSED QUESTIONS (Review with student):' : 'MISSED QUESTIONS: None — perfect accuracy!',
-                    ...wrongQ.slice(0, 10).map((q, i) => `${i+1}. Q: ${q.q.slice(0,60)}${q.q.length>60?'...':''}\n   Their answer: ${q.yourAnswer}\n   Correct: ${q.correct}`),
-                    wrongQ.length > 10 ? `   ...and ${wrongQ.length - 10} more. Use in-game Question Review for full list.` : '',
+                    wrongQ.length > 0 ? 'MISSED QUESTIONS:' : 'MISSED QUESTIONS: None',
+                    ...wrongQ.slice(0, 10).map((q, i) =>
+                        `${i+1}. ${q.q.slice(0,60)}${q.q.length>60?'...':''}\n   Their answer: ${q.yourAnswer}\n   Correct:      ${q.correct}`
+                    ),
+                    wrongQ.length > 10 ? `   ...and ${wrongQ.length - 10} more (see in-game Question Review)` : '',
                     '═══════════════════════════════════════',
-                    'Generated by ELA Quest — elaquest.app',
-                ].filter(line => line !== '').join('\n');
-
-                // Show in a copyable overlay
-                const reportOverlay = document.createElement('div');
-                reportOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
-                reportOverlay.innerHTML = `
-                    <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px;width:100%;max-width:560px;max-height:80vh;overflow-y:auto;">
-                        <h3 style="color:#38bdf8;font-family:'Press Start 2P',monospace;font-size:0.6rem;margin-bottom:12px;text-align:center;">📋 TEACHER REPORT</h3>
-                        <p style="color:#94a3b8;font-size:0.72rem;margin-bottom:8px;text-align:center;">Select all text below and copy (Ctrl+A, Ctrl+C)</p>
-                        <textarea id="report-text" style="width:100%;height:320px;background:#020617;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:12px;font-family:monospace;font-size:0.72rem;resize:none;box-sizing:border-box;" readonly>${report}</textarea>
-                        <button onclick="document.getElementById('report-text').select();document.execCommand('copy');this.textContent='✅ Copied!';" style="margin-top:10px;width:100%;padding:10px;background:#0369a1;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;">Copy to Clipboard</button>
-                        <button onclick="this.parentElement.parentElement.remove();" style="margin-top:8px;width:100%;padding:8px;background:#374151;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;">Close</button>
-                    </div>
-                `;
-                document.body.appendChild(reportOverlay);
+                ].filter(l => l !== '').join('\n');
+                const ov = document.createElement('div');
+                ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+                ov.innerHTML = `<div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px;width:100%;max-width:540px;max-height:80vh;overflow-y:auto;">
+                    <h3 style="color:#38bdf8;font-family:'Press Start 2P',monospace;font-size:0.6rem;margin-bottom:12px;text-align:center;">📋 TEACHER REPORT</h3>
+                    <p style="color:#94a3b8;font-size:0.72rem;margin-bottom:8px;text-align:center;">Tap Copy below or select all and copy.</p>
+                    <textarea id="report-ta" style="width:100%;height:300px;background:#020617;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:10px;font-family:monospace;font-size:0.7rem;resize:none;box-sizing:border-box;" readonly>${report}</textarea>
+                    <button onclick="const t=document.getElementById('report-ta');t.select();document.execCommand('copy');this.textContent='✅ Copied!';" style="margin-top:8px;width:100%;padding:10px;background:#0369a1;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;">Copy to Clipboard</button>
+                    <button onclick="this.parentElement.parentElement.remove();" style="margin-top:6px;width:100%;padding:8px;background:#374151;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;">Close</button>
+                </div>`;
+                document.body.appendChild(ov);
             };
         }
 
@@ -8376,38 +8499,42 @@ function showCharacterSelect() {
         gameState.player.sprite = selectedOpt.id;
         sprites.player = selectedOpt.emoji;
 
-        // Name entry screen
         titleDiv.innerHTML = `
             <div style="position:absolute;inset:0;background:#0a0a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;padding:2rem;">
                 <p style="font-family:'Press Start 2P',monospace;font-size:0.6rem;color:#8888ff;letter-spacing:.15em;margin-bottom:1.5rem;">WHAT IS YOUR NAME?</p>
-                <p style="color:rgba(200,200,255,0.6);font-size:0.85rem;text-align:center;margin-bottom:1.5rem;max-width:320px;">This will appear on your Certificate of Mastery at the end of the game.</p>
-                <input id="player-name-input" type="text" maxlength="24" placeholder="Enter your name..." 
+                <p style="color:rgba(200,200,255,0.6);font-size:0.85rem;text-align:center;margin-bottom:1.5rem;max-width:300px;">Your name will appear on your Certificate of Mastery.</p>
+                <input id="player-name-input" type="text" maxlength="24" placeholder="Enter your name..."
                     style="width:280px;padding:12px 16px;border-radius:8px;border:2px solid #4040a0;background:#1a1a3e;color:white;font-size:1rem;font-family:'Nunito',sans-serif;text-align:center;outline:none;margin-bottom:1rem;">
-                <button id="name-confirm-btn" style="padding:12px 32px;background:#2563eb;color:white;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:.05em;">
+                <button id="name-confirm-btn" style="padding:12px 32px;background:#2563eb;color:white;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;font-size:0.55rem;cursor:pointer;">
                     BEGIN ADVENTURE →
                 </button>
-                <p style="color:rgba(200,200,255,0.3);font-size:0.7rem;margin-top:1rem;cursor:pointer;" id="skip-name-btn">Skip</p>
+                <p id="skip-name-btn" style="color:rgba(200,200,255,0.25);font-size:0.7rem;margin-top:1rem;cursor:pointer;opacity:0;transition:opacity 0.5s;">Skip</p>
             </div>
         `;
 
         const nameInput = document.getElementById('player-name-input');
         nameInput.focus();
 
+        setTimeout(() => {
+            const s = document.getElementById('skip-name-btn');
+            if (s) s.style.opacity = '1';
+        }, 3000);
+
         const launchGame = () => {
-            const entered = nameInput.value.trim();
-            gameState.playerName = entered || 'Trainer';
+            gameState.playerName = (nameInput.value || '').trim() || 'Trainer';
             titleDiv.classList.add('hidden');
             gameLoop();
             startDialogue([
                 "You wake up.",
                 "Mom (downstairs): 'Breakfast is ready!'",
-                "(Arrows: Move | Z/Enter: Interact | M: Menu)"
+                "(Arrows: Move | Z/Enter: Interact | M: Menu)",
+                "💾 TIP: Your game saves automatically each time you enter a new area. You can also save anytime from the MENU."
             ]);
         };
 
         document.getElementById('name-confirm-btn').onclick = launchGame;
         document.getElementById('skip-name-btn').onclick = launchGame;
-        nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') launchGame(); });
+        nameInput.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') launchGame(); });
     };
 }
 
@@ -8963,6 +9090,22 @@ p.currentHp = p.maxHp;
 function handleCityFishMerchant() {
     if (!gameState.cityMerchantVisits) gameState.cityMerchantVisits = 0;
     gameState.cityMerchantVisits++;
+
+    // First visit — Crane introduces himself before opening shop
+    if (gameState.cityMerchantVisits === 1) {
+        return startDialogue([
+            "A man in waders looks up from a mounted Syn-tuna on the wall. He studies you.",
+            "Crane: 'You have the look of someone who fishes.'",
+            "'Not everyone does. Most people walk past water without seeing it.'",
+            "'The name is Crane. I buy aquatic specimens — creatures you catch with a rod.'",
+            "'I used to teach literature at the school down the road.'",
+            "'Then I discovered that every great story has water in it.'",
+            "'Moby-Dick. The Old Man and the Sea. The Great Gatsby. Huckleberry Finn.'",
+            "'Water is where meaning lives. I decided to get closer to it.'",
+            "'Bring me what you catch. I pay the best prices in the region.'",
+            "'Come back when your bag is full.'"
+        ]);
+    }
 
     // PRICES — highest in the game, reflecting city premium
     const CITY_PRICES = {
@@ -9620,6 +9763,12 @@ function setupTouchSnake() {
         if (down) down.onpointerdown = (e) => { e.preventDefault(); if (dir.y !== -1) nextDir = { x: 0, y: 1 }; };
         if (left) left.onpointerdown = (e) => { e.preventDefault(); if (dir.x !== 1) nextDir = { x: -1, y: 0 }; };
         if (right) right.onpointerdown = (e) => { e.preventDefault(); if (dir.x !== -1) nextDir = { x: 1, y: 0 }; };
+        // Prevent iOS long-press context menu and text selection on d-pad
+        [up, down, left, right].forEach(btn => {
+            if (!btn) return;
+            btn.oncontextmenu = (e) => e.preventDefault();
+            btn.ontouchstart = (e) => e.preventDefault();
+        });
     }
 
     function teardownTouchSnake() {
