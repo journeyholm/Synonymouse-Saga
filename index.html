@@ -1120,7 +1120,12 @@ button { cursor: pointer; }
             <h2 style="font-family:'Press Start 2P',monospace;font-size:0.75rem;color:#fbbf24;margin:0;">📋 QUEST LOG</h2>
             <button class="ui-back-btn" style="padding:6px 14px;background:#4b5563;color:white;border:none;border-radius:6px;font-family:'Press Start 2P',monospace;font-size:0.45rem;cursor:pointer;">← Back</button>
         </div>
-        <div id="quest-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+<div id="quest-list"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1rem;gap:8px;">
+            <button id="quest-prev-btn" style="flex:1;padding:10px;background:#92400e;color:#fde68a;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;font-size:0.5rem;cursor:pointer;">◀ Prev</button>
+            <span id="quest-page-label" style="color:#9ca3af;font-size:0.65rem;white-space:nowrap;"></span>
+            <button id="quest-next-btn" style="flex:1;padding:10px;background:#92400e;color:#fde68a;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;font-size:0.5rem;cursor:pointer;">Next ▶</button>
+        </div>
     </div>
     </div>
 
@@ -2731,7 +2736,7 @@ syntaxstone: '🪨', periodpython: '🔥', apostrophantom: '👻', lexiconlord: 
 'choral-reef': '🎸', 'vocal-cord': '🗣️', 'lyrical-loon': '🎤',
 
     // --- NPCS & OBJECTS ---
-    player: '🙂', mom: '👩', sister: '👧', momFlower: '🌺', artist: '🎨', professor: '👨‍🏫', rival: '🙎‍♂️', villager: '🧔', villager2: '👵', 
+    player: '🙂', mom: '👩', sister: '👧', momFlower: '🌼', artist: '🎨', professor: '👨‍🏫', rival: '🙎‍♂️', villager: '🧔', villager2: '👵', 
     hiker: '🧗', poeFan: '🧛', nurse: '👩‍⚕️', shopkeep: '🏪', gymLeader: '🏆',
     poet: '✍️', pilot: '👨‍✈️', graduate: '🎓', principal: '👨‍💼', goblin: '👺', hippie: '☮️', fisherman: '🎣',
     teacher: '👩‍🏫', student: '🎒', shakespeare: '🎭', dickinson: '👒', hughes: '🎷', maya: '📖',
@@ -5568,91 +5573,90 @@ function updateStudyUI(filterCategory = 'All', searchTerm = '') {
     }
 }
 
-    function updateQuestUI() {
+function updateQuestUI(pageIndex) {
     const list = document.getElementById('quest-list');
-    list.innerHTML = '';
 
-    const quests = [
+    const allQuests = [
         {
-            name: "The Gym Challenge",
-            icon: "🏆",
+            name: "The Gym Challenge", icon: "🏆",
             description: "Earn both Gym Badges and defeat Champion Andy to become the region's greatest trainer.",
+            hint: !gameState.gymBadges?.rhyme ? "Head to Lexington City Gym — challenge Gym Leader Rhonda!" : !gameState.gymBadges?.synonym ? "Synonym City Gym is next — find it north through the Adjective Woods." : "The Pyramid of the Void awaits. Train hard before you enter.",
             stages: [
-                { label: "Earn the Rhyme Badge — defeat Gym Leader Rhonda in Lexington City", done: !!(gameState.gymBadges?.rhyme) },
-                { label: "Earn the Synonym Badge — defeat Gym Leader Lex in Synonym City", done: !!(gameState.gymBadges?.synonym) },
-                { label: "Clear the Elite Four in the Pyramid of the Void", done: ['elitePoet','eliteDramatist','eliteJournalist','eliteGrammarian'].every(t => gameState.defeatedTrainers.includes(t)) },
-                { label: "Defeat Champion Andy — the final battle", done: gameState.defeatedTrainers.includes('finalRival') },
+                { label: "Earn the Rhyme Badge (Gym Leader Rhonda)", done: !!(gameState.gymBadges?.rhyme) },
+                { label: "Earn the Synonym Badge (Gym Leader Lex)", done: !!(gameState.gymBadges?.synonym) },
+                { label: "Clear the Elite Four", done: ['elitePoet','eliteDramatist','eliteJournalist','eliteGrammarian'].every(t => gameState.defeatedTrainers.includes(t)) },
+                { label: "Defeat Champion Andy", done: gameState.defeatedTrainers.includes('finalRival') },
             ],
             active: true,
             complete: gameState.defeatedTrainers.includes('finalRival'),
         },
         {
-            name: "Ms. Katrina: The Lost Student",
-            icon: "🎒",
-            description: "A student went missing during recess. Ms. Katrina at the Lexington School needs your help.",
+            name: "Ms. Katrina: The Lost Student", icon: "🎒",
+            description: "A student went missing during recess. Ms. Katrina at Lexington School needs your help finding them.",
+            hint: (gameState.katrinaQuest || 0) === 0 ? "Visit Lexington School and speak to Ms. Katrina." : (gameState.katrinaQuest || 0) === 1 ? "Search the Adjective Woods — head south from Synonym City." : "Return to Ms. Katrina at the school with the good news.",
             stages: [
                 { label: "Speak to Ms. Katrina at Lexington School", done: (gameState.katrinaQuest || 0) >= 1 },
                 { label: "Find the missing student in the Adjective Woods", done: (gameState.katrinaQuest || 0) >= 2 },
-                { label: "Return to Ms. Katrina with good news", done: (gameState.katrinaQuest || 0) >= 3 },
+                { label: "Return to Ms. Katrina", done: (gameState.katrinaQuest || 0) >= 3 },
             ],
             active: (gameState.katrinaQuest || 0) >= 1,
             complete: (gameState.katrinaQuest || 0) >= 3,
         },
         {
-            name: "Dr. Powers: The Run-On Outbreak",
-            icon: "🦠",
-            description: "A strange virus is infecting Wordworms on Route 2. Dr. Powers in the Library needs a specimen.",
+            name: "Dr. Powers: The Run-On Outbreak", icon: "🦠",
+            description: "A strange virus is infecting Wordworms on Route 2. Dr. Powers in the Library needs a specimen to create an antidote.",
+            hint: (gameState.runOnQuest || 0) === 0 ? "Find Dr. Powers in the Synonym City Library." : (gameState.infectedFixed || 0) < 3 ? `Fix infected Wordworms on Route 2 — ${3 - (gameState.infectedFixed||0)} remaining.` : !gameState.viralSpecimenCollected ? "Find the Mutated Wordworm deep in Grammar Cave." : "Return to Dr. Powers with the specimen.",
             stages: [
                 { label: "Talk to Dr. Powers in the Library (Synonym City)", done: (gameState.runOnQuest || 0) >= 1 },
-                { label: "Fix 3 Infected Wordworms on Route 2", done: (gameState.infectedFixed || 0) >= 3 },
-                { label: "Find the Mutated Wordworm deep in Grammar Cave", done: !!gameState.viralSpecimenCollected },
+                { label: `Fix 3 Infected Wordworms on Route 2 (${Math.min(gameState.infectedFixed||0,3)}/3)`, done: (gameState.infectedFixed || 0) >= 3 },
+                { label: "Find the Mutated Wordworm in Grammar Cave", done: !!gameState.viralSpecimenCollected },
                 { label: "Return to Dr. Powers — receive the Antidote", done: (gameState.runOnQuest || 0) >= 4 },
             ],
             active: (gameState.runOnQuest || 0) >= 1,
             complete: (gameState.runOnQuest || 0) >= 4,
         },
         {
-            name: "The Lost Manuscript",
-            icon: "📜",
-            description: "Three scholars scattered across the region each hold a fragment of a legendary manuscript.",
+            name: "The Lost Manuscript", icon: "📜",
+            description: "Three scholars scattered across the region each hold a fragment of a legendary manuscript. Reunite the pages.",
+            hint: !gameState.manuscriptQuest ? "Start by visiting the Library in Synonym City." : !gameState.manuscriptQuest?.archivist ? "The Archivist is somewhere in the Library." : !gameState.manuscriptQuest?.explorer ? "The Explorer is stranded on the Deserted Island." : !gameState.manuscriptQuest?.poet ? "The Poet Scholar is deep in the Adjective Woods." : "All fragments collected — use the Lost Manuscript from your inventory!",
             stages: [
-                { label: "Find the Archivist Scholar — somewhere in the Library", done: !!(gameState.manuscriptQuest?.archivist) },
-                { label: "Find the Explorer Scholar — stranded on the Deserted Island", done: !!(gameState.manuscriptQuest?.explorer) },
-                { label: "Find the Poet Scholar — deep in the Adjective Woods", done: !!(gameState.manuscriptQuest?.poet) },
-                { label: "Assemble the manuscript and teach Grand Narrative to a creature", done: !!(gameState.manuscriptQuest?.done) },
+                { label: "Find the Archivist Scholar (Library)", done: !!(gameState.manuscriptQuest?.archivist) },
+                { label: "Find the Explorer Scholar (Deserted Island)", done: !!(gameState.manuscriptQuest?.explorer) },
+                { label: "Find the Poet Scholar (Adjective Woods)", done: !!(gameState.manuscriptQuest?.poet) },
+                { label: "Teach Grand Narrative to a creature", done: !!(gameState.manuscriptQuest?.done) },
             ],
             active: !!(gameState.manuscriptQuest),
             complete: !!(gameState.manuscriptQuest?.done),
         },
         {
-            name: "Island Survival",
-            icon: "🏝️",
-            description: "A pilot has been stranded on a deserted island. Reach them before it's too late.",
+            name: "Island Survival", icon: "🏝️",
+            description: "A pilot has been stranded on a deserted island for years. Repair the captain's boat and mount a rescue.",
+            hint: !gameState.defeatedTrainers.includes('goblinBoss') ? "Defeat the Goblin Boss in Grammar Cave first." : !gameState.boatFixed ? "Find the Engine Cog — explore Lexington City." : !gameState.islandQuest ? "Speak to the captain at Home Bay to set sail." : !(gameState.inventory.LH02LyricalHightail > 0) ? "Complete the island tasks to earn your reward." : "Quest complete! You have the Lyrical Hightail.",
             stages: [
                 { label: "Defeat the Goblin Boss in Grammar Cave", done: gameState.defeatedTrainers.includes('goblinBoss') },
-                { label: "Fix the captain's boat — find the Engine Cog", done: !!gameState.boatFixed },
+                { label: "Fix the captain's boat (find Engine Cog)", done: !!gameState.boatFixed },
                 { label: "Sail to the Deserted Island", done: !!(gameState.islandQuest) },
-                { label: "Complete the island survival tasks", done: !!(gameState.islandQuest?.wilson) },
-                { label: "Receive LH02 Lyrical Hightail — fly home", done: (gameState.inventory.LH02LyricalHightail || 0) > 0 },
+                { label: "Complete the survival tasks", done: !!(gameState.islandQuest?.wilson) },
+                { label: "Receive LH02 Lyrical Hightail", done: (gameState.inventory.LH02LyricalHightail || 0) > 0 },
             ],
             active: gameState.defeatedTrainers.includes('goblinBoss'),
             complete: (gameState.inventory.LH02LyricalHightail || 0) > 0,
         },
         {
-            name: "The Argument Quest",
-            icon: "⚖️",
-            description: "Maya and Ethan are arguing at school. Help them identify the parts of a good argument.",
+            name: "The Argument Quest", icon: "⚖️",
+            description: "Maya and Ethan are debating school uniforms. Help them label the parts of a good argument.",
+            hint: !!gameState.argumentQuestDone ? "Complete! You've mastered argument structure." : "Find Maya and Ethan in the back of Lexington School.",
             stages: [
-                { label: "Find Maya and Ethan in the back of Lexington School", done: !!gameState.argumentQuestDone },
+                { label: "Find Maya and Ethan in Lexington School", done: !!gameState.argumentQuestDone },
                 { label: "Label all 5 parts: Claim, Evidence, Reasoning, Counterclaim, Rebuttal", done: !!gameState.argumentQuestDone },
             ],
             active: (gameState.katrinaQuest || 0) >= 1,
             complete: !!gameState.argumentQuestDone,
         },
         {
-            name: "The Writing Process Quest",
-            icon: "✏️",
-            description: "A panicked student doesn't know how to start their essay. Teach them the writing process.",
+            name: "The Writing Process Quest", icon: "✏️",
+            description: "A panicked student doesn't know how to start their essay. Teach them the 5 stages of writing.",
+            hint: !!gameState.writingQuestDone ? "Complete! Prewrite → Draft → Revise → Edit → Publish." : "Find the panicked student in Lexington School.",
             stages: [
                 { label: "Find the panicked student in Lexington School", done: !!gameState.writingQuestDone },
                 { label: "Answer 5 questions about the writing process", done: !!gameState.writingQuestDone },
@@ -5661,63 +5665,91 @@ function updateStudyUI(filterCategory = 'All', searchTerm = '') {
             complete: !!gameState.writingQuestDone,
         },
         {
-            name: "The Fishing Economy",
-            icon: "🎣",
-            description: "Find the Old Rod, explore fishing spots, and sell your catches to Merchant Crane.",
+            name: "The Fishing Economy", icon: "🎣",
+            description: "Find the Old Rod, discover fishing spots across the region, and sell your catches to Merchant Crane.",
+            hint: !(gameState.inventory.oldRod > 0) ? "Find the Lucky Lure on the Deserted Island, then bring it to the fisherman at Home Bay." : Object.keys(gameState.inventory.caughtFish||{}).length === 0 ? "Use the Old Rod at Home Bay, the Synonym Canal, or the cave lake." : "Sell your catch to Crane — his shop has a 🐟 above the door in Lexington City.",
             stages: [
-                { label: "Find the Lucky Lure on the Deserted Island", done: (gameState.inventory.luckyLure || 0) > 0 || (gameState.inventory.oldRod || 0) > 0 },
-                { label: "Return the lure to the fisherman at Home Bay — receive the Old Rod", done: (gameState.inventory.oldRod || 0) > 0 },
-                { label: "Catch at least one fish (Home Bay, Synonym Canal, or Cave Lake)", done: Object.keys(gameState.inventory.caughtFish || {}).length > 0 },
-                { label: "Sell fish to Merchant Crane in Lexington City (🐟 building)", done: (gameState.craneSalesTotal || 0) > 0 },
+                { label: "Find the Lucky Lure (Deserted Island)", done: (gameState.inventory.luckyLure||0)>0||(gameState.inventory.oldRod||0)>0 },
+                { label: "Receive the Old Rod from the Home Bay fisherman", done: (gameState.inventory.oldRod||0)>0 },
+                { label: "Catch at least one fish", done: Object.keys(gameState.inventory.caughtFish||{}).length>0 },
+                { label: "Sell fish to Merchant Crane (🐟 shop, Lexington City)", done: (gameState.craneSalesTotal||0)>0 },
             ],
-            active: gameState.gymBadges?.rhyme,
-            complete: (gameState.craneSalesTotal || 0) > 0 && Object.keys(gameState.inventory.caughtFish || {}).length >= 3,
+            active: !!(gameState.gymBadges?.rhyme),
+            complete: (gameState.craneSalesTotal||0)>0,
         },
         {
-            name: "Tom Becomes Principal",
-            icon: "🎓",
-            description: "DeathMasheen — a gamer in Lexington City — has a secret dream. Help him achieve it.",
+            name: "Tom Becomes Principal", icon: "🎓",
+            description: "DeathMasheen — a passionate gamer in Lexington City — secretly dreams of becoming a school principal.",
+            hint: !gameState.hasMetDeathMasheen ? "Find DeathMasheen in Lexington City (cityHouse3 — the gamer's den)." : !gameState.tomBecamePrincipal ? "Earn both Gym Badges to trigger the next step." : "Tom is now Principal of Lexington School!",
             stages: [
                 { label: "Meet DeathMasheen (Tom) in Lexington City", done: !!gameState.hasMetDeathMasheen },
                 { label: "Earn both Gym Badges", done: !!(gameState.gymBadges?.rhyme && gameState.gymBadges?.synonym) },
-                { label: "Tom becomes Principal of Lexington School!", done: !!gameState.tomBecamePrincipal },
+                { label: "Tom becomes Principal!", done: !!gameState.tomBecamePrincipal },
             ],
             active: !!gameState.hasMetDeathMasheen,
             complete: !!gameState.tomBecamePrincipal,
         },
     ];
 
-    quests.forEach(quest => {
-        if (!quest.active) return;
-        const doneCount = quest.stages.filter(s => s.done).length;
-        const card = document.createElement('div');
-        card.style.cssText = `
-            background: ${quest.complete ? 'rgba(22,163,74,0.12)' : 'rgba(255,255,255,0.04)'};
-            border: 1px solid ${quest.complete ? '#16a34a' : 'rgba(251,191,36,0.3)'};
-            border-radius: 10px; padding: 12px; margin-bottom: 2px;
-        `;
-        card.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="color:${quest.complete ? '#4ade80' : '#fbbf24'};font-size:0.85rem;font-weight:bold;">
-                    ${quest.icon} ${quest.name}
-                </span>
-                <span style="color:#9ca3af;font-size:0.68rem;">${doneCount}/${quest.stages.length}</span>
-            </div>
-            <p style="color:#9ca3af;font-size:0.68rem;margin-bottom:8px;font-style:italic;">${quest.description}</p>
-            ${quest.stages.map(s => `
-                <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:3px;">
-                    <span style="color:${s.done ? '#4ade80' : '#6b7280'};font-size:0.75rem;flex-shrink:0;margin-top:1px;">${s.done ? '✅' : '○'}</span>
-                    <span style="color:${s.done ? '#d1d5db' : '#6b7280'};font-size:0.7rem;${s.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${s.label}</span>
-                </div>
-            `).join('')}
-            ${quest.complete ? '<div style="color:#4ade80;font-size:0.62rem;text-align:right;margin-top:6px;font-family:\'Press Start 2P\',monospace;">✓ COMPLETE</div>' : ''}
-        `;
-        list.appendChild(card);
-    });
-
-    if (list.innerHTML === '') {
-        list.innerHTML = '<p style="color:#9ca3af;text-align:center;font-size:0.8rem;margin-top:1rem;">No active quests yet.<br><br>Explore the world and talk to NPCs to discover quests!</p>';
+    const activeQuests = allQuests.filter(q => q.active);
+    if (activeQuests.length === 0) {
+        list.innerHTML = '<p style="color:#9ca3af;text-align:center;font-size:0.8rem;margin-top:2rem;">No active quests yet.<br><br>Explore and talk to NPCs to discover quests!</p>';
+        document.getElementById('quest-page-label').textContent = '';
+        document.getElementById('quest-prev-btn').style.visibility = 'hidden';
+        document.getElementById('quest-next-btn').style.visibility = 'hidden';
+        return;
     }
+
+    if (pageIndex === undefined || pageIndex === null) pageIndex = gameState._questPage || 0;
+    pageIndex = Math.max(0, Math.min(pageIndex, activeQuests.length - 1));
+    gameState._questPage = pageIndex;
+
+    const quest = activeQuests[pageIndex];
+    const doneCount = quest.stages.filter(s => s.done).length;
+    const pct = Math.round((doneCount / quest.stages.length) * 100);
+
+    // Progress bar color
+    const barColor = quest.complete ? '#4ade80' : pct >= 50 ? '#fbbf24' : '#f97316';
+
+    list.innerHTML = `
+        <div style="background:${quest.complete ? 'rgba(22,163,74,0.12)' : 'rgba(251,191,36,0.06)'};border:1px solid ${quest.complete ? '#16a34a' : 'rgba(251,191,36,0.3)'};border-radius:12px;padding:16px;">
+            <div style="font-size:2rem;text-align:center;margin-bottom:8px;">${quest.icon}</div>
+            <div style="font-family:'Press Start 2P',monospace;font-size:0.6rem;color:${quest.complete ? '#4ade80' : '#fbbf24'};text-align:center;margin-bottom:10px;">${quest.name}</div>
+            <p style="color:#d1d5db;font-size:0.75rem;text-align:center;margin-bottom:14px;line-height:1.5;">${quest.description}</p>
+
+            <div style="background:rgba(0,0,0,0.3);border-radius:99px;height:8px;overflow:hidden;margin-bottom:6px;">
+                <div style="width:${pct}%;height:100%;background:${barColor};border-radius:99px;transition:width 0.4s;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+                <span style="color:#9ca3af;font-size:0.65rem;">${doneCount}/${quest.stages.length} stages</span>
+                <span style="color:${barColor};font-size:0.65rem;">${pct}%</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+                ${quest.stages.map(s => `
+                    <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(255,255,255,0.04);border-radius:6px;padding:6px 8px;">
+                        <span style="font-size:0.85rem;flex-shrink:0;">${s.done ? '✅' : '○'}</span>
+                        <span style="color:${s.done ? '#9ca3af' : '#e5e7eb'};font-size:0.72rem;${s.done ? 'text-decoration:line-through;opacity:0.5;' : ''}">${s.label}</span>
+                    </div>
+                `).join('')}
+            </div>
+
+            ${!quest.complete ? `
+            <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:8px 10px;">
+                <span style="color:#fbbf24;font-size:0.6rem;font-family:'Press Start 2P',monospace;">💡 HINT</span>
+                <p style="color:#fde68a;font-size:0.72rem;margin-top:4px;margin-bottom:0;">${quest.hint}</p>
+            </div>` : `
+            <div style="text-align:center;color:#4ade80;font-family:'Press Start 2P',monospace;font-size:0.55rem;padding:8px;">✓ QUEST COMPLETE</div>`}
+        </div>
+    `;
+
+    document.getElementById('quest-page-label').textContent = `${pageIndex + 1} / ${activeQuests.length}`;
+    document.getElementById('quest-prev-btn').style.visibility = pageIndex > 0 ? 'visible' : 'hidden';
+    document.getElementById('quest-next-btn').style.visibility = pageIndex < activeQuests.length - 1 ? 'visible' : 'hidden';
+
+    // Wire nav buttons
+    document.getElementById('quest-prev-btn').onclick = () => updateQuestUI(pageIndex - 1);
+    document.getElementById('quest-next-btn').onclick = () => updateQuestUI(pageIndex + 1);
 }
 
 
