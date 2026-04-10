@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">    <title>ELA Quest: The Synonymouse Saga</title>
     <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <div id="title-scene" class="absolute inset-0 z-50" style="background:#0a0a1a;overflow:hidden;font-family:'Nunito',sans-serif;">
 
@@ -89,7 +88,7 @@ animation: ts-float-mouse 4s ease-in-out infinite;
   <!-- Main content -->
   <div style="position:relative;z-index:1;width:100%;max-width:700px;padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;margin:0 auto;height:100%;justify-content:center;">
 
-    <div class="ts-badge">&#9670; Version 3.0 &#9670; Classroom Edition &#9670;</div>
+    <div class="ts-badge">&#9670; Version 2.0 &#9670; Classroom Edition &#9670;</div>
 
     <div style="text-align:center;margin-bottom:.5rem;">
       <span class="ts-ela">ELA</span>
@@ -988,191 +987,15 @@ button { cursor: pointer; }
             <canvas id="gameCanvas"></canvas>
             <canvas id="sailing-canvas"></canvas>
             <div id="root-snake-overlay">
-  <!-- Header bar -->
-  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:8px 12px;background:rgba(0,0,0,0.85);box-sizing:border-box;flex-shrink:0;">
-    <div>
-      <div style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:#60a5fa;">🐍 ROOT SNAKE</div>
-      <div style="font-family:'Press Start 2P',monospace;font-size:0.5rem;color:#fbbf24;margin-top:2px;" id="snake-score-display">Score: $0</div>
-      <div style="font-family:'Press Start 2P',monospace;font-size:0.42rem;color:#6b7280;margin-top:2px;" id="snake-best-display">Best: 0</div>
+    <div id="snake-header">
+        <span>🕹️ ROOT SNAKE</span>
+        <span id="snake-score-display">Score: $0</span>
     </div>
-    <div style="display:flex;gap:6px;">
-      <button id="snake-pause-btn" style="background:rgba(251,191,36,0.1);border:1px solid #fbbf24;color:#fbbf24;font-family:'Press Start 2P',monospace;font-size:0.42rem;padding:5px 8px;cursor:pointer;border-radius:4px;">⏸ PAUSE</button>
-      <button id="snake-quit-btn" style="background:rgba(239,68,68,0.1);border:1px solid #ef4444;color:#ef4444;font-family:'Press Start 2P',monospace;font-size:0.42rem;padding:5px 8px;cursor:pointer;border-radius:4px;">✕ QUIT</button>
-    </div>
-  </div>
-  <!-- Definition -->
-  <div id="snake-definition" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.55rem,2.2vw,0.75rem);color:#4ade80;text-align:center;padding:6px 12px;background:rgba(0,0,0,0.6);width:100%;box-sizing:border-box;flex-shrink:0;">Loading...</div>
-  <!-- How to play hint -->
-  <div style="font-size:0.62rem;color:#6b7280;text-align:center;padding:2px 0;flex-shrink:0;">Guide the snake → eat the correct prefix/suffix</div>
-  <!-- Canvas -->
-  <canvas id="snake-canvas" style="border:1px solid rgba(96,165,250,0.3);border-radius:4px;display:block;flex-shrink:0;"></canvas>
-  <!-- Status -->
-  <div id="snake-status" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.45rem,1.8vw,0.6rem);color:#4ade80;text-align:center;min-height:1.2em;padding:4px 12px;flex-shrink:0;"></div>
-  <!-- D-Pad for mobile -->
-  <div style="display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:4px;flex-shrink:0;margin:4px 0;">
-    <div></div>
-    <button id="snake-up" style="background:rgba(30,30,60,0.9);border:2px solid #60a5fa;color:#60a5fa;border-radius:8px;font-size:1.3rem;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;" oncontextmenu="return false">▲</button>
-    <div></div>
-    <button id="snake-left" style="background:rgba(30,30,60,0.9);border:2px solid #60a5fa;color:#60a5fa;border-radius:8px;font-size:1.3rem;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;" oncontextmenu="return false">◀</button>
-    <div style="background:rgba(30,30,60,0.5);border-radius:50%;border:1px solid rgba(96,165,250,0.2);"></div>
-    <button id="snake-right" style="background:rgba(30,30,60,0.9);border:2px solid #60a5fa;color:#60a5fa;border-radius:8px;font-size:1.3rem;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;" oncontextmenu="return false">▶</button>
-    <div></div>
-    <button id="snake-down" style="background:rgba(30,30,60,0.9);border:2px solid #60a5fa;color:#60a5fa;border-radius:8px;font-size:1.3rem;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;" oncontextmenu="return false">▼</button>
-    <div></div>
-  </div>
-  <!-- Pause overlay -->
-  <div id="snake-pause-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);z-index:20;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
-    <div style="font-family:'Press Start 2P',monospace;font-size:1rem;color:#fbbf24;">PAUSED</div>
-    <button id="snake-resume-btn" style="background:rgba(74,222,128,0.1);border:2px solid #4ade80;color:#4ade80;font-family:'Press Start 2P',monospace;font-size:0.55rem;padding:10px 24px;cursor:pointer;border-radius:6px;">▶ RESUME</button>
-    <button id="snake-quit-pause-btn" style="background:rgba(239,68,68,0.1);border:2px solid #ef4444;color:#ef4444;font-family:'Press Start 2P',monospace;font-size:0.55rem;padding:10px 24px;cursor:pointer;border-radius:6px;">✕ QUIT</button>
-  </div>
+    <div id="snake-definition">Loading...</div>
+    <canvas id="snake-canvas" width="300" height="260"></canvas>
+    <div id="snake-status"></div>
+    <button id="snake-quit-btn">QUIT ARCADE</button>
 </div>
-
-<!-- NEON ROOTS ARCADE GAME -->
-<div id="neon-roots-overlay" style="display:none;position:absolute;inset:0;z-index:60;background:#050510;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;font-family:'Share Tech Mono',monospace;color:white;box-sizing:border-box;">
-  <canvas id="nr-canvas" style="display:block;position:absolute;top:0;left:0;pointer-events:none;"></canvas>
-
-  <!-- HUD (shown during gameplay) -->
-  <div id="nr-hud" style="display:none;position:absolute;top:0;left:0;right:0;z-index:5;pointer-events:none;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 12px;background:linear-gradient(to bottom,rgba(0,0,0,0.92),transparent);">
-      <div>
-        <div style="display:flex;gap:14px;align-items:center;">
-          <div><span style="color:#888;font-size:0.55rem;letter-spacing:1px;display:block;">SCORE</span><span id="nr-score" style="font-size:1.2rem;font-family:'Orbitron',monospace;color:#fff;text-shadow:0 0 8px #00f3ff;">0</span></div>
-          <div><span style="color:#888;font-size:0.55rem;letter-spacing:1px;display:block;">COINS</span><span id="nr-cash" style="font-size:1.2rem;font-family:'Orbitron',monospace;color:#ffd700;text-shadow:0 0 8px #ffd700;">0</span></div>
-          <div><span style="color:#888;font-size:0.55rem;letter-spacing:1px;display:block;">BEST</span><span id="nr-best" style="font-size:1.2rem;font-family:'Orbitron',monospace;color:#a78bfa;">0</span></div>
-        </div>
-        <div style="margin-top:4px;">
-          <div style="font-size:0.55rem;color:#ff00ff;letter-spacing:2px;margin-bottom:2px;">FEVER</div>
-          <div style="width:clamp(90px,25vw,140px);height:6px;border:1px solid #555;background:rgba(0,0,0,0.5);overflow:hidden;">
-            <div id="nr-fever-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#ff00ff,#00f3ff);transition:width 0.2s;"></div>
-          </div>
-        </div>
-        <div id="nr-shields" style="display:flex;gap:3px;margin-top:3px;"></div>
-      </div>
-      <div style="display:flex;gap:6px;pointer-events:auto;">
-        <button id="nr-pause-btn" onclick="nrTogglePause()" style="background:rgba(251,191,36,0.1);border:1px solid #fbbf24;color:#fbbf24;font-family:'Press Start 2P',monospace;font-size:0.4rem;padding:5px 8px;cursor:pointer;border-radius:4px;">⏸</button>
-        <button onclick="nrQuit()" style="background:rgba(255,49,49,0.1);border:1px solid #ff3131;color:#ff3131;font-family:'Press Start 2P',monospace;font-size:0.4rem;padding:5px 8px;cursor:pointer;border-radius:4px;">✕</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Target definition (shown during gameplay) -->
-  <div id="nr-target-box" style="display:none;position:absolute;bottom:0;left:0;right:0;text-align:center;padding:10px 12px 14px;background:linear-gradient(to top,rgba(0,0,0,0.92),transparent);z-index:5;pointer-events:none;">
-    <div style="font-size:0.55rem;color:#aaa;letter-spacing:2px;margin-bottom:3px;font-family:'Press Start 2P',monospace;">TARGET DEFINITION — shoot the matching prefix/suffix</div>
-    <div id="nr-target-def" style="font-family:'Orbitron',monospace;font-size:clamp(0.9rem,3.5vw,1.4rem);color:#00ff41;text-shadow:0 0 20px #00ff41;font-weight:bold;">LOADING...</div>
-  </div>
-
-  <!-- MENU SCREEN -->
-  <div id="nr-menu" style="position:absolute;inset:0;background:rgba(5,5,18,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:8px;padding:20px;box-sizing:border-box;overflow-y:auto;">
-    <div style="font-family:'Orbitron',monospace;font-size:clamp(1.4rem,5vw,2.2rem);background:linear-gradient(to bottom,#fff,#00f3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:2px;">NEON ROOTS</div>
-    <div style="color:#ff00ff;letter-spacing:3px;font-size:clamp(0.55rem,2vw,0.75rem);margin-bottom:4px;font-family:'Orbitron',monospace;text-align:center;">GREEK & LATIN AFFIXES</div>
-    <div id="nr-menu-best" style="color:#ffd700;font-family:'Press Start 2P',monospace;font-size:0.5rem;margin-bottom:12px;">BEST SCORE: 0</div>
-
-    <div style="background:rgba(0,243,255,0.05);border:1px solid rgba(0,243,255,0.3);border-radius:8px;padding:10px 16px;margin-bottom:8px;max-width:360px;width:100%;box-sizing:border-box;">
-      <div style="color:#00f3ff;font-family:'Press Start 2P',monospace;font-size:0.5rem;margin-bottom:6px;">HOW TO PLAY</div>
-      <div style="color:#aaa;font-size:0.72rem;line-height:1.5;">
-        📖 A <span style="color:#00ff41;">definition</span> glows at the bottom<br>
-        🎯 Shoot the <span style="color:#00f3ff;">word box</span> that matches it<br>
-        ✅ Correct hit = +100 pts + coin drop<br>
-        ❌ Wrong hit or miss = lose a shield<br>
-        🔥 10 correct in a row = FEVER MODE<br>
-        🛡️ Touch + drag to move · tap to shoot
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:340px;">
-      <button onclick="nrStart(1)" style="background:rgba(0,243,255,0.06);border:1px solid #00f3ff;color:#00f3ff;padding:12px 6px;font-family:'Orbitron',monospace;font-size:clamp(0.6rem,2vw,0.75rem);cursor:pointer;border-radius:6px;transition:background 0.15s;">QUARTER 1<br><span style="font-size:0.55rem;color:#aaa;">WEEKS 1–7</span></button>
-      <button onclick="nrStart(2)" style="background:rgba(0,243,255,0.06);border:1px solid #00f3ff;color:#00f3ff;padding:12px 6px;font-family:'Orbitron',monospace;font-size:clamp(0.6rem,2vw,0.75rem);cursor:pointer;border-radius:6px;">QUARTER 2<br><span style="font-size:0.55rem;color:#aaa;">WEEKS 8–15</span></button>
-      <button onclick="nrStart(3)" style="background:rgba(0,243,255,0.06);border:1px solid #00f3ff;color:#00f3ff;padding:12px 6px;font-family:'Orbitron',monospace;font-size:clamp(0.6rem,2vw,0.75rem);cursor:pointer;border-radius:6px;">QUARTER 3<br><span style="font-size:0.55rem;color:#aaa;">WEEKS 16–26</span></button>
-      <button onclick="nrStart(4)" style="background:rgba(0,243,255,0.06);border:1px solid #00f3ff;color:#00f3ff;padding:12px 6px;font-family:'Orbitron',monospace;font-size:clamp(0.6rem,2vw,0.75rem);cursor:pointer;border-radius:6px;">QUARTER 4<br><span style="font-size:0.55rem;color:#aaa;">WEEKS 27–36</span></button>
-      <button onclick="nrStart(5)" style="background:rgba(0,255,65,0.06);border:1px solid #00ff41;color:#00ff41;padding:12px 6px;font-family:'Orbitron',monospace;font-size:clamp(0.6rem,2vw,0.75rem);cursor:pointer;border-radius:6px;">EXPERT<br><span style="font-size:0.55rem;color:#aaa;">BONUS ROOTS</span></button>
-      <button onclick="nrStart(6)" style="background:rgba(255,0,255,0.06);border:1px solid #ff00ff;color:#ff00ff;padding:12px 6px;font-family:'Orbitron',monospace;font-size:clamp(0.6rem,2vw,0.75rem);cursor:pointer;border-radius:6px;">MASTER<br><span style="font-size:0.55rem;color:#aaa;">ALL CONTENT</span></button>
-    </div>
-    <button onclick="nrQuit()" style="margin-top:10px;background:rgba(255,49,49,0.08);border:1px solid #ff3131;color:#ff3131;padding:8px 28px;font-family:'Press Start 2P',monospace;font-size:0.45rem;cursor:pointer;border-radius:6px;">EXIT ARCADE</button>
-  </div>
-
-  <!-- PAUSE SCREEN -->
-  <div id="nr-pause-screen" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.88);z-index:20;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
-    <div style="font-family:'Orbitron',monospace;font-size:1.6rem;color:#ffd700;text-shadow:0 0 20px #ffd700;">PAUSED</div>
-    <div style="color:#aaa;font-size:0.75rem;text-align:center;margin-bottom:4px;">Mission suspended</div>
-    <button onclick="nrTogglePause()" style="background:rgba(0,255,65,0.1);border:2px solid #00ff41;color:#00ff41;font-family:'Orbitron',monospace;font-size:0.8rem;padding:12px 32px;cursor:pointer;border-radius:8px;min-width:180px;">▶ RESUME</button>
-    <button onclick="nrQuit()" style="background:rgba(255,49,49,0.1);border:2px solid #ff3131;color:#ff3131;font-family:'Orbitron',monospace;font-size:0.8rem;padding:12px 32px;cursor:pointer;border-radius:8px;min-width:180px;">✕ QUIT</button>
-  </div>
-
-  <!-- GAME OVER SCREEN -->
-  <div id="nr-gameover" style="display:none;position:absolute;inset:0;background:rgba(5,5,18,0.97);flex-direction:column;align-items:center;justify-content:center;z-index:10;text-align:center;gap:8px;padding:20px;box-sizing:border-box;">
-    <div style="color:#ff3131;font-family:'Orbitron',monospace;font-size:clamp(1.2rem,4vw,1.8rem);margin-bottom:4px;">MISSION FAILED</div>
-    <div style="color:#aaa;font-size:0.65rem;letter-spacing:2px;font-family:'Press Start 2P',monospace;">FINAL SCORE</div>
-    <div id="nr-end-score" style="font-size:clamp(2rem,8vw,3rem);font-family:'Orbitron',monospace;color:#fff;text-shadow:0 0 20px #00f3ff;">0</div>
-    <div id="nr-new-best-badge" style="display:none;color:#ffd700;font-family:'Press Start 2P',monospace;font-size:0.6rem;background:rgba(255,215,0,0.1);border:1px solid #ffd700;padding:6px 16px;border-radius:20px;margin:4px 0;">⭐ NEW HIGH SCORE!</div>
-    <div id="nr-earned-msg" style="color:#ffd700;font-size:0.8rem;margin:4px 0;font-family:'Orbitron',monospace;"></div>
-    <div id="nr-mistakes-list" style="max-width:320px;width:100%;margin:8px 0;max-height:120px;overflow-y:auto;background:rgba(0,0,0,0.4);border:1px solid #333;border-radius:6px;padding:8px;display:none;"></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px;">
-      <button onclick="nrShowMenu()" style="background:rgba(0,243,255,0.08);border:1px solid #00f3ff;color:#00f3ff;padding:10px 20px;font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;border-radius:6px;">PLAY AGAIN</button>
-      <button onclick="nrQuit()" style="background:rgba(255,49,49,0.08);border:1px solid #ff3131;color:#ff3131;padding:10px 20px;font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;border-radius:6px;">EXIT</button>
-    </div>
-  </div>
-</div>
-<!-- PUNCTUATION PATH ARCADE GAME -->
-<div id="punct-path-overlay" style="display:none;position:absolute;inset:0;z-index:60;background:#192a56;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;font-family:'Press Start 2P',cursive;color:white;box-sizing:border-box;">
-
-  <!-- Header bar -->
-  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:8px 12px;background:rgba(0,0,0,0.6);box-sizing:border-box;flex-shrink:0;gap:8px;">
-    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-      <span style="font-size:clamp(0.42rem,1.5vw,0.6rem);color:#fcc419;">🏃 PUNCT PATH</span>
-      <span id="pp-score-display" style="font-size:clamp(0.42rem,1.5vw,0.55rem);color:#fff;">Score: 0</span>
-      <span id="pp-lives-display" style="font-size:clamp(0.42rem,1.5vw,0.55rem);color:#ff7b7b;">Lives: 3</span>
-      <span id="pp-level-display" style="font-size:clamp(0.42rem,1.5vw,0.55rem);color:#74c0fc;">Level: 1</span>
-      <span id="pp-timer-display" style="font-size:clamp(0.42rem,1.5vw,0.55rem);color:#aaa;">Time: 00:00</span>
-      <span id="pp-best-display" style="font-size:clamp(0.38rem,1.3vw,0.5rem);color:#a78bfa;">Best: 0</span>
-    </div>
-    <div style="display:flex;gap:6px;flex-shrink:0;">
-      <button id="pp-pause-btn" onclick="ppTogglePause()" style="background:rgba(251,191,36,0.1);border:1px solid #fbbf24;color:#fbbf24;font-family:'Press Start 2P',cursive;font-size:0.38rem;padding:5px 7px;cursor:pointer;border-radius:4px;">⏸</button>
-      <button onclick="ppQuit()" style="background:rgba(239,68,68,0.1);border:1px solid #ef4444;color:#ef4444;font-family:'Press Start 2P',cursive;font-size:0.38rem;padding:5px 7px;cursor:pointer;border-radius:4px;">✕</button>
-    </div>
-  </div>
-
-  <!-- Game canvas area -->
-  <div id="pp-game-wrap" style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:0;position:relative;">
-    <div id="pp-game-container" style="position:relative;border:4px solid rgba(255,255,255,0.3);border-radius:8px;overflow:hidden;background:#74b0ff;aspect-ratio:800/600;max-height:100%;max-width:100%;">
-      <canvas id="pp-canvas" width="800" height="600" style="display:block;width:100%;height:100%;touch-action:none;"></canvas>
-
-      <!-- Question modal -->
-      <div id="pp-question-modal" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.88);border:3px solid white;border-radius:10px;padding:3%;text-align:center;flex-direction:column;width:85%;max-width:580px;box-shadow:0 0 20px rgba(0,0,0,0.5);max-height:90%;box-sizing:border-box;">
-        <div style="overflow-y:auto;margin-bottom:2%;flex-grow:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
-          <p id="pp-sentence-text" style="font-size:clamp(13px,2.8vmin,1.1rem);line-height:1.5;margin-bottom:1rem;"></p>
-          <p id="pp-feedback-text" style="font-size:clamp(11px,2.3vmin,0.9rem);color:#ffc078;min-height:40px;line-height:1.4;"></p>
-        </div>
-        <div style="display:flex;justify-content:center;gap:3%;flex-shrink:0;">
-          <button class="pp-ans-btn" data-answer="." style="font-family:'Press Start 2P',cursive;font-size:clamp(1.3rem,4.5vmin,2.2rem);color:white;background:#fa5252;border:3px solid white;border-radius:8px;padding:1.5% 3%;cursor:pointer;">.</button>
-          <button class="pp-ans-btn" data-answer="?" style="font-family:'Press Start 2P',cursive;font-size:clamp(1.3rem,4.5vmin,2.2rem);color:white;background:#fa5252;border:3px solid white;border-radius:8px;padding:1.5% 3%;cursor:pointer;">?</button>
-          <button class="pp-ans-btn" data-answer="!" style="font-family:'Press Start 2P',cursive;font-size:clamp(1.3rem,4.5vmin,2.2rem);color:white;background:#fa5252;border:3px solid white;border-radius:8px;padding:1.5% 3%;cursor:pointer;">!</button>
-        </div>
-      </div>
-
-      <!-- Message modal (start/end/level) -->
-      <div id="pp-message-modal" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.88);border:3px solid white;border-radius:10px;padding:3%;text-align:center;display:flex;flex-direction:column;width:85%;max-width:580px;box-shadow:0 0 20px rgba(0,0,0,0.5);max-height:90%;box-sizing:border-box;">
-      </div>
-
-      <!-- Pause screen -->
-      <div id="pp-pause-screen" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);z-index:20;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
-        <div style="font-size:1.2rem;color:#fcc419;">PAUSED</div>
-        <button onclick="ppTogglePause()" style="background:rgba(81,207,102,0.1);border:2px solid #51cf66;color:#51cf66;font-family:'Press Start 2P',cursive;font-size:0.65rem;padding:10px 28px;cursor:pointer;border-radius:8px;">▶ RESUME</button>
-        <button onclick="ppQuit()" style="background:rgba(239,68,68,0.1);border:2px solid #ef4444;color:#ef4444;font-family:'Press Start 2P',cursive;font-size:0.65rem;padding:10px 28px;cursor:pointer;border-radius:8px;">✕ QUIT</button>
-      </div>
-
-      <!-- Touch controls (inside game container) -->
-      <div id="pp-touch-controls" style="display:none;position:absolute;bottom:2%;left:2%;right:2%;justify-content:space-between;align-items:flex-end;user-select:none;-webkit-user-select:none;pointer-events:auto;">
-        <div style="display:flex;gap:3vmin;">
-          <button id="pp-touch-left" style="width:clamp(55px,13vmin,90px);height:clamp(55px,13vmin,90px);background:rgba(255,255,255,0.28);border:3px solid rgba(255,255,255,0.7);border-radius:50%;font-size:clamp(28px,7vmin,46px);color:white;display:flex;align-items:center;justify-content:center;text-shadow:2px 2px #000;touch-action:none;">⬅️</button>
-          <button id="pp-touch-right" style="width:clamp(55px,13vmin,90px);height:clamp(55px,13vmin,90px);background:rgba(255,255,255,0.28);border:3px solid rgba(255,255,255,0.7);border-radius:50%;font-size:clamp(28px,7vmin,46px);color:white;display:flex;align-items:center;justify-content:center;text-shadow:2px 2px #000;touch-action:none;">➡️</button>
-        </div>
-        <button id="pp-touch-jump" style="width:clamp(55px,13vmin,90px);height:clamp(55px,13vmin,90px);background:rgba(255,255,255,0.28);border:3px solid rgba(255,255,255,0.7);border-radius:50%;font-size:clamp(28px,7vmin,46px);color:white;display:flex;align-items:center;justify-content:center;text-shadow:2px 2px #000;touch-action:none;">⬆️</button>
-      </div>
-    </div>
-  </div>
-</div>
-
             <div id="fishing-minigame">
     <div id="fishing-title">🎣 Something is on the line!</div>
     <div id="fishing-creature-name"></div>
@@ -1539,6 +1362,14 @@ maps.village.objects['6,5'] = { sprite: 'rival', interaction: ["Andy: Whoa... di
     }
     if (gameState.defeatedTrainers.includes('finalBoss1')) delete maps.finalCave.objects['9,3'];
     if (gameState.defeatedTrainers.includes('finalBoss2')) delete maps.finalCave.objects['9,2'];
+    // Remove village Andy (9,9) as soon as player has access to the Pyramid
+    if (gameState.defeatedTrainers.includes('goblinBoss') && maps.village && maps.village.objects['9,9']) {
+        delete maps.village.objects['9,9'];
+    }
+    // Remove village Andy when player has entered the Pyramid
+    if (gameState._enteredFinalCave && maps.village && maps.village.objects['9,9']) {
+        delete maps.village.objects['9,9'];
+    }
 
     // 5. RESTORE FINAL INVASION
 if (gameState.defeatedTrainers.includes('shipwreckedPilot') && !gameState.finalBossDefeated && !gameState.andyInvited) {        if (maps.village) {
@@ -1648,14 +1479,13 @@ seenQuestions: [],
         metRivalRoute1: false,
         boatFixed: false,
         arcadeHighScore: 0,
-        nrHighScore: 0,
-        ppHighScore: 0,
 lexiconComplete: false,
         lexiconSageDone: false,
         lexiconSageVisits: 0,
 seenFocusTutorial: false,
 seenTypeChart: false,
-        dayCount: 1,
+dayCount: 1,
+            playerName: '',
         argumentQuestDone: false,
         writingQuestDone: false
     };
@@ -2987,8 +2817,34 @@ const maps = {
     return lines[(gameState.tvVisits - 1) % lines.length];
 }},            
             // MIRROR (Change Avatar)
-            '1,2': { sprite: 'mirror', interaction: () => {
-                showChoices("Change your look?", [
+'1,2': { sprite: 'mirror', interaction: () => {
+                showChoices("Change your look or name?", [
+                    { text: "✏️ Change Name", callback: () => {
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;';
+                        overlay.innerHTML = `
+                            <p style="font-family:\'Press Start 2P\',monospace;font-size:0.6rem;color:#8888ff;margin-bottom:1rem;">CHANGE YOUR NAME</p>
+                            <p style="color:rgba(200,200,255,0.6);font-size:0.8rem;margin-bottom:1rem;">Current name: <strong style="color:white;">${gameState.playerName || 'Trainer'}</strong></p>
+                            <input id="rename-input" type="text" maxlength="24" placeholder="Enter new name..."
+                                style="width:260px;padding:10px 14px;border-radius:8px;border:2px solid #4040a0;background:#1a1a3e;color:white;font-size:1rem;text-align:center;outline:none;margin-bottom:1rem;">
+                            <button id="rename-confirm" style="padding:10px 28px;background:#2563eb;color:white;border:none;border-radius:8px;font-family:\'Press Start 2P\',monospace;font-size:0.5rem;cursor:pointer;margin-bottom:0.5rem;">Confirm</button>
+                            <button id="rename-cancel" style="padding:8px 20px;background:#4b5563;color:white;border:none;border-radius:8px;font-size:0.8rem;cursor:pointer;">Cancel</button>
+                        `;
+                        document.body.appendChild(overlay);
+                        const input = document.getElementById('rename-input');
+                        input.focus();
+                        const doRename = () => {
+                            const newName = input.value.trim();
+                            if (newName) {
+                                gameState.playerName = newName;
+                                overlay.remove();
+                                startDialogue([`Your name has been changed to ${newName}!`, "Your certificate will now reflect your new name."]);
+                            }
+                        };
+                        document.getElementById('rename-confirm').onclick = doRename;
+                        document.getElementById('rename-cancel').onclick = () => { overlay.remove(); startDialogue("You look fine just the way you are."); };
+                        input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') doRename(); });
+                    }},
                     { text: "Rock Star (👨‍🎤)", callback: () => { sprites.player = '👨‍🎤'; gameState.player.sprite = 'player_bowie'; draw(); startDialogue("You look fabulous."); } },
                     { text: "Rebel (🧑‍🎤)",    callback: () => { sprites.player = '🧑‍🎤'; gameState.player.sprite = 'player_green'; draw(); startDialogue("Edgy look selected."); } },
                     { text: "Boy (👦)",        callback: () => { sprites.player = '👦';   gameState.player.sprite = 'player_boy';   draw(); startDialogue("Back to basics."); } },
@@ -3037,10 +2893,19 @@ const maps = {
         "'Don't make it weird. I'm still not doing your chores.'",
         "'...but seriously. That's amazing. I'm proud of you.'"
     ];
-    if (gameState.gymBadges.synonym) return [
+if (gameState.gymBadges.synonym) return [
         "Sis: 'Two badges. Fine. You're not completely hopeless.'",
         "'Mom called. She wants us to come to Lexington City for dinner.'",
         "'Don't tell her I said this, but... nice work.'"
+    ];
+    if (gameState.earthquake1Triggered) return [
+        "Sis: 'Did you feel that? The whole house shook.'",
+        "'A hole opened up right in the center of the village path. Just... gone. Like the ground decided it was done.'",
+        "'The professor came out to look at it. He didn't seem surprised, which I thought was weird.'",
+        "'He just stood there, looking down, and said: \"It was only a matter of time.\"'",
+        "'What does that even mean? It was only a matter of time?'",
+        "'He knows something. I don't know what. But he knows something.'",
+        "'Be careful out there. Whatever is under this town — it's waking up.'"
     ];
     if (gameState.gymBadges.rhyme) return [
         "Sis: 'Is that a gym badge?'",
@@ -3109,7 +2974,7 @@ const maps = {
             '5,9': { sprite: 'campfire', interaction: handleVillageCampfire },
             '7,0': { sprite: 'gate', interaction: handleGateInteraction },
             '8,0': { sprite: 'gate', interaction: handleGateInteraction },
-            '10,10': { sprite: 'sign', interaction: 'Village of Beginnings' },
+            '10,10': { sprite: 'sign', interaction: 'Village of Beginnings — 💾 Tip: Save your game from the MENU anytime!' },
             '7,12': { target: 'homeBay', x: 7, y: 1 },
             '8,12': { target: 'homeBay', x: 8, y: 1 },
             '4,5': { interaction: handleHoleEntrance }
@@ -3271,7 +3136,7 @@ rivalsRoom: {
         "A news segment: 'Who IS Jay Gatsby, and why does he keep staring at that light?' — The Great Gatsby"
     ];
     return lines[(gameState.rivalTvVisits - 1) % lines.length];
-}},            '4,2': { sprite: 'bed', interaction: "Your rival's bed. It's surprisingly neat." },
+}},            '4,2': { sprite: 'bed', interaction: "Your rival's bed. It's a water bed..." },
             
             // 2. Lord of the Flies Reference (Table)
 '1,2': { sprite: 'table', interaction: () => {
@@ -3341,7 +3206,7 @@ rivalsRoom: {
                 const v = lines[(gameState.route1CamperVisits - 1) % lines.length];
                 return Array.isArray(v) ? v : [v];
             }},
-            '8,4': { sprite: 'sign', interaction: 'Route 1' }
+            '8,4': { sprite: 'sign', interaction: 'Route 1 — 💾 Your game saves automatically when you enter a new area!' }
             
         }, 
 encounters: ['Wordworm', 'SimileSlime', 'CommaLeon', 'Hyper-bole', 'Metaphorpillar', 'Haiku-na', 'Crick-it', 'Moth-if', 'Adjectlizard']    },
@@ -3402,10 +3267,10 @@ lexingtonCity: {
             '9,9': { symbol: '🏡', symbolOffsetY: -2 },
             '9,10': { target: 'parentsCottage', x: 3, y: 5 },
 
-'3,1': { sprite: 'sign', interaction: "🐟 CRANE & ASSOCIATES — Aquatic Specimen Buyers. Shop entrance: the building just south of here." },
-'1,10': { sprite: 'poeFan', interaction: handleCityPoetInteraction },            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
+'1,10': { sprite: 'poeFan', interaction: handleCityPoetInteraction },
+           '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
             '7,13': { target: 'route1', x: 7, y: 0 }, '8,13': { target: 'route1', x: 8, y: 0 },
-            '9,12': { sprite: 'sign', interaction: 'Lexington City' },
+            '9,12': { sprite: 'sign', interaction: 'Lexington City — 💾 Don\'t forget to save from the MENU before you log off!' },
             '11,7': { sprite: 'hiker', interaction: () => {
                 if (!gameState.lexCityHikerVisits) gameState.lexCityHikerVisits = 0;
                 gameState.lexCityHikerVisits++;
@@ -3780,7 +3645,7 @@ cityHouse3: {
             '8,0': { target: 'adjectiveWoods', x: 8, y: 13 },
             '2,7': { sprite: 'bookworm', interaction: () => handleTrainerBattle('bookwormBarry') },
             '2,3': { sprite: 'professor', interaction: () => handleTrainerBattle('profGrendel') },
-            '9,12': { sprite: 'sign', interaction: 'Route 2 - Path to the Woods' },
+            '9,12': { sprite: 'sign', interaction: 'Route 2 - Path to the Woods — 💾 Pro tip: Save before big battles!' },
             '12,6': { sprite: 'graduate', interaction: handleSenseiWu } 
         },
 encounters: ['PronounProwler', 'VerbViper', 'Rhyth-mite', 'Were-word', 'Biogra-bee', 'Syn-tuna', 'Tempo-toad', 'Haiku-na', 'Poetry-can']    },
@@ -3807,8 +3672,8 @@ objects: {
 '8,2': { sprite: 'shakespeare', interaction: () => handleScholar('poet') },
 
             // Campfire — top-right rest spot
-            '9,3': { sprite: 'campfire', interaction: handleCaveCampfire },
-            '10,2': { sprite: 'hiker', interaction: () => {
+            '14,2': { sprite: 'campfire', interaction: handleCaveCampfire },
+            '11,2': { sprite: 'hiker', interaction: () => {
                 if (!gameState.woodsCamperVisits) gameState.woodsCamperVisits = 0;
                 gameState.woodsCamperVisits++;
                 const lines = [
@@ -3846,7 +3711,7 @@ objects: {
             '7,0': { target: 'synonymCity', x: 7, y: 13 },
             
             // Sign
-'9,12': { sprite: 'sign', interaction: 'Adjective Woods - Watch your descriptions!' },
+'9,12': { sprite: 'sign', interaction: 'Adjective Woods - Watch your descriptions! — 💾 Remember to save your progress!' },
 '6,7': { sprite: 'sign', interaction: "“Not all those who wander are lost. -Tolkien" }                    },
 encounters: ['Metaphorpillar', 'PronounProwler', 'Owl-literation', 'Choral-reef', 'Theme-oth', 'Fantasy-fox', 'Poetry-can', 'Lyrical-loon', 'Para-phrase']    },
 
@@ -3946,7 +3811,7 @@ encounters: ['Fic-tion', 'Drama-llama', 'Sci-Fi-der', 'Fantasy-fox', 'Mytho-log'
 '14,10': { sprite: 'bookworm', interaction: handleSynonymBookwormInteraction },
             '7,13': { target: 'adjectiveWoods', x: 7, y: 0 },
             '8,13': { target: 'adjectiveWoods', x: 8, y: 0 },
-            '9,12': { sprite: 'sign', interaction: 'Synonym City - The City of Similar Words' },
+            '9,12': { sprite: 'sign', interaction: 'Synonym City - The City of Similar Words — 💾 Save your game at the MENU!' },
             '7,2': { symbol: '', symbolOffsetY: -2 }, 
             '6,3': { target: 'synonymCityGym', x: 4, y: 5 },
             '7,3': { target: 'synonymCityGym', x: 4, y: 5 },
@@ -4108,7 +3973,7 @@ encounters: ['Haiku-na', 'Hyper-bole', 'SimileSlime', 'Coral-scribe', 'Squid-pro
             '14,2': { sprite: 'boulder', interaction: handleBoulderInteraction },
             '14,3': { sprite: 'lexiconstruct', interaction: handleLegendaryBattle },
             '13,10': { sprite: 'fisherman', interaction: handleCaveFisherInteraction },
-            '3,5':  { sprite: 'campfire', interaction: handleCaveCampfire },
+'14,10': { sprite: 'campfire', interaction: handleCaveCampfire },
             '1,5':  { sprite: 'candy', interaction: () => handleCaveItem('Great Phrase', 'greatphrases', 1, 'caveLevel1', 1, 5) },
             '11,9': { sprite: 'candy', interaction: () => handleCaveItem('Synonym Roll', 'synonymRoll', 1, 'caveLevel1', 11, 9) },
             '5,3':  { sprite: 'wordorb', interaction: () => handleCaveItem('Ultra Sentence', 'ultrasentences', 1, 'caveLevel1', 5, 3) },
@@ -4157,10 +4022,14 @@ finalCave: {
             [31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31] 
         ],
         objects: {
-            // ENTRANCE
+// ENTRANCE
             '9,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
 '10,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
-            '14,18': { sprite: 'sign', interaction: "Pyramid of the Void\nOnly the mastered may ascend." },
+
+            // CAMPFIRE — mid-pyramid rest point
+            '7,13': { sprite: 'campfire', interaction: handleFinalCaveCampfire },
+'10,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
+            '14,18': { sprite: 'sign', interaction: "Pyramid of the Void\nOnly the mastered may ascend.\n💾 Save your game NOW before entering." },
 
             // TIER 2 GUARDIANS (Blocking bridges)
             '8,11': { sprite: 'professor', interaction: () => handleEliteBattle('eliteGrammarian', 8, 11) },
@@ -6311,6 +6180,31 @@ function handleBedInteraction() {
     }
     return "A comfy bed.";
 }
+function handleFinalCaveCampfire() {
+    if (gameState.playerParty.length === 0) {
+        return ["🔥 A campfire burns in the heart of the Pyramid.", "'Someone lit it long ago. It has not gone out.'"];
+    }
+    const allFull = gameState.playerParty.every(p => p.currentHp >= p.maxHp);
+    if (allFull) {
+        return [
+            "🔥 The campfire crackles in the dark.",
+            "Your team is already at full strength.",
+            "'The Elite Four are above you. Rest while you can.'"
+        ];
+    }
+    startDialogue([
+        "🔥 A campfire burns in the heart of the Pyramid of the Void.",
+        "'You don't know who lit it. You don't ask.'",
+        "'You sit. Your creatures recover in the warmth.'",
+        "'Above you: the Elite Four. Below you: the way home.'",
+        "'You choose up.'",
+    ], () => {
+        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; });
+        startDialogue(["✨ All creatures fully healed.", "'Press on. The summit is close.'"]);
+    });
+    return null;
+}
+
 function handleCaveCampfire() {
     if (gameState.playerParty.length === 0) {
         return "A small campfire — someone left it burning. It feels warm.";
@@ -6994,24 +6888,116 @@ if (!gameState.pennVisitCount) gameState.pennVisitCount = 0;
 }
 
 function handleCityPoetInteraction() {
-    if (gameState.gymBadges.synonym && gameState.gymBadges.rhyme) {
+    if (!gameState.paleStrangerVisits) gameState.paleStrangerVisits = 0;
+    gameState.paleStrangerVisits++;
+
+    if (gameState.finalBossDefeated) {
         return [
-            "Poet: 'Two badges. Your journey has rhythm AND meaning now.'",
-            "'That is the mark of a true writer.'",
-            "'5-7-5... the haiku is complete. So are you — for now.'"
+            "The pale stranger nods slowly.",
+            "Stranger: 'You have returned from the Pyramid. I knew you would.'",
+            "'The boundaries which divide Life from Death are at best shadowy and vague.'",
+            "'You have walked that boundary. Few do. Fewer return.'",
+            "'Sleep, those little slices of death — how I loathe them.'",
+            "'But you — you have earned your rest.'"
         ];
     }
-    if (gameState.gymBadges.rhyme) {
+
+    if (gameState.gymBadges.synonym) {
         return [
-            "Poet: 'You earned the Rhyme Badge! You understand rhythm.'",
-            "'Now go find meaning in Synonym City. A haiku needs both.'"
+            "Stranger: 'Two badges. Your journey has weight now.'",
+            "'The true genius shudders at incompleteness.'",
+            "'You are not yet complete. But you are no longer empty.'"
         ];
     }
-    return [
-        "Poet: 'A 5-7-5 syllable structure...'",
-        "'The haiku is a gentle art.'",
-        "'Even a battle can be poetry.'"
+
+    const visits = [
+        // Visit 1 — Introduction
+        [
+            "A pale figure stands very still in the shadow of the building.",
+            "Stranger: 'I have been here a long time. The city moves around me.'",
+            "'From childhood's hour I have not been as others were.'",
+            "'I have not seen as others saw. I could not bring my passions from a common spring.'",
+            "'I am simply... passing through. As I always am.'"
+        ],
+        // Visit 2 — The Raven
+        [
+            "Stranger: 'Quoth the Raven — Nevermore.'",
+            "'People always ask: what does it mean?'",
+            "'It means exactly what it says. The raven does not comfort. It does not lie.'",
+            "'It simply tells the truth that the narrator cannot bear to hear.'",
+            "'That is the most terrifying thing a story can do.'"
+        ],
+        // Visit 3 — Madness and sanity
+        [
+            "Stranger: 'I became insane, with long intervals of horrible sanity.'",
+            "'People assume the madness was the problem. It was the sanity I found difficult.'",
+            "'Men have called me mad. But the question is not yet settled.'",
+            "'That which you mistake for madness is but over-acuteness of the senses.'",
+            "'Most people feel too little. I had the opposite affliction.'"
+        ],
+        // Visit 4 — Gothic atmosphere and dread
+        [
+            "Stranger: 'Do you know what dread is? Not fear. Dread.'",
+            "'Fear has an object. Dread has only... atmosphere.'",
+            "'There is no exquisite beauty without some strangeness in the proportion.'",
+            "'I built my stories from the inside out — emotion first, then architecture.'",
+            "'The House of Usher fell because it had to. The reader felt it long before it happened.'"
+        ],
+        // Visit 5 — The Tell-Tale Heart
+        [
+            "Stranger: '— TRUE! — nervous — very, very dreadfully nervous I had been.'",
+            "'But why will you say that I am mad?'",
+            "'The narrator of that story insists he is sane. That is the point.'",
+            "'A sane person does not need to prove their sanity. They simply act.'",
+            "'Watch what people feel compelled to deny. It tells you everything.'"
+        ],
+        // Visit 6 — Dreams
+        [
+            "Stranger: 'All that we see or seem is but a dream within a dream.'",
+            "'I wrote that on a bad night. Most of my best work was written on bad nights.'",
+            "'The scariest monsters are the ones that lurk within our souls.'",
+            "'Literature does not invent darkness. It names what was already there.'",
+            "'And naming a thing — truly naming it — takes away some of its power.'"
+        ],
+        // Visit 7 — Death and beauty
+        [
+            "Stranger: 'The death of a beautiful woman is, unquestionably, the most poetical topic in the world.'",
+            "'I have been criticized for saying this. I stand by it — with clarification.'",
+            "'Annabel Lee. Ligeia. Lenore. Berenice.'",
+            "'I was not celebrating death. I was refusing to accept it.'",
+            "'That is what grief looks like when a poet holds the pen.'"
+        ],
+        // Visit 8 — Detective story
+        [
+            "Stranger: 'I invented a man named C. Auguste Dupin.'",
+            "'He solved crimes not by chasing criminals — but by thinking about them.'",
+            "'The Murders in the Rue Morgue. 1841.'",
+            "'Every detective story since owes something to that room.'",
+            "'Holmes. Poirot. Marple. They are all Dupin's grandchildren.'",
+            "'Few people know where their favorites come from.'"
+        ],
+        // Visit 9 — On writing
+        [
+            "Stranger: 'I have great faith in fools — self-confidence my friends call it.'",
+            "'I believe nothing you hear, and only one half that you see.'",
+            "'The true genius shudders at incompleteness — and imperfection pains to the soul.'",
+            "'Every word in a story must earn its place. If it does not carry weight — cut it.'",
+            "'I rewrote The Raven more times than I can count.'",
+            "'The poem that looks effortless took the most effort.'"
+        ],
+        // Visit 10 — Parting
+        [
+            "Stranger: 'You have spoken with me many times now.'",
+            "'Most people stop after one. They find me... unsettling.'",
+            "'Beauty of whatever kind, in its supreme development, invariably excites the sensitive soul to tears.'",
+            "'I do not know if I am beautiful. But I am, I think, supreme in my kind.'",
+            "'That is all any of us can hope for.'",
+            "'Come back when you have seen the Pyramid. I will still be here.'"
+        ],
     ];
+
+    const idx = Math.min(gameState.paleStrangerVisits - 1, visits.length - 1);
+    return visits[idx];
 }
 
 function handleGodotInteraction() {
@@ -8570,14 +8556,19 @@ maps.village.objects['6,5'] = { sprite: 'rival', interaction: ["Andy: Whoa... di
                  // 5. REMOVE OLD OBJECTS (If any existed from previous saves)
                  if(maps.village.objects['4,5']) delete maps.village.objects['4,5'];
             }
-            startDialogue([
+startDialogue([
                 "B-b-brrrring! B-b-brrrring!",
                 "Your phone is ringing. It's Mom!",
-                "Mom: 'Sweetie, are you okay?! There was a huge earthquake!'",
-                "'I've enabled the Home-Warp feature on the PC network. Use it to get back safely!'"
+                "Mom: 'Sweetie! Are you safe?! There was a massive earthquake here in the village!'",
+                "'A hole opened right up in the middle of town. I am not kidding. An actual hole.'",
+                "'Your father is fine. I'm fine. The flowers are fine — priorities.'",
+                "'But listen to me: get home as quickly as possible. I need to see you.'",
+                "'I've enabled the Home-Warp feature on the PC network while you travel.'",
+                "'Find a PC, use it to warp straight home. Please. Don't dawdle.'",
+                "'I love you. Come home.'"
             ], () => {
                 gameState.teleportUnlocked = true;
-                startDialogue("The Home-Warp feature on PCs is now online!");
+                startDialogue("The Home-Warp feature on PCs is now online! Find a PC to warp home instantly.");
             });
         }, 3000);
     });
@@ -8952,11 +8943,24 @@ function showCharacterSelect() {
         grid.appendChild(card);
     });
 
-    confirmBtn.onclick = (e) => {
+confirmBtn.onclick = (e) => {
         e.stopPropagation();
         if (!selectedOpt) return;
         gameState.player.sprite = selectedOpt.id;
         sprites.player = selectedOpt.emoji;
+
+        // Skip name entry if player already has a name from a previous save
+        if (gameState.playerName && gameState.playerName !== '') {
+            titleDiv.classList.add('hidden');
+            gameLoop();
+            startDialogue([
+                "You wake up.",
+                "Mom (downstairs): 'Breakfast is ready!'",
+                "(Arrows: Move | Z/Enter: Interact | M: Menu)",
+                "💾 TIP: Your game saves automatically each time you enter a new area. You can also save anytime from the MENU."
+            ]);
+            return;
+        }
 
         titleDiv.innerHTML = `
             <div style="position:absolute;inset:0;background:#0a0a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;padding:2rem;">
@@ -8979,8 +8983,8 @@ function showCharacterSelect() {
             if (s) s.style.opacity = '1';
         }, 3000);
 
-        const launchGame = () => {
-            gameState.playerName = (nameInput.value || '').trim() || 'Trainer';
+const launchGame = () => {
+            gameState.playerName = (nameInput.value || '').trim() || gameState.playerName || 'Trainer';
             titleDiv.classList.add('hidden');
             gameLoop();
             startDialogue([
@@ -9856,37 +9860,6 @@ function handleArcadeInteraction() {
                 "'Your personal best will be saved. Try to beat it!'"
             ], () => startRootSnake());
         }},
-        { text: "🚀 Play NEON ROOTS ($10)", callback: () => {
-            if (gameState.money < 10 && !gameState.devModeActive) {
-                startDialogue("Machine: 'Insert $10 to play. Come back when you have coins!'");
-                return;
-            }
-            if (!gameState.devModeActive) gameState.money -= 10;
-            closeAllMenus();
-            startDialogue([
-                "Arcade Machine: 'Welcome to NEON ROOTS!'",
-                "'A definition glows at the bottom of the screen.'",
-                "'Shoot the falling word that matches — destroy the wrong ones and you lose a shield!'",
-                "'Fill the FEVER bar by hitting 10 correct in a row for a power surge!'",
-                "'Earn coins for every correct hit. Quarter 1 through Master mode available.'"
-            ], () => NR.open());
-        }},
-        { text: "🏃 Play PUNCT PATH ($10)", callback: () => {
-            if (gameState.money < 10 && !gameState.devModeActive) {
-                startDialogue("Machine: 'Insert $10 to play. Come back when you have coins!'");
-                return;
-            }
-            if (!gameState.devModeActive) gameState.money -= 10;
-            closeAllMenus();
-            startDialogue([
-                "Arcade Machine: 'Welcome to PUNCTUATION PATH!'",
-                "'Run and jump through 5 levels as a robot explorer.'",
-                "'Hit the yellow ? blocks to answer punctuation questions.'",
-                "'Answer correctly for points. Wrong answers cost a life!'",
-                "'Collect coins, avoid the ladybugs, and reach the flag!'",
-                "'Finish all 5 levels fast — your score turns into coins!'"
-            ], () => PP.open());
-        }},
         { text: "Leave", callback: () => { gameState.inDialogue = false; messageBox.classList.add('hidden'); } }
     ]);
     return null;
@@ -9904,7 +9877,7 @@ function startRootSnake() {
     const ctx = canvas.getContext('2d');
 
     const COLS = 15, ROWS = 13;
-    const CELL = Math.min(26, Math.floor((Math.min(window.innerWidth, 420) - 24) / COLS));
+    const CELL = 20;
     canvas.width = COLS * CELL;
     canvas.height = ROWS * CELL;
 
@@ -10048,8 +10021,6 @@ score = 0;
         seenQ = [];
         gameOver = false;
         currentQ = pickQuestion();
-        const bestEl = document.getElementById('snake-best-display');
-        if (bestEl) bestEl.textContent = 'Best: ' + (gameState.arcadeHighScore || 0);
         defDisplay.textContent = currentQ.definition;
         spawnPellets(currentQ);
         scoreDisplay.textContent = `Score: $0`;
@@ -10234,9 +10205,9 @@ setTimeout(() => {
     function handleKey(e) {
         const map = {
             'ArrowUp':    { x: 0, y: -1 },
-            'ArrowDown':  { x: 0, y:  1 },
+            'ArrowDown':  { x: 0, y: 1 },
             'ArrowLeft':  { x: -1, y: 0 },
-            'ArrowRight': { x:  1, y: 0 },
+            'ArrowRight': { x: 1, y: 0 },
         };
         if (map[e.key]) {
             const d = map[e.key];
@@ -10248,35 +10219,20 @@ setTimeout(() => {
 
     // Touch d-pad support — wire to existing touch buttons
 function setupTouchSnake() {
-        // Use dedicated snake d-pad buttons first, fall back to world d-pad
-        const up    = document.getElementById('snake-up')    || document.getElementById('touch-up');
-        const down  = document.getElementById('snake-down')  || document.getElementById('touch-down');
-        const left  = document.getElementById('snake-left')  || document.getElementById('touch-left');
-        const right = document.getElementById('snake-right') || document.getElementById('touch-right');
-        if (up)    up.onpointerdown    = (e) => { e.preventDefault(); if (dir.y !== 1)  nextDir = { x: 0, y: -1 }; };
-        if (down)  down.onpointerdown  = (e) => { e.preventDefault(); if (dir.y !== -1) nextDir = { x: 0, y:  1 }; };
-        if (left)  left.onpointerdown  = (e) => { e.preventDefault(); if (dir.x !== 1)  nextDir = { x: -1, y: 0 }; };
-        if (right) right.onpointerdown = (e) => { e.preventDefault(); if (dir.x !== -1) nextDir = { x:  1, y: 0 }; };
+        const up = document.getElementById('touch-up');
+        const down = document.getElementById('touch-down');
+        const left = document.getElementById('touch-left');
+        const right = document.getElementById('touch-right');
+        if (up) up.onpointerdown = (e) => { e.preventDefault(); if (dir.y !== 1) nextDir = { x: 0, y: -1 }; };
+        if (down) down.onpointerdown = (e) => { e.preventDefault(); if (dir.y !== -1) nextDir = { x: 0, y: 1 }; };
+        if (left) left.onpointerdown = (e) => { e.preventDefault(); if (dir.x !== 1) nextDir = { x: -1, y: 0 }; };
+        if (right) right.onpointerdown = (e) => { e.preventDefault(); if (dir.x !== -1) nextDir = { x: 1, y: 0 }; };
+        // Prevent iOS long-press context menu and text selection on d-pad
         [up, down, left, right].forEach(btn => {
             if (!btn) return;
             btn.oncontextmenu = (e) => e.preventDefault();
-            btn.ontouchstart  = (e) => e.preventDefault();
+            btn.ontouchstart = (e) => e.preventDefault();
         });
-        // Wire pause button
-        const pauseBtn   = document.getElementById('snake-pause-btn');
-        const resumeBtn  = document.getElementById('snake-resume-btn');
-        const quitPause  = document.getElementById('snake-quit-pause-btn');
-        const pauseOv    = document.getElementById('snake-pause-overlay');
-        if (pauseBtn) pauseBtn.onclick = () => {
-            if (gameOver) return;
-            clearInterval(gameLoop);
-            pauseOv.style.display = 'flex';
-        };
-        if (resumeBtn) resumeBtn.onclick = () => {
-            pauseOv.style.display = 'none';
-            if (!gameOver) gameLoop = setInterval(tick, Math.max(70, 260 - (score * 8)));
-        };
-        if (quitPause) quitPause.onclick = () => { pauseOv.style.display='none'; quitBtn.click(); };
     }
 
     function teardownTouchSnake() {
@@ -10555,18 +10511,19 @@ function handleVinnieInteraction() {
         "Vinnie: 'Whoa, traveler. Bad vibes ahead.'",
         "'This ancient tree blocked the gate to Synonym City. It didn't want the noise.'",
         "'I can carve it into a flute to release its spirit, but I need new chisels.'",
-        "'Can you spot me $100 for the tools?'"
+"'Can you spot me $1,000 for the tools?'",
+        "'I know. I know. I'm sorry. Art isn't cheap, man.'"
 ], () => {
         gameState.inDialogue = false;
-        const yesText = "Yes, take $100"; // Clean text for immersion
+        const yesText = "Yes, take $1,000";
         
-        showChoices("Give Vinnie $100?", [
+        showChoices("Give Vinnie $1,000?", [
             { 
                 text: yesText, 
                 callback: () => {
                     // Logic: Checks for Money OR Dev Mode silently
-if (gameState.money >= 100 || gameState.devModeActive) {
-                        if (!gameState.devModeActive) gameState.money -= 100;
+if (gameState.money >= 1000 || gameState.devModeActive) {
+                        if (!gameState.devModeActive) gameState.money -= 1000;
                         gameState.treeRemoved = true;
                         gameState.inventory.treeFlute = 1;
                         
@@ -10574,7 +10531,7 @@ if (gameState.money >= 100 || gameState.devModeActive) {
                         draw(); 
                         
 startDialogue([
-                            "You hand Vinnie $100.",
+                            "You hand Vinnie $1,000.",
                             "Vinnie smiles, buys the tools, and gets to work.",
                             "*CHOP* ... *WHITTLE* ... *HUM*",
                             "The huge tree is transformed! He hands you the Nature Flute.",
@@ -10582,11 +10539,12 @@ startDialogue([
                             "Vinnie hands your $100 back.",
                             "Vinnie: 'I can't take money for art, man. It's about the vibes.'",
                             "Vinnie: 'Keep your cash. The path is open.'"
-                        ], () => { gameState.money += 100; });
+], () => { gameState.money += 1000; });
                     } else {
                         startDialogue([
-                            "Vinnie: 'Bummer. You're short on cash.'",
-                            "Vinnie: 'I can't buy the tools without the funds. Come back when you have $100.'"
+"Vinnie: 'Bummer. You're short on cash.'",
+                            "Vinnie: 'I'm sorry, I really am. But quality chisels aren't free.'",
+                            "Vinnie: 'Come back when you have $1,000. The tree will wait. Trees are patient.'"
                         ]);
                     }
                 }
@@ -12804,1076 +12762,8 @@ if (oldBattle.trainerId === 'senseiWu') {
         }
     }
 
-
-// ============================================================
-// NEON ROOTS — Polished ELA Quest Arcade
-// ============================================================
-const NR_Dict = {
-    q1:[
-        {def:"Before, in advance",words:["Pre-","Ante-","Fore-"]},
-        {def:"After",words:["Post-"]},
-        {def:"One",words:["Mono-","Uni-"]},
-        {def:"Many",words:["Poly-","Multi-"]},
-        {def:"Two",words:["Bi-","Di-"]},
-        {def:"Three",words:["Tri-"]},
-        {def:"Four",words:["Quad-","Tetra-"]},
-        {def:"Together, with",words:["Co-","Com-","Con-","Syn-","Sym-"]},
-        {def:"Against, opposite",words:["Contra-","Counter-","Anti-"]},
-        {def:"Under, below",words:["Sub-","Infra-"]},
-        {def:"Over, above, beyond",words:["Super-","Sur-","Hyper-"]},
-        {def:"Not, none",words:["Un-","Dis-","Non-","In-"]}
-    ],
-    q2:[
-        {def:"Between, among",words:["Inter-"]},
-        {def:"Within, inside",words:["Intra-","Intro-"]},
-        {def:"Round, around",words:["Circ-","Circum-","Peri-"]},
-        {def:"Across, through",words:["Trans-","Dia-"]},
-        {def:"Bad, badly, wrong",words:["Mal-","Mis-","Dys-"]},
-        {def:"Again, back",words:["Re-"]},
-        {def:"Under, below, less",words:["Hypo-"]},
-        {def:"Able to be",words:["-able","-ible"]},
-        {def:"Without",words:["-less","a-"]},
-        {def:"Study of",words:["-ology"]},
-        {def:"Fear of",words:["-phobia"]},
-        {def:"A person who",words:["-ian","-or","-ist"]},
-        {def:"State or quality of",words:["-ance","-ence"]}
-    ],
-    q3:[
-        {def:"Out, out of",words:["E-","Ex-","Ec-"]},
-        {def:"In, into",words:["In-","En-","Em-"]},
-        {def:"Not",words:["Non-","Il-","Im-","Ir-"]},
-        {def:"Forward, in favor of",words:["Pro-"]},
-        {def:"Backward, back",words:["Retro-"]},
-        {def:"Away from",words:["Ab-","Apo-"]},
-        {def:"Toward",words:["Ad-"]},
-        {def:"Down, out",words:["De-","Cata-"]},
-        {def:"Equal",words:["Equ-","Iso-"]},
-        {def:"Half",words:["Hemi-","Semi-"]},
-        {def:"Self",words:["Auto-","Self-"]},
-        {def:"Small",words:["Micro-"]},
-        {def:"Large",words:["Mega-","Macro-"]},
-        {def:"State, condition",words:["-ness"]},
-        {def:"Full of",words:["-ful"]},
-        {def:"Foot",words:["ped","pod"]},
-        {def:"Hand",words:["man","manu"]}
-    ],
-    q4:[
-        {def:"See, look",words:["spec","vid","vis"]},
-        {def:"Speak",words:["dict","loc","loqu"]},
-        {def:"Writing",words:["graph","gram"]},
-        {def:"Write",words:["scrib","script"]},
-        {def:"Believe",words:["cred"]},
-        {def:"Good, well",words:["ben","bene","bon"]},
-        {def:"Life",words:["bio","vit","viv"]},
-        {def:"Land, earth",words:["terr","terra","geo"]},
-        {def:"Sea, ship",words:["naut","nav","mar"]},
-        {def:"Carry",words:["port","fer"]},
-        {def:"Break",words:["rupt","fract"]},
-        {def:"Sound",words:["phon","son"]},
-        {def:"Send",words:["mit","miss"]},
-        {def:"Throw",words:["ject"]}
-    ],
-    q5:[
-        {def:"All",words:["omni","pan"]},
-        {def:"Body",words:["corp","phys"]},
-        {def:"New",words:["nov","neo"]},
-        {def:"Truth",words:["ver"]},
-        {def:"Eat",words:["vor","phag"]},
-        {def:"Move",words:["mob","mot","kin"]},
-        {def:"Love",words:["phil","am"]},
-        {def:"Color",words:["chrom"]},
-        {def:"Shape",words:["morph","form"]},
-        {def:"End",words:["fin","term"]}
-    ]
-};
-
-const NR = {
-    canvas:null, ctx:null, raf:null,
-    active:false, paused:false,
-    W:0, H:0,
-    player:null, bullets:[], enemies:[], drops:[], particles:[],
-    score:0, fever:0, feverActive:false, feverTimer:0,
-    waveData:[], target:null,
-    spawnTimer:0, bgOffset:0, stars:[],
-    mistakes:[], correctCount:0,
-    keys:{left:false,right:false,space:false},
-    touchX:null, touchY:null, touching:false,
-    _touchHandler:null, _keyHandler:null,
-
-    open: () => {
-        const ov = document.getElementById('neon-roots-overlay');
-        ov.style.display = 'flex';
-        gameState.activeScene = 'neon-roots';
-        NR.canvas = document.getElementById('nr-canvas');
-        NR.ctx = NR.canvas.getContext('2d');
-        NR.resize();
-        NR.stars = Array(70).fill(null).map(()=>({
-            x:Math.random()*NR.W, y:Math.random()*NR.H,
-            z:Math.random()*1.5+0.3, size:Math.random()*2+0.5, op:Math.random()
-        }));
-        NR._initInput();
-        NR.showMenu();
-    },
-
-    resize: () => {
-        const ov = document.getElementById('neon-roots-overlay');
-        NR.W = ov.offsetWidth || window.innerWidth;
-        NR.H = ov.offsetHeight || window.innerHeight;
-        if (NR.canvas) { NR.canvas.width = NR.W; NR.canvas.height = NR.H; }
-    },
-
-    showMenu: () => {
-        document.getElementById('nr-menu').style.display = 'flex';
-        document.getElementById('nr-gameover').style.display = 'none';
-        document.getElementById('nr-hud').style.display = 'none';
-        document.getElementById('nr-target-box').style.display = 'none';
-        document.getElementById('nr-pause-screen').style.display = 'none';
-        const best = gameState.nrHighScore || 0;
-        document.getElementById('nr-menu-best').textContent = 'BEST SCORE: ' + best;
-        NR._bgLoop();
-    },
-
-    _bgLoop: () => {
-        if (NR.active) return;
-        NR._drawBg();
-        NR.raf = requestAnimationFrame(NR._bgLoop);
-    },
-
-    _drawBg: () => {
-        if (!NR.ctx) return;
-        const ctx = NR.ctx;
-        ctx.fillStyle = '#050510'; ctx.fillRect(0,0,NR.W,NR.H);
-        NR.bgOffset = (NR.bgOffset+1)%500;
-        ctx.strokeStyle='rgba(255,0,255,0.1)'; ctx.lineWidth=1; ctx.beginPath();
-        for(let i=0;i<=NR.W;i+=80){ctx.moveTo(i,NR.H);ctx.lineTo(NR.W/2+(i-NR.W/2)*0.1,NR.H*0.3);}
-        for(let i=0;i<8;i++){const y=(NR.H*0.3)+((i*80+NR.bgOffset)%(NR.H*0.7));ctx.moveTo(0,y);ctx.lineTo(NR.W,y);}
-        ctx.stroke();
-        NR.stars.forEach(s=>{
-            s.y+=1.5*s.z; if(s.y>NR.H){s.y=0;s.x=Math.random()*NR.W;}
-            ctx.globalAlpha=s.op*0.5; ctx.fillStyle='#fff'; ctx.fillRect(s.x,s.y,s.size,s.size);
-        });
-        ctx.globalAlpha=1;
-    },
-
-    _initInput: () => {
-        NR._keyHandler = (e) => {
-            if (!NR.active||NR.paused) return;
-            if(e.key==='ArrowLeft'||e.key==='a') NR.keys.left=true;
-            if(e.key==='ArrowRight'||e.key==='d') NR.keys.right=true;
-            if(e.key===' ') { e.preventDefault(); NR.keys.space=true; }
-            if(e.key==='Escape'||e.key==='p') nrTogglePause();
-        };
-        const keyUp = (e) => {
-            if(e.key==='ArrowLeft'||e.key==='a') NR.keys.left=false;
-            if(e.key==='ArrowRight'||e.key==='d') NR.keys.right=false;
-            if(e.key===' ') NR.keys.space=false;
-        };
-        document.addEventListener('keydown', NR._keyHandler);
-        document.addEventListener('keyup', keyUp);
-        // Touch — drag to move, tap to shoot
-        const c = NR.canvas;
-        c.addEventListener('touchstart', e=>{
-            e.preventDefault(); NR.touching=true;
-            NR.touchX=e.touches[0].clientX; NR.touchY=e.touches[0].clientY;
-        },{passive:false});
-        c.addEventListener('touchmove', e=>{
-            e.preventDefault();
-            NR.touchX=e.touches[0].clientX; NR.touchY=e.touches[0].clientY;
-        },{passive:false});
-        c.addEventListener('touchend', e=>{ e.preventDefault(); NR.touching=false; },{passive:false});
-    },
-
-    start: (level) => {
-        let d=[];
-        if(level===1)d=NR_Dict.q1; else if(level===2)d=NR_Dict.q2;
-        else if(level===3)d=NR_Dict.q3; else if(level===4)d=NR_Dict.q4;
-        else if(level===5)d=NR_Dict.q5;
-        else d=[...NR_Dict.q1,...NR_Dict.q2,...NR_Dict.q3,...NR_Dict.q4,...NR_Dict.q5];
-        NR.waveData=d;
-        document.getElementById('nr-menu').style.display='none';
-        document.getElementById('nr-hud').style.display='block';
-        document.getElementById('nr-target-box').style.display='block';
-        document.getElementById('nr-gameover').style.display='none';
-        NR._reset();
-        NR.active=true;
-        NR._loop();
-    },
-
-    _reset: () => {
-        NR.player={x:NR.W/2, y:NR.H-100, vx:0, hp:3, maxHp:3, cd:0};
-        NR.bullets=[]; NR.enemies=[]; NR.drops=[]; NR.particles=[];
-        NR.score=0; NR.fever=0; NR.feverActive=false; NR.feverTimer=0;
-        NR.spawnTimer=0; NR.bgOffset=0; NR.mistakes=[]; NR.correctCount=0;
-        NR.paused=false;
-        NR._pickTarget();
-        NR._updateHUD();
-    },
-
-    _pickTarget: () => {
-        NR.target=NR.waveData[Math.floor(Math.random()*NR.waveData.length)];
-        const el=document.getElementById('nr-target-def');
-        el.textContent=NR.target.def.toUpperCase();
-        el.style.color='#00ff41'; el.style.textShadow='0 0 20px #00ff41';
-        setTimeout(()=>{el.style.color='#4ade80';el.style.textShadow='none';},350);
-    },
-
-    _spawnEnemy: () => {
-        const isTarget=Math.random()<0.42;
-        let word;
-        if(isTarget){
-            word=NR.target.words[Math.floor(Math.random()*NR.target.words.length)];
-        } else {
-            let w=NR.waveData[Math.floor(Math.random()*NR.waveData.length)];
-            let tries=0;
-            while(w===NR.target&&tries<10){w=NR.waveData[Math.floor(Math.random()*NR.waveData.length)];tries++;}
-            word=w.words[Math.floor(Math.random()*w.words.length)];
-        }
-        const isElite=Math.random()<0.07;
-        const cellW=Math.max(word.length*12+40, 60);
-        NR.enemies.push({
-            word,isTarget,isElite,
-            x:Math.random()*(NR.W-cellW-20)+cellW/2+10, y:-44,
-            w:cellW, h:38,
-            speed:(Math.random()*0.35+0.25)*(isElite?0.65:1)*(NR.feverActive?1.4:1),
-            hp:isElite?2:1
-        });
-    },
-
-    _fire: () => {
-        const p=NR.player;
-        if(NR.feverActive){
-            NR.bullets.push({x:p.x,y:p.y-22,vx:0,spd:17,col:'#fff'});
-            NR.bullets.push({x:p.x,y:p.y-22,vx:-2.5,spd:16,col:'#fff'});
-            NR.bullets.push({x:p.x,y:p.y-22,vx:2.5,spd:16,col:'#fff'});
-            p.cd=5; return;
-        }
-        NR.bullets.push({x:p.x,y:p.y-22,vx:0,spd:14,col:'#00f3ff'});
-        p.cd=16;
-    },
-
-    _hitEnemy: (idx) => {
-        const e=NR.enemies[idx];
-        e.hp--;
-        if(e.hp>0){NR._boom(e.x,e.y,'#ffd700');return;}
-        NR.enemies.splice(idx,1);
-        if(e.isTarget){
-            NR._boom(e.x,e.y,'#00ff41');
-            NR.score+=100; NR.correctCount++;
-            // Coin drop
-            const val=NR.feverActive?50:25;
-            NR.drops.push({x:e.x,y:e.y,vx:(Math.random()-0.5)*3,vy:-2.5,val,timer:0});
-            // Fever
-            if(!NR.feverActive){NR.fever++;if(NR.fever>=10){NR.feverActive=true;NR.feverTimer=360;}}
-            NR._pickTarget(); NR._updateHUD();
-        } else {
-            NR._boom(e.x,e.y,'#ff3131');
-            NR._takeDamage();
-            const realDef=NR.waveData.find(d=>d.words.includes(e.word))?.def||'?';
-            NR.mistakes.push({word:e.word,def:realDef});
-        }
-    },
-
-    _takeDamage: () => {
-        if(NR.feverActive) return;
-        NR.fever=0; NR.player.hp--;
-        NR._updateHUD();
-        const ov=document.getElementById('neon-roots-overlay');
-        ov.style.filter='brightness(2.5)';
-        setTimeout(()=>ov.style.filter='',90);
-        if(NR.player.hp<=0) NR._endGame();
-    },
-
-    _boom: (x,y,col) => {
-        for(let i=0;i<14;i++) NR.particles.push({x,y,vx:(Math.random()-0.5)*9,vy:(Math.random()-0.5)*9,life:22,col});
-    },
-
-    _endGame: () => {
-        NR.active=false;
-        cancelAnimationFrame(NR.raf);
-        const coinsEarned=Math.floor(NR.score/4);
-        if(coinsEarned>0) gameState.money=(gameState.money||0)+coinsEarned;
-        // High score
-        const prev=gameState.nrHighScore||0;
-        const newBest=NR.score>prev;
-        if(newBest) gameState.nrHighScore=NR.score;
-        document.getElementById('nr-end-score').textContent=NR.score;
-        document.getElementById('nr-earned-msg').textContent=coinsEarned>0?`+$${coinsEarned} added to your wallet!`:'';
-        document.getElementById('nr-new-best-badge').style.display=newBest?'block':'none';
-        // Show mistakes
-        const ml=document.getElementById('nr-mistakes-list');
-        if(NR.mistakes.length>0){
-            ml.style.display='block';
-            const unique=[...new Map(NR.mistakes.map(m=>[m.word,m])).values()];
-            ml.innerHTML='<div style="color:#ff7070;font-family:\'Press Start 2P\',monospace;font-size:0.45rem;margin-bottom:6px;">REVIEW:</div>'+
-                unique.slice(0,5).map(m=>`<div style="padding:4px 0;border-bottom:1px solid #333;font-size:0.68rem;"><span style="color:#ff7070;font-weight:bold;">${m.word}</span><span style="color:#888;"> = ${m.def}</span></div>`).join('');
-        } else {
-            ml.style.display='none';
-        }
-        document.getElementById('nr-hud').style.display='none';
-        document.getElementById('nr-target-box').style.display='none';
-        document.getElementById('nr-gameover').style.display='flex';
-        NR._bgLoop();
-    },
-
-    _updateHUD: () => {
-        document.getElementById('nr-score').textContent=NR.score;
-        document.getElementById('nr-cash').textContent=gameState.money||0;
-        document.getElementById('nr-best').textContent=gameState.nrHighScore||0;
-        // Shields
-        const sd=document.getElementById('nr-shields'); sd.innerHTML='';
-        for(let i=0;i<NR.player.maxHp;i++){
-            const pip=document.createElement('div');
-            pip.style.cssText=`width:18px;height:5px;background:${i<NR.player.hp?'#00f3ff':'rgba(40,40,60,0.6)'};border:1px solid ${i<NR.player.hp?'#fff':'#333'};transform:skew(-20deg);`;
-            sd.appendChild(pip);
-        }
-        // Fever
-        const pct=NR.feverActive?100:(NR.fever/10)*100;
-        const fill=document.getElementById('nr-fever-fill');
-        fill.style.width=pct+'%';
-        fill.style.background=NR.feverActive?'linear-gradient(90deg,#fff,#ff00ff,#fff)':'linear-gradient(90deg,#ff00ff,#00f3ff)';
-    },
-
-    _update: () => {
-        if(!NR.active||NR.paused) return;
-        const p=NR.player;
-        const spd=NR.feverActive?1.5:0.9;
-        if(NR.keys.left) p.vx-=spd;
-        if(NR.keys.right) p.vx+=spd;
-        if(NR.touchX!==null) p.vx+=(NR.touchX-p.x)*0.07;
-        p.x+=p.vx; p.vx*=0.87;
-        if(p.x<26) p.x=26; if(p.x>NR.W-26) p.x=NR.W-26;
-        if(p.cd>0) p.cd--;
-        if((NR.keys.space||NR.touching)&&p.cd<=0) NR._fire();
-        if(NR.feverActive){NR.feverTimer--;if(NR.feverTimer<=0){NR.feverActive=false;NR.fever=0;}}
-        // Spawn
-        NR.spawnTimer++;
-        const rate=NR.feverActive?18:Math.max(55,105-Math.floor(NR.score/200));
-        if(NR.spawnTimer>rate){NR._spawnEnemy();NR.spawnTimer=0;}
-        // Bullets
-        for(let i=NR.bullets.length-1;i>=0;i--){
-            const b=NR.bullets[i]; b.y-=b.spd; b.x+=b.vx;
-            if(b.y<-10){NR.bullets.splice(i,1);continue;}
-            for(let j=NR.enemies.length-1;j>=0;j--){
-                const e=NR.enemies[j];
-                if(b.x>e.x-e.w/2&&b.x<e.x+e.w/2&&b.y>e.y-e.h/2&&b.y<e.y+e.h/2){
-                    NR.bullets.splice(i,1); NR._hitEnemy(j); break;
-                }
-            }
-        }
-        // Enemies
-        for(let i=NR.enemies.length-1;i>=0;i--){
-            const e=NR.enemies[i];
-            e.y+=e.speed;
-            if(e.y>NR.H+50){
-                if(e.isTarget) NR._takeDamage();
-                NR.enemies.splice(i,1);
-            }
-        }
-        // Drops
-        for(let i=NR.drops.length-1;i>=0;i--){
-            const d=NR.drops[i]; d.y+=d.vy; d.vy+=0.12; d.x+=d.vx; d.timer++;
-            const dist=Math.hypot(p.x-d.x, p.y-d.y);
-            if(dist<36){
-                gameState.money=(gameState.money||0)+d.val;
-                NR.particles.push({x:d.x,y:d.y-10,vx:0,vy:-1.8,life:35,col:'#ffd700',text:`+$${d.val}`,isText:true});
-                NR.drops.splice(i,1); NR._updateHUD();
-            } else if(d.timer>200||d.y>NR.H+30) NR.drops.splice(i,1);
-        }
-        // Particles
-        for(let i=NR.particles.length-1;i>=0;i--){
-            const pt=NR.particles[i]; pt.x+=pt.vx; pt.y+=pt.vy; pt.life--;
-            if(pt.life<=0) NR.particles.splice(i,1);
-        }
-        NR.bgOffset=(NR.bgOffset+3)%500;
-    },
-
-    _draw: () => {
-        const ctx=NR.ctx;
-        ctx.fillStyle='#050510'; ctx.fillRect(0,0,NR.W,NR.H);
-        // Grid
-        ctx.strokeStyle=NR.feverActive?'rgba(255,255,255,0.18)':'rgba(255,0,255,0.1)';
-        ctx.lineWidth=1; ctx.beginPath();
-        for(let i=0;i<=NR.W;i+=80){ctx.moveTo(i,NR.H);ctx.lineTo(NR.W/2+(i-NR.W/2)*0.1,NR.H*0.3);}
-        for(let i=0;i<8;i++){const y=(NR.H*0.3)+((i*80+NR.bgOffset)%(NR.H*0.7));ctx.moveTo(0,y);ctx.lineTo(NR.W,y);}
-        ctx.stroke();
-        // Stars
-        NR.stars.forEach(s=>{
-            s.y+=NR.feverActive?7:2; if(s.y>NR.H){s.y=0;s.x=Math.random()*NR.W;}
-            ctx.globalAlpha=s.op*0.55; ctx.fillStyle='#fff'; ctx.fillRect(s.x,s.y,s.size,s.size);
-        });
-        ctx.globalAlpha=1;
-        // Player
-        const p=NR.player;
-        ctx.save(); ctx.translate(p.x,p.y);
-        ctx.shadowBlur=NR.feverActive?30:14;
-        ctx.shadowColor=NR.feverActive?'#fff':'#00f3ff';
-        if(NR.feverActive){
-            ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,22,0,Math.PI*2); ctx.fill();
-            ctx.strokeStyle=`rgba(255,0,255,${Math.random()})`;
-            ctx.lineWidth=3; ctx.beginPath(); ctx.arc(0,0,28+Math.random()*8,0,Math.PI*2); ctx.stroke();
-        } else {
-            ctx.rotate(p.vx*0.04);
-            ctx.fillStyle='#000'; ctx.strokeStyle='#00f3ff'; ctx.lineWidth=2;
-            ctx.beginPath(); ctx.moveTo(0,-22); ctx.lineTo(12,8); ctx.lineTo(12,17);
-            ctx.lineTo(4,12); ctx.lineTo(0,22); ctx.lineTo(-4,12); ctx.lineTo(-12,17);
-            ctx.lineTo(-12,8); ctx.closePath(); ctx.fill(); ctx.stroke();
-        }
-        ctx.restore(); ctx.shadowBlur=0;
-        // Enemies
-        NR.enemies.forEach(e=>{
-            ctx.save(); ctx.translate(e.x,e.y);
-            const col=e.isElite?'#ffd700':(e.isTarget?'#00f3ff':'#ff00ff');
-            ctx.shadowBlur=10; ctx.shadowColor=col; ctx.strokeStyle=col; ctx.lineWidth=2;
-            ctx.fillStyle='rgba(0,0,0,0.88)';
-            ctx.beginPath(); ctx.roundRect(-e.w/2,-e.h/2,e.w,e.h,5); ctx.fill(); ctx.stroke();
-            ctx.shadowBlur=0; ctx.fillStyle=e.isElite?'#ffd700':'#fff';
-            ctx.font=`bold ${Math.min(14,Math.floor(e.w/e.word.length+2))}px 'Share Tech Mono',monospace`;
-            ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(e.word,0,0);
-            ctx.restore();
-        });
-        // Bullets
-        NR.bullets.forEach(b=>{
-            ctx.shadowBlur=8; ctx.shadowColor=b.col; ctx.fillStyle=b.col;
-            ctx.beginPath(); ctx.arc(b.x,b.y,4,0,Math.PI*2); ctx.fill();
-        });
-        // Drops
-        NR.drops.forEach(d=>{
-            ctx.shadowBlur=14; ctx.shadowColor='#ffd700'; ctx.fillStyle='#ffd700';
-            ctx.beginPath(); ctx.moveTo(d.x,d.y-7); ctx.lineTo(d.x+7,d.y); ctx.lineTo(d.x,d.y+7); ctx.lineTo(d.x-7,d.y); ctx.fill();
-            ctx.shadowBlur=0; ctx.fillStyle='#000'; ctx.font='bold 10px Arial';
-            ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$',d.x,d.y);
-        });
-        // Particles
-        NR.particles.forEach(pt=>{
-            if(pt.isText){
-                ctx.shadowBlur=5; ctx.shadowColor=pt.col; ctx.fillStyle=pt.col;
-                ctx.font=`bold ${Math.max(11,Math.floor(pt.life*0.5))}px 'Orbitron',monospace`;
-                ctx.textAlign='center'; ctx.globalAlpha=Math.min(1,pt.life/10);
-                ctx.fillText(pt.text,pt.x,pt.y);
-            } else {
-                ctx.globalAlpha=pt.life/22; ctx.fillStyle=pt.col;
-                ctx.beginPath(); ctx.arc(pt.x,pt.y,2+Math.random()*2,0,Math.PI*2); ctx.fill();
-            }
-        });
-        ctx.globalAlpha=1; ctx.shadowBlur=0;
-        // Fever flash on HUD
-        if(NR.feverActive&&Math.floor(Date.now()/200)%2===0){
-            ctx.fillStyle='rgba(255,0,255,0.04)'; ctx.fillRect(0,0,NR.W,NR.H);
-        }
-    },
-
-    _loop: () => {
-        if(!NR.active) return;
-        NR._update(); NR._draw();
-        NR.raf=requestAnimationFrame(NR._loop);
-    }
-};
-
-function nrStart(level){ NR.start(level); }
-function nrTogglePause(){
-    if(!NR.active) return;
-    NR.paused=!NR.paused;
-    const ps=document.getElementById('nr-pause-screen');
-    ps.style.display=NR.paused?'flex':'none';
-    if(!NR.paused) NR._loop();
-}
-function nrShowMenu(){ NR.showMenu(); }
-function nrQuit(){
-    NR.active=false;
-    cancelAnimationFrame(NR.raf);
-    document.getElementById('neon-roots-overlay').style.display='none';
-    gameState.activeScene=null;
-    NR.keys={left:false,right:false,space:false};
-    NR.touchX=null; NR.touching=false;
-    if(NR._keyHandler){ document.removeEventListener('keydown',NR._keyHandler); NR._keyHandler=null; }
-}
-}
-
-// ============================================================
-// PUNCTUATION PATH — ELA Quest Arcade Integration
-// ============================================================
-const PP = {
-    canvas: null, ctx: null, raf: null,
-    active: false, paused: false, gameStarted: false,
-    score: 0, totalScore: 0, lives: 3, currentLevel: 1,
-    timeElapsed: 0, timerInterval: null,
-    highScore: 0,
-    gamePaused: true,
-    currentBlock: null,
-    keys: {},
-    player: null, powerup: null, particles: [],
-    levelObjects: [], enemies: [], coins: [],
-    backgroundClouds: [],
-    jumpPower: -14, baseJumpPower: -14,
-    playerSpeed: 5, gravity: 0.6,
-    camera: { x: 0 },
-    _keyDown: null, _keyUp: null,
-
-    allQuestions: [
-        {sentence:"Despite the rain, the team continued to practice on the field",answer:".",explanation:"This sentence makes a statement, so it ends with a period (.)."},
-        {sentence:"The new exhibit at the science museum features interactive displays",answer:".",explanation:"Use a period (.) to end a sentence that declares a fact."},
-        {sentence:"What inspired you to write your first novel",answer:"?",explanation:"This sentence asks a direct question, so it needs a question mark (?)."},
-        {sentence:"If you could travel anywhere in the world, where would you go",answer:"?",explanation:"A question mark (?) is used for sentences that ask for information."},
-        {sentence:"I can't believe we're finally going to the concert",answer:"!",explanation:"This sentence shows strong excitement, so it ends with an exclamation point (!)."},
-        {sentence:"That was the most incredible performance I've ever witnessed",answer:"!",explanation:"Use an exclamation point (!) to express strong feelings or emphasis."},
-        {sentence:"Please hand me the blue folder on the top shelf",answer:".",explanation:"This is a polite command (a request), so it ends with a period (.)."},
-        {sentence:"Watch out for that falling rock",answer:"!",explanation:"This is an urgent command or warning, so an exclamation point (!) is appropriate."},
-        {sentence:"After you finish your chores, will you be able to go to the movies",answer:"?",explanation:"Even with an introductory clause, this sentence asks a question (?)."},
-        {sentence:"Stop that right now",answer:"!",explanation:"A short, forceful command needs an exclamation point (!)."},
-        {sentence:"The concert, which was held outdoors, was a huge success",answer:".",explanation:"This is a declarative sentence, providing information, so it ends with a period (.)."},
-        {sentence:"Did the teacher say whether the assignment is due on Friday or Monday",answer:"?",explanation:"This sentence asks a question about what the teacher said (?)."},
-        {sentence:"Could you please explain the main theme of the story",answer:"?",explanation:"This is a polite question asking for information, so it needs a question mark (?)."},
-        {sentence:"Wow, that was a close call",answer:"!",explanation:"This sentence expresses surprise and relief, so an exclamation point (!) is best."},
-        {sentence:"Before the game starts, make sure your equipment is ready",answer:".",explanation:"This is an imperative sentence (a command), but it's instructional, so a period (.) is appropriate."},
-        {sentence:"How on earth did you solve that puzzle so quickly",answer:"?",explanation:"This question shows surprise but is still asking for information, requiring a question mark (?)."},
-        {sentence:"Get out of the way",answer:"!",explanation:"This is a very strong, urgent command, so it needs an exclamation point (!)."},
-        {sentence:"The old library, a building that had stood for a century, was finally being renovated",answer:".",explanation:"This complex sentence is making a statement of fact, so it ends with a period (.)."},
-        {sentence:"What a beautiful day it is for a picnic",answer:"!",explanation:"This sentence is exclamatory, expressing strong positive feeling about the day."},
-        {sentence:"Do you know if the store on the corner sells stamps",answer:"?",explanation:"This sentence is asking a question, so it requires a question mark (?)."},
-        {sentence:"To become a doctor, you must attend many years of school",answer:".",explanation:"An introductory phrase doesn't change this sentence from being a simple statement (.)."},
-        {sentence:"What an unbelievable shot that was",answer:"!",explanation:"This sentence exclaims with excitement and disbelief, so it needs an exclamation point (!)."},
-        {sentence:"Have you ever wondered what life would be like on another planet",answer:"?",explanation:"This is a classic question asking about a past experience (?)."},
-        {sentence:"Hurry up or we're going to miss the bus",answer:"!",explanation:"This command expresses urgency, so an exclamation point (!) is the correct punctuation."},
-        {sentence:"Is it true that a blue whale's heart is as big as a small car",answer:"?",explanation:"This sentence asks a question to confirm a fact, requiring a question mark (?)."},
-        {sentence:"I can't find my keys anywhere",answer:".",explanation:"While frustrating, this sentence is a statement of fact. A period (.) is most appropriate."},
-        {sentence:"You're not actually going to eat that, are you",answer:"?",explanation:"Tag questions like 'are you?' turn a statement into a question, requiring a question mark (?)."},
-        {sentence:"That's the best idea I've heard all day",answer:"!",explanation:"This sentence shows strong positive emotion, making an exclamation point (!) the right choice."},
-        {sentence:"When the storm finally passed, a brilliant rainbow appeared in the sky",answer:".",explanation:"This is a complex sentence that makes a statement, so it ends with a period (.)."},
-        {sentence:"Which of these books would you recommend for a summer reading list",answer:"?",explanation:"This sentence asks for a recommendation, so it needs a question mark (?)."},
-        {sentence:"I am so incredibly proud of everything you have accomplished",answer:"!",explanation:"Strong feeling of pride makes this sentence exclamatory (!)."},
-        {sentence:"Clean your room before you go out with your friends",answer:".",explanation:"This is a standard command or instruction, so a period (.) is sufficient."},
-        {sentence:"How many times do I have to tell you to put your shoes away",answer:"?",explanation:"This is a rhetorical question showing frustration, but it's still punctuated as a question (?)."},
-        {sentence:"Look out",answer:"!",explanation:"A short, sharp warning like this is always exclamatory and needs an exclamation point (!)."},
-        {sentence:"Would you mind helping me with this heavy box",answer:"?",explanation:"This is a polite request phrased as a question, so it ends with a question mark (?)."},
-        {sentence:"Please take out the trash before you leave for school",answer:".",explanation:"This is a polite command, also known as a request, which ends with a period (.)."},
-        {sentence:"That was a spectacular fireworks display",answer:"!",explanation:"Use an exclamation point (!) to show strong feeling or excitement."},
-        {sentence:"When is the next train scheduled to arrive",answer:"?",explanation:"A sentence that asks for information is a question and needs a question mark (?)."},
-        {sentence:"Running a marathon requires months of dedicated training",answer:".",explanation:"This sentence states a fact, so it ends with a period (.)."},
-        {sentence:"I can't believe you finished the entire puzzle by yourself",answer:"!",explanation:"This sentence expresses surprise, a strong emotion, so it needs an exclamation point (!)."},
-        {sentence:"Stop making that noise immediately",answer:"!",explanation:"This is a forceful command that shows urgency, requiring an exclamation point (!)."},
-        {sentence:"The mysterious old house at the end of the street is rumored to be haunted",answer:".",explanation:"This is a declarative sentence that provides information, ending with a period (.)."},
-        {sentence:"Wow, you did an amazing job on your presentation",answer:"!",explanation:"This sentence starts with an interjection ('Wow') and expresses praise, so use an exclamation point (!)."},
-        {sentence:"Even though the path was difficult, the view from the mountaintop was worth it",answer:".",explanation:"This complex sentence makes a statement and ends with a period (.)."},
-        {sentence:"I've never been so happy in my entire life",answer:"!",explanation:"This sentence expresses a very strong emotion of happiness, requiring an exclamation point (!)."},
-        {sentence:"Whose turn is it to walk the dog tonight",answer:"?",explanation:"This sentence asks a direct question about whose turn it is, so it needs a question mark (?)."},
-        {sentence:"Ouch, I just stubbed my toe on the table leg",answer:"!",explanation:"Sentences that start with an interjection expressing pain ('Ouch') are exclamatory (!)."},
-        {sentence:"He asked if we wanted to go to the movies",answer:".",explanation:"This is an indirect question. It reports what someone asked, so it ends with a period (.)."},
-        {sentence:"Did you remember to lock the back door before we left",answer:"?",explanation:"This is a yes/no question asking about a past action, requiring a question mark (?)."},
-        {sentence:"This is the last time I'm warning you",answer:"!",explanation:"This statement is delivered with strong emotion and force, making it exclamatory (!)."},
-        {sentence:"What would you do if you won the lottery",answer:"?",explanation:"This sentence asks a hypothetical question, so it needs a question mark (?)."},
-        {sentence:"Congratulations on winning the championship game",answer:"!",explanation:"Expressing congratulations is a form of excitement, so this is an exclamatory sentence (!)."},
-        {sentence:"The school's annual bake sale is scheduled for next Friday",answer:".",explanation:"This sentence provides factual information, making it a statement that ends with a period (.)."}
-    ],
-
-    open: () => {
-        const ov = document.getElementById('punct-path-overlay');
-        ov.style.display = 'flex';
-        gameState.activeScene = 'punct-path';
-        PP.canvas = document.getElementById('pp-canvas');
-        PP.ctx = PP.canvas.getContext('2d');
-        PP.highScore = gameState.ppHighScore || 0;
-        PP._resizeGame();
-        PP._initClouds();
-        PP._initInput();
-        PP._showMainMenu();
-    },
-
-    _resizeGame: () => {
-        const wrap = document.getElementById('pp-game-wrap');
-        if (!wrap) return;
-        const ww = wrap.clientWidth, wh = wrap.clientHeight;
-        const cont = document.getElementById('pp-game-container');
-        if (!cont) return;
-        const ratio = 800 / 600;
-        const cRatio = ww / wh;
-        if (cRatio > ratio) {
-            cont.style.height = wh + 'px';
-            cont.style.width = (wh * ratio) + 'px';
-        } else {
-            cont.style.width = ww + 'px';
-            cont.style.height = (ww / ratio) + 'px';
-        }
-    },
-
-    _initClouds: () => {
-        PP.backgroundClouds = [];
-        for (let i = 0; i < 20; i++) {
-            PP.backgroundClouds.push({
-                x: Math.random() * 3000, y: Math.random() * 300,
-                size: Math.random() * 30 + 20, speed: Math.random() * 0.2 + 0.1
-            });
-        }
-    },
-
-    _initInput: () => {
-        PP._keyDown = (e) => {
-            PP.keys[e.code] = true;
-            if (e.code === 'Escape') ppTogglePause();
-        };
-        PP._keyUp = (e) => { PP.keys[e.code] = false; };
-        document.addEventListener('keydown', PP._keyDown);
-        document.addEventListener('keyup', PP._keyUp);
-        // Touch controls
-        const left  = document.getElementById('pp-touch-left');
-        const right = document.getElementById('pp-touch-right');
-        const jump  = document.getElementById('pp-touch-jump');
-        if (left)  { left.addEventListener('touchstart',  e=>{e.preventDefault();PP.keys['ArrowLeft']=true;},{passive:false}); left.addEventListener('touchend',  e=>{e.preventDefault();PP.keys['ArrowLeft']=false;},{passive:false}); }
-        if (right) { right.addEventListener('touchstart', e=>{e.preventDefault();PP.keys['ArrowRight']=true;},{passive:false}); right.addEventListener('touchend', e=>{e.preventDefault();PP.keys['ArrowRight']=false;},{passive:false}); }
-        if (jump)  { jump.addEventListener('touchstart',  e=>{e.preventDefault();PP.keys['ArrowUp']=true;},{passive:false}); jump.addEventListener('touchend',  e=>{e.preventDefault();PP.keys['ArrowUp']=false;},{passive:false}); }
-        // Answer buttons
-        document.getElementById('punct-path-overlay').addEventListener('click', e => {
-            if (e.target.classList.contains('pp-ans-btn')) PP._handleAnswer(e.target);
-        });
-    },
-
-    _showMainMenu: () => {
-        const modal = document.getElementById('pp-message-modal');
-        modal.innerHTML = `
-            <div style="overflow-y:auto;flex-grow:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-bottom:2%;">
-                <h2 style="font-size:clamp(1rem,3.5vmin,1.6rem);color:#fcc419;flex-shrink:0;margin-bottom:1rem;">Punctuation Path!</h2>
-                <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:3%;margin-bottom:1rem;font-size:clamp(10px,2vmin,0.75rem);line-height:1.8;text-align:left;">
-                    🤖 Move with <b>Arrow Keys</b> or on-screen buttons<br>
-                    ❓ Jump UP into <b style="color:#fcc419;">?</b> blocks to get a question<br>
-                    ⭐ Hit <b style="color:#ff922b;">★</b> blocks for a <b>Jump Boost</b><br>
-                    🪙 Collect coins for bonus points<br>
-                    🐞 Avoid ladybugs — they cost you a life!<br>
-                    🏁 Reach the <b style="color:#51cf66;">flag</b> to complete the level<br>
-                    ⏱ 5 levels · answer fast · fewest lives lost wins!
-                </div>
-                <p style="font-size:clamp(9px,1.8vmin,0.65rem);color:#a78bfa;">Best Score: ${PP.highScore}</p>
-            </div>
-            <button id="pp-start-btn" style="font-family:'Press Start 2P',cursive;font-size:clamp(0.7rem,2.5vmin,1.1rem);color:black;background:#51cf66;border:3px solid white;border-radius:8px;padding:2% 5%;cursor:pointer;flex-shrink:0;">▶ Start Game</button>`;
-        modal.style.display = 'flex';
-        const startBtn = document.getElementById('pp-start-btn');
-        if (startBtn) {
-            startBtn.onclick = () => PP._startGame();
-            startBtn.addEventListener('touchstart', e => { e.preventDefault(); PP._startGame(); }, {passive:false});
-        }
-    },
-
-    _startGame: () => {
-        PP.gameStarted = true;
-        PP.currentLevel = 1;
-        PP.lives = 3;
-        PP.totalScore = 0;
-        PP.timeElapsed = 0;
-        clearInterval(PP.timerInterval);
-        PP.timerInterval = setInterval(() => { if (!PP.gamePaused) { PP.timeElapsed++; PP._updateHUD(); } }, 1000);
-        PP._startLevel();
-        PP._gameLoop();
-    },
-
-    _startLevel: () => {
-        document.getElementById('pp-message-modal').style.display = 'none';
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        document.getElementById('pp-touch-controls').style.display = isTouchDevice ? 'flex' : 'none';
-        PP.score = 0;
-        PP.gamePaused = false;
-        PP.active = true;
-        PP.keys = {};
-        PP.jumpPower = PP.baseJumpPower;
-        PP.powerup = { active: false, timer: 0 };
-        PP.particles = [];
-        PP._createLevel(PP.currentLevel);
-        PP._resetPlayer();
-        PP._updateHUD();
-    },
-
-    _resetPlayer: () => {
-        PP.player = { x:50, y:400, width:40, height:60, dx:0, dy:0, onGround:false, invincible:false, invincibleTimer:0, direction:1 };
-        PP.camera.x = 0;
-    },
-
-    _createLevel: (level) => {
-        const q = [...PP.allQuestions].sort(() => Math.random() - 0.5);
-        PP.levelObjects = [];
-        PP.enemies = [];
-        PP.coins = [];
-        const gnd = 3000;
-        PP.levelObjects.push({type:'platform', x:0, y:550, width:gnd, height:50, color:'#2f9e44'});
-
-        if (level === 1) {
-            PP.levelObjects.push({type:'q-block', x:200, y:400, question:q[0]});
-            PP.levelObjects.push({type:'platform', x:350, y:320, width:150});
-            PP.levelObjects.push({type:'powerup-block', x:400, y:150});
-            PP.levelObjects.push({type:'platform', x:550, y:80, width:100});
-            PP.coins.push({x:560,y:40},{x:600,y:40});
-            PP.levelObjects.push({type:'q-block', x:550, y:400, question:q[1]});
-            PP.levelObjects.push({type:'platform', x:700, y:320, width:100});
-            PP.levelObjects.push({type:'q-block', x:950, y:300, question:q[2]});
-            PP.levelObjects.push({type:'platform', x:850, y:450, width:200});
-            PP.levelObjects.push({type:'platform', x:1100, y:280, width:150});
-            PP.levelObjects.push({type:'q-block', x:1200, y:280, question:q[3]});
-            PP.coins.push({x:380,y:280},{x:420,y:280},{x:730,y:280},{x:960,y:250});
-            PP.levelObjects.push({type:'goal', x:1500, y:350, width:20, height:200});
-        } else if (level === 2) {
-            PP.levelObjects.push({type:'platform', x:150, y:450, width:250});
-            PP.levelObjects.push({type:'q-block', x:250, y:300, question:q[4]});
-            PP.levelObjects.push({type:'platform', x:500, y:450, width:180});
-            PP.levelObjects.push({type:'q-block', x:600, y:300, question:q[5]});
-            PP.levelObjects.push({type:'platform', x:800, y:300, width:200});
-            PP.levelObjects.push({type:'q-block', x:900, y:150, question:q[6]});
-            PP.levelObjects.push({type:'powerup-block', x:850, y:150});
-            PP.levelObjects.push({type:'q-block', x:1150, y:150, question:q[7]});
-            PP.levelObjects.push({type:'platform', x:1100, y:450, width:300});
-            PP.levelObjects.push({type:'q-block', x:1250, y:300, question:q[8]});
-            PP.coins.push({x:530,y:410},{x:570,y:410},{x:830,y:260},{x:870,y:260},{x:910,y:260});
-            PP.enemies.push({x:810,y:260,width:40,height:40,speed:1,direction:1,startX:810,range:140});
-            PP.enemies.push({x:1110,y:410,width:40,height:40,speed:1.5,direction:1,startX:1110,range:240});
-            PP.levelObjects.push({type:'goal', x:1700, y:350, width:20, height:200});
-        } else if (level === 3) {
-            PP.levelObjects.push({type:'platform', x:200, y:450, width:100});
-            PP.levelObjects.push({type:'platform', x:400, y:350, width:100});
-            PP.levelObjects.push({type:'platform', x:600, y:250, width:100});
-            PP.levelObjects.push({type:'q-block', x:625, y:100, question:q[9]});
-            PP.levelObjects.push({type:'platform', x:850, y:400, width:250});
-            PP.levelObjects.push({type:'powerup-block', x:975, y:100});
-            PP.levelObjects.push({type:'q-block', x:975, y:250, question:q[10]});
-            PP.levelObjects.push({type:'platform', x:1200, y:300, width:150});
-            PP.levelObjects.push({type:'q-block', x:1250, y:150, question:q[11]});
-            PP.levelObjects.push({type:'platform', x:1500, y:450, width:400});
-            PP.levelObjects.push({type:'platform', x:1800, y:180, width:150});
-            PP.coins.push({x:1810,y:140},{x:1850,y:140},{x:1890,y:140});
-            PP.levelObjects.push({type:'q-block', x:1700, y:300, question:q[12]});
-            PP.coins.push({x:430,y:310},{x:900,y:360},{x:950,y:360},{x:1000,y:360},{x:1550,y:410});
-            PP.enemies.push({x:860,y:360,width:40,height:40,speed:2,direction:1,startX:860,range:190});
-            PP.enemies.push({x:1510,y:410,width:40,height:40,speed:1.5,direction:1,startX:1510,range:340});
-            PP.levelObjects.push({type:'goal', x:2000, y:350, width:20, height:200});
-        } else if (level === 4) {
-            PP.levelObjects.push({type:'platform', x:100, y:400, width:100});
-            PP.levelObjects.push({type:'platform', x:100, y:250, width:100});
-            PP.levelObjects.push({type:'q-block', x:125, y:100, question:q[13]});
-            PP.levelObjects.push({type:'platform', x:300, y:450, width:400});
-            PP.enemies.push({x:310,y:410,width:40,height:40,speed:2.5,direction:1,startX:310,range:340});
-            PP.levelObjects.push({type:'q-block', x:500, y:300, question:q[14]});
-            PP.levelObjects.push({type:'platform', x:750, y:350, width:150});
-            PP.levelObjects.push({type:'powerup-block', x:1000, y:400});
-            PP.levelObjects.push({type:'platform', x:1100, y:200, width:100});
-            PP.levelObjects.push({type:'q-block', x:1125, y:50, question:q[15]});
-            PP.levelObjects.push({type:'platform', x:1300, y:400, width:300});
-            PP.enemies.push({x:1310,y:360,width:40,height:40,speed:2,direction:1,startX:1310,range:240});
-            PP.levelObjects.push({type:'platform', x:1650, y:300, width:150});
-            PP.levelObjects.push({type:'q-block', x:1675, y:150, question:q[16]});
-            PP.coins.push({x:350,y:250},{x:400,y:250},{x:780,y:310},{x:1350,y:200},{x:1400,y:200});
-            PP.levelObjects.push({type:'goal', x:2200, y:350, width:20, height:200});
-        } else if (level === 5) {
-            PP.levelObjects.push({type:'platform', x:150, y:450, width:50});
-            PP.levelObjects.push({type:'platform', x:300, y:350, width:50});
-            PP.levelObjects.push({type:'platform', x:450, y:250, width:50});
-            PP.levelObjects.push({type:'q-block', x:450, y:100, question:q[17]});
-            PP.levelObjects.push({type:'platform', x:600, y:500, width:800});
-            PP.enemies.push({x:610,y:460,width:40,height:40,speed:3,direction:1,startX:610,range:350});
-            PP.enemies.push({x:1000,y:460,width:40,height:40,speed:3,direction:-1,startX:1000,range:350});
-            PP.levelObjects.push({type:'q-block', x:1000, y:300, question:q[18]});
-            PP.levelObjects.push({type:'platform', x:1500, y:450, width:100});
-            PP.levelObjects.push({type:'powerup-block', x:1525, y:300});
-            PP.levelObjects.push({type:'platform', x:1700, y:200, width:50});
-            PP.levelObjects.push({type:'platform', x:1900, y:100, width:50});
-            PP.levelObjects.push({type:'q-block', x:1900, y:-50, question:q[19]});
-            PP.levelObjects.push({type:'platform', x:2100, y:400, width:200});
-            PP.levelObjects.push({type:'q-block', x:2200, y:250, question:q[20]});
-            PP.coins.push({x:160,y:410},{x:310,y:310},{x:800,y:460},{x:1200,y:460},{x:1710,y:160});
-            PP.levelObjects.push({type:'goal', x:2500, y:350, width:20, height:200});
-        }
-
-        PP.levelObjects.forEach(obj => {
-            if (obj.width === undefined) obj.width = 50;
-            if (obj.height === undefined) obj.height = 50;
-            if (obj.color === undefined) obj.color = '#9c6644';
-        });
-        PP.coins.forEach(c => { c.collected = false; });
-    },
-
-    _askQuestion: (block) => {
-        PP.gamePaused = true;
-        PP.currentBlock = block;
-        const modal = document.getElementById('pp-question-modal');
-        document.getElementById('pp-sentence-text').textContent = block.question.sentence;
-        document.getElementById('pp-feedback-text').textContent = '';
-        document.querySelectorAll('.pp-ans-btn').forEach(btn => { btn.disabled = false; btn.style.backgroundColor = '#fa5252'; });
-        modal.style.display = 'flex';
-        document.getElementById('pp-touch-controls').style.display = 'none';
-    },
-
-    _handleAnswer: (btn) => {
-        if (!PP.currentBlock) return;
-        const selected = btn.dataset.answer;
-        const correct = selected === PP.currentBlock.question.answer;
-        document.querySelectorAll('.pp-ans-btn').forEach(b => b.disabled = true);
-        if (correct) {
-            btn.style.backgroundColor = '#51cf66';
-            document.getElementById('pp-feedback-text').textContent = '✅ Correct! +100 pts';
-            PP.score += 100;
-            PP.currentBlock.answered = true;
-            PP.currentBlock.type = 'used-block';
-            setTimeout(() => PP._closeQuestion(), 1400);
-        } else {
-            PP.lives--;
-            document.getElementById('pp-feedback-text').textContent = PP.currentBlock.question.explanation;
-            PP.currentBlock.answered = true;
-            PP.currentBlock.type = 'used-block';
-            btn.style.backgroundColor = '#c92a2a';
-            const correctBtn = document.querySelector(`.pp-ans-btn[data-answer="${PP.currentBlock.question.answer}"]`);
-            if (correctBtn) correctBtn.style.backgroundColor = '#51cf66';
-            setTimeout(() => {
-                PP._closeQuestion();
-                if (PP.lives <= 0) PP._endGame('Game Over!');
-            }, 2800);
-        }
-        PP._updateHUD();
-    },
-
-    _closeQuestion: () => {
-        document.getElementById('pp-question-modal').style.display = 'none';
-        PP.currentBlock = null;
-        PP.gamePaused = false;
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        if (isTouchDevice) document.getElementById('pp-touch-controls').style.display = 'flex';
-    },
-
-    _updateHUD: () => {
-        const fmt = (s) => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-        document.getElementById('pp-score-display').textContent = `Score: ${PP.totalScore + PP.score}`;
-        document.getElementById('pp-lives-display').textContent = `Lives: ${PP.lives}`;
-        document.getElementById('pp-level-display').textContent = `Level: ${PP.currentLevel}`;
-        document.getElementById('pp-timer-display').textContent = `Time: ${fmt(PP.timeElapsed)}`;
-        document.getElementById('pp-best-display').textContent = `Best: ${PP.highScore}`;
-    },
-
-    _levelComplete: () => {
-        PP.gamePaused = true;
-        PP.totalScore += PP.score;
-        document.getElementById('pp-touch-controls').style.display = 'none';
-        if (PP.currentLevel < 5) {
-            const modal = document.getElementById('pp-message-modal');
-            modal.innerHTML = `
-                <div style="flex-grow:1;display:flex;flex-direction:column;justify-content:center;margin-bottom:2%;">
-                    <h2 style="color:#fcc419;font-size:clamp(0.9rem,3vmin,1.4rem);">Level ${PP.currentLevel} Complete! 🎉</h2>
-                    <p style="font-size:clamp(10px,2.2vmin,0.85rem);line-height:1.6;">Score so far: <b>${PP.totalScore}</b></p>
-                </div>
-                <button id="pp-next-btn" style="font-family:'Press Start 2P',cursive;font-size:clamp(0.65rem,2.2vmin,1rem);color:black;background:#fcc419;border:3px solid white;border-radius:8px;padding:2% 5%;cursor:pointer;flex-shrink:0;">Next Level ▶</button>`;
-            modal.style.display = 'flex';
-            const nb = document.getElementById('pp-next-btn');
-            if (nb) {
-                nb.onclick = () => { PP.currentLevel++; PP._startLevel(); };
-                nb.addEventListener('touchstart', e => { e.preventDefault(); PP.currentLevel++; PP._startLevel(); }, {passive:false});
-            }
-        } else {
-            PP._showStats('Run Complete! 🏁');
-        }
-    },
-
-    _endGame: (title) => { PP._showStats(title); },
-
-    _showStats: (title) => {
-        PP.active = false;
-        PP.gamePaused = true;
-        clearInterval(PP.timerInterval);
-        PP.totalScore += PP.score;
-        const livesBonus = PP.lives * 500;
-        const finalScore = Math.max(0, PP.totalScore + livesBonus - PP.timeElapsed);
-        const coinsEarned = Math.floor(finalScore / 20);
-        const isNewBest = finalScore > PP.highScore;
-        if (isNewBest) { PP.highScore = finalScore; gameState.ppHighScore = finalScore; }
-        if (coinsEarned > 0) gameState.money = (gameState.money || 0) + coinsEarned;
-        document.getElementById('pp-touch-controls').style.display = 'none';
-        const modal = document.getElementById('pp-message-modal');
-        modal.innerHTML = `
-            <div style="overflow-y:auto;flex-grow:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-bottom:2%;">
-                <h2 style="color:#fcc419;font-size:clamp(0.9rem,3vmin,1.4rem);flex-shrink:0;">${title}</h2>
-                ${isNewBest ? '<div style="color:#ffd700;font-size:clamp(9px,1.8vmin,0.6rem);background:rgba(255,215,0,0.1);border:1px solid #ffd700;border-radius:16px;padding:4px 12px;margin:4px auto;display:inline-block;">⭐ NEW HIGH SCORE!</div>' : ''}
-                <div style="display:grid;grid-template-columns:1fr auto;gap:1vmin 2vmin;text-align:left;width:90%;max-width:380px;margin:1vmin auto;font-size:clamp(11px,2.2vmin,0.85rem);line-height:1.6;">
-                    <span>Base Score:</span><span><b>${PP.totalScore}</b></span>
-                    <span>Lives Bonus (×500):</span><span><b>+${livesBonus}</b></span>
-                    <span>Time Penalty:</span><span><b>-${PP.timeElapsed}s</b></span>
-                    <span style="border-top:1px solid rgba(255,255,255,0.3);padding-top:4px;">Final Score:</span><span style="border-top:1px solid rgba(255,255,255,0.3);padding-top:4px;"><b>${finalScore}</b></span>
-                </div>
-                <p style="font-size:clamp(10px,2vmin,0.75rem);color:#ffd700;">💰 +$${coinsEarned} added to your wallet!</p>
-                <p style="font-size:clamp(9px,1.6vmin,0.6rem);color:#a78bfa;">High Score: ${PP.highScore}</p>
-            </div>
-            <button id="pp-restart-btn" style="font-family:'Press Start 2P',cursive;font-size:clamp(0.6rem,2vmin,0.9rem);color:white;background:#4dabf7;border:3px solid white;border-radius:8px;padding:2% 4%;cursor:pointer;flex-shrink:0;margin-bottom:6px;">Play Again</button>`;
-        modal.style.display = 'flex';
-        const rb = document.getElementById('pp-restart-btn');
-        if (rb) {
-            rb.onclick = () => { PP.gameStarted = false; PP._showMainMenu(); };
-            rb.addEventListener('touchstart', e => { e.preventDefault(); PP.gameStarted = false; PP._showMainMenu(); }, {passive:false});
-        }
-    },
-
-    _updatePlayer: () => {
-        const p = PP.player;
-        if (p.invincible) { p.invincibleTimer--; if (p.invincibleTimer <= 0) p.invincible = false; }
-        if (PP.powerup.active) { PP.powerup.timer--; if (PP.powerup.timer <= 0) { PP.powerup.active = false; PP.jumpPower = PP.baseJumpPower; } }
-        if (PP.keys['ArrowRight']) { p.dx = PP.playerSpeed; p.direction = 1; }
-        else if (PP.keys['ArrowLeft']) { p.dx = -PP.playerSpeed; p.direction = -1; }
-        else { p.dx = 0; }
-        if (PP.keys['ArrowUp'] && p.onGround) { p.dy = PP.jumpPower; p.onGround = false; }
-        p.x += p.dx; p.dy += PP.gravity; p.y += p.dy; p.onGround = false;
-
-        PP.levelObjects.forEach(obj => {
-            const types = ['platform','q-block','used-block','powerup-block'];
-            if (types.includes(obj.type)) {
-                if (p.x < obj.x+obj.width && p.x+p.width > obj.x && p.y < obj.y+obj.height && p.y+p.height > obj.y) {
-                    if (p.dy > 0 && p.y+p.height-p.dy <= obj.y) {
-                        p.y = obj.y-p.height; p.dy = 0; p.onGround = true;
-                    } else if (p.dy < 0 && p.y-p.dy >= obj.y+obj.height) {
-                        p.y = obj.y+obj.height; p.dy = 1;
-                        if (obj.type === 'q-block' && !obj.answered) { PP._boom(obj.x+25, obj.y+25, '#fcc419'); PP._askQuestion(obj); }
-                        if (obj.type === 'powerup-block' && !obj.answered) {
-                            PP.powerup.active = true; PP.powerup.timer = 300;
-                            PP.jumpPower = PP.baseJumpPower * 1.4;
-                            obj.answered = true; obj.type = 'used-block';
-                            PP._boom(obj.x+25, obj.y+25, 'gold');
-                        }
-                    } else if (p.dx > 0 && p.x+p.width-p.dx <= obj.x) { p.x = obj.x-p.width; }
-                    else if (p.dx < 0 && p.x-p.dx >= obj.x+obj.width) { p.x = obj.x+obj.width; }
-                }
-            } else if (obj.type === 'goal') {
-                if (p.x < obj.x+obj.width && p.x+p.width > obj.x && p.y < obj.y+obj.height && p.y+p.height > obj.y) {
-                    PP._levelComplete();
-                }
-            }
-        });
-
-        PP.enemies.forEach(en => {
-            if (!p.invincible && p.x < en.x+en.width && p.x+p.width > en.x && p.y < en.y+en.height && p.y+p.height > en.y) {
-                PP.lives--; PP._updateHUD();
-                if (PP.lives <= 0) { PP._endGame('Game Over!'); }
-                else { p.invincible = true; p.invincibleTimer = 180; }
-            }
-        });
-
-        PP.coins.forEach(c => {
-            if (!c.collected && p.x < c.x+30 && p.x+p.width > c.x && p.y < c.y+30 && p.y+p.height > c.y) {
-                c.collected = true; PP.score += 50; PP._updateHUD(); PP._boom(c.x+15, c.y+15, '#fcc419');
-            }
-        });
-
-        if (p.y > 620) { PP.lives--; PP._updateHUD(); if (PP.lives > 0) PP._resetPlayer(); else PP._endGame('You fell!'); }
-        if (p.x < PP.camera.x) p.x = PP.camera.x;
-    },
-
-    _updateEnemies: () => {
-        PP.enemies.forEach(en => {
-            en.x += en.speed * en.direction;
-            if (en.x <= en.startX || en.x >= en.startX + en.range) en.direction *= -1;
-        });
-    },
-
-    _boom: (x, y, color) => {
-        for (let i = 0; i < 15; i++) {
-            PP.particles.push({ x, y, dx:(Math.random()-0.5)*4, dy:(Math.random()-0.5)*4, life:Math.random()*30+20, color });
-        }
-    },
-
-    _draw: () => {
-        const ctx = PP.ctx;
-        ctx.clearRect(0, 0, 800, 600);
-        ctx.save();
-        ctx.translate(-PP.camera.x, 0);
-
-        // Sky
-        ctx.fillStyle = '#d0eaff';
-        ctx.fillRect(PP.camera.x, 0, 800, 600);
-
-        // Clouds
-        ctx.fillStyle = 'white';
-        PP.backgroundClouds.forEach(cloud => {
-            let drawX = cloud.x - PP.camera.x * cloud.speed;
-            ctx.beginPath();
-            ctx.arc(drawX, cloud.y, cloud.size, 0, Math.PI*2);
-            ctx.arc(drawX+cloud.size*0.8, cloud.y, cloud.size*0.8, 0, Math.PI*2);
-            ctx.arc(drawX-cloud.size*0.7, cloud.y, cloud.size*0.7, 0, Math.PI*2);
-            ctx.fill();
-        });
-
-        // Level objects
-        PP.levelObjects.forEach(obj => {
-            if (obj.type === 'platform' || obj.type === 'used-block') {
-                ctx.fillStyle = obj.type === 'used-block' ? '#784917' : (obj.color || '#9c6644');
-                ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-            } else if (obj.type === 'q-block' && !obj.answered) {
-                ctx.fillStyle = '#fcc419'; ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-                ctx.fillStyle = 'black'; ctx.font = '26px "Press Start 2P"';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText('?', obj.x+obj.width/2, obj.y+obj.height/2+2);
-            } else if (obj.type === 'powerup-block' && !obj.answered) {
-                ctx.fillStyle = '#ff922b'; ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-                ctx.font = '26px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-                ctx.fillText('⭐', obj.x+obj.width/2, obj.y+obj.height/2+2);
-            } else if (obj.type === 'goal') {
-                ctx.fillStyle = '#ced4da'; ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-                ctx.fillStyle = '#51cf66'; ctx.beginPath();
-                ctx.moveTo(obj.x+obj.width, obj.y); ctx.lineTo(obj.x+obj.width+50, obj.y+25);
-                ctx.lineTo(obj.x+obj.width, obj.y+50); ctx.closePath(); ctx.fill();
-            }
-        });
-
-        // Enemies
-        ctx.font = '36px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        PP.enemies.forEach(en => ctx.fillText('🐞', en.x+en.width/2, en.y+en.height/2));
-
-        // Coins
-        ctx.font = '26px sans-serif';
-        PP.coins.forEach(c => { if (!c.collected) ctx.fillText('🪙', c.x+15, c.y+15); });
-
-        // Particles
-        PP.particles.forEach(pt => {
-            ctx.save(); ctx.fillStyle = pt.color; ctx.globalAlpha = pt.life/40;
-            ctx.fillRect(pt.x, pt.y, 5, 5); ctx.restore();
-        });
-
-        // Player
-        ctx.save();
-        if (PP.powerup.active) { ctx.shadowBlur = 20; ctx.shadowColor = 'gold'; }
-        if (PP.player.invincible && Math.floor(PP.player.invincibleTimer/10)%2===0) ctx.globalAlpha = 0.5;
-        ctx.translate(PP.player.x+PP.player.width/2, PP.player.y+PP.player.height/2);
-        if (PP.player.direction === -1) ctx.scale(-1, 1);
-        ctx.font = '46px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText('🤖', 0, 0);
-        ctx.restore();
-
-        ctx.restore();
-
-        // Particles update
-        for (let i = PP.particles.length-1; i >= 0; i--) {
-            const pt = PP.particles[i]; pt.x+=pt.dx; pt.y+=pt.dy; pt.life--;
-            if (pt.life <= 0) PP.particles.splice(i, 1);
-        }
-    },
-
-    _gameLoop: () => {
-        if (!PP.active) return;
-        if (!PP.gamePaused) {
-            PP._updatePlayer();
-            PP._updateEnemies();
-            PP.camera.x = Math.max(0, PP.player.x - 800/3);
-        }
-        PP._draw();
-        PP.raf = requestAnimationFrame(PP._gameLoop);
-    }
-};
-
-function ppQuit() {
-    PP.active = false;
-    clearInterval(PP.timerInterval);
-    cancelAnimationFrame(PP.raf);
-    PP.keys = {};
-    document.getElementById('punct-path-overlay').style.display = 'none';
-    document.getElementById('pp-touch-controls').style.display = 'none';
-    gameState.activeScene = null;
-    if (PP._keyDown) { document.removeEventListener('keydown', PP._keyDown); PP._keyDown = null; }
-    if (PP._keyUp)   { document.removeEventListener('keyup',   PP._keyUp);   PP._keyUp   = null; }
-}
-
-function ppTogglePause() {
-    if (!PP.active && !PP.gameStarted) return;
-    if (PP.gamePaused && document.getElementById('pp-question-modal').style.display === 'flex') return;
-    PP.paused = !PP.paused;
-    PP.gamePaused = PP.paused;
-    const ps = document.getElementById('pp-pause-screen');
-    ps.style.display = PP.paused ? 'flex' : 'none';
-    if (!PP.paused) PP._gameLoop();
+    gameState.inBattle = false;
+    battleScene.classList.add('hidden');
 }
 </script>
 </body>
