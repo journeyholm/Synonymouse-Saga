@@ -89,7 +89,7 @@ animation: ts-float-mouse 4s ease-in-out infinite;
   <!-- Main content -->
   <div style="position:relative;z-index:1;width:100%;max-width:700px;padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;margin:0 auto;height:100%;justify-content:center;">
 
-    <div class="ts-badge">&#9670; Version 3.0 &#9670; Classroom Edition &#9670;</div>
+    <div class="ts-badge">&#9670; Version 4.0 &#9670; Classroom Edition &#9670;</div>
 
     <div style="text-align:center;margin-bottom:.5rem;">
       <span class="ts-ela">ELA</span>
@@ -1539,6 +1539,10 @@ maps.village.objects['6,5'] = { sprite: 'rival', interaction: ["Andy: Whoa... di
     }
     if (gameState.defeatedTrainers.includes('finalBoss1')) delete maps.finalCave.objects['9,3'];
     if (gameState.defeatedTrainers.includes('finalBoss2')) delete maps.finalCave.objects['9,2'];
+    // Remove village Andy when player has entered the Pyramid
+    if (gameState._enteredFinalCave && maps.village && maps.village.objects['9,9']) {
+        delete maps.village.objects['9,9'];
+    }
 
     // 5. RESTORE FINAL INVASION
 if (gameState.defeatedTrainers.includes('shipwreckedPilot') && !gameState.finalBossDefeated && !gameState.andyInvited) {        if (maps.village) {
@@ -1656,6 +1660,7 @@ lexiconComplete: false,
 seenFocusTutorial: false,
 seenTypeChart: false,
         dayCount: 1,
+            playerName: '',
         argumentQuestDone: false,
         writingQuestDone: false
     };
@@ -2381,7 +2386,7 @@ case 'Syn-tuna': baseHp = 50; baseAtk = 28; baseDef = 18; attacks = ['Tackle', '
             case 'Vocal-cord': baseHp = 30; baseAtk = 15; baseDef = 5; attacks = ['Roar of Knowledge', 'Tackle']; break;
             case 'Tempo-toad': baseHp = 35; baseAtk = 10; baseDef = 15; attacks = ['Tackle', 'Sharpen']; break;
 case 'Choral-reef': baseHp = 40; baseAtk = 10; baseDef = 18; attacks = ['Gooey Touch', 'Growl']; break;
-case 'Synonymouse': baseHp = 22; baseAtk = 10; baseDef = 8; attacks = ['Tackle', 'Word Strike', 'Synonym Slam']; break;
+case 'Synonymouse': baseHp = 22; baseAtk = 10; baseDef = 8; attacks = ['Tackle', 'Growl']; break;
 case 'ThesaurusRex': baseHp = 40; baseAtk = 20; baseDef = 15; attacks = ['Tackle', 'Word Strike', 'Synonym Slam']; break;
 case 'LexiconLord': baseHp = 70; baseAtk = 38; baseDef = 28; attacks = ['Tackle', 'Word Strike', 'Synonym Slam', 'Roar of Knowledge']; break;
 case 'OmniScribe': baseHp = 95; baseAtk = 55; baseDef = 40; attacks = ['Grand Narrative', 'Roar of Knowledge', 'Lexical Bolt', 'Word Crush']; break;
@@ -2987,8 +2992,34 @@ const maps = {
     return lines[(gameState.tvVisits - 1) % lines.length];
 }},            
             // MIRROR (Change Avatar)
-            '1,2': { sprite: 'mirror', interaction: () => {
-                showChoices("Change your look?", [
+'1,2': { sprite: 'mirror', interaction: () => {
+                showChoices("Change your look or name?", [
+                    { text: "✏️ Change Name", callback: () => {
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;';
+                        overlay.innerHTML = `
+                            <p style="font-family:\'Press Start 2P\',monospace;font-size:0.6rem;color:#8888ff;margin-bottom:1rem;">CHANGE YOUR NAME</p>
+                            <p style="color:rgba(200,200,255,0.6);font-size:0.8rem;margin-bottom:1rem;">Current name: <strong style="color:white;">${gameState.playerName || 'Trainer'}</strong></p>
+                            <input id="rename-input" type="text" maxlength="24" placeholder="Enter new name..."
+                                style="width:260px;padding:10px 14px;border-radius:8px;border:2px solid #4040a0;background:#1a1a3e;color:white;font-size:1rem;text-align:center;outline:none;margin-bottom:1rem;">
+                            <button id="rename-confirm" style="padding:10px 28px;background:#2563eb;color:white;border:none;border-radius:8px;font-family:\'Press Start 2P\',monospace;font-size:0.5rem;cursor:pointer;margin-bottom:0.5rem;">Confirm</button>
+                            <button id="rename-cancel" style="padding:8px 20px;background:#4b5563;color:white;border:none;border-radius:8px;font-size:0.8rem;cursor:pointer;">Cancel</button>
+                        `;
+                        document.body.appendChild(overlay);
+                        const input = document.getElementById('rename-input');
+                        input.focus();
+                        const doRename = () => {
+                            const newName = input.value.trim();
+                            if (newName) {
+                                gameState.playerName = newName;
+                                overlay.remove();
+                                startDialogue([`Your name has been changed to ${newName}!`, "Your certificate will now reflect your new name."]);
+                            }
+                        };
+                        document.getElementById('rename-confirm').onclick = doRename;
+                        document.getElementById('rename-cancel').onclick = () => { overlay.remove(); startDialogue("You look fine just the way you are."); };
+                        input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') doRename(); });
+                    }},
                     { text: "Rock Star (👨‍🎤)", callback: () => { sprites.player = '👨‍🎤'; gameState.player.sprite = 'player_bowie'; draw(); startDialogue("You look fabulous."); } },
                     { text: "Rebel (🧑‍🎤)",    callback: () => { sprites.player = '🧑‍🎤'; gameState.player.sprite = 'player_green'; draw(); startDialogue("Edgy look selected."); } },
                     { text: "Boy (👦)",        callback: () => { sprites.player = '👦';   gameState.player.sprite = 'player_boy';   draw(); startDialogue("Back to basics."); } },
@@ -3106,7 +3137,6 @@ const maps = {
             // TUTORIAL NPC (Updated from generic villager)
             '2,9': { sprite: 'villager', interaction: handleTutorialNPC },
             '4,9': { sprite: 'sign', interaction: handleVillageNoticeBoard },
-            '5,9': { sprite: 'campfire', interaction: handleVillageCampfire },
             '7,0': { sprite: 'gate', interaction: handleGateInteraction },
             '8,0': { sprite: 'gate', interaction: handleGateInteraction },
             '10,10': { sprite: 'sign', interaction: 'Village of Beginnings' },
@@ -3186,7 +3216,7 @@ encounters: []    },
             ];
             return l[(gameState.profShelf2 - 1) % l.length];
         }},
-        '3,1': { sprite: 'bookshelf', interaction: () => {
+        '4,1': { sprite: 'bookshelf', interaction: () => {
             if (!gameState.profNoteVisits) gameState.profNoteVisits = 0;
             gameState.profNoteVisits++;
             const notes = [
@@ -3341,7 +3371,7 @@ rivalsRoom: {
                 const v = lines[(gameState.route1CamperVisits - 1) % lines.length];
                 return Array.isArray(v) ? v : [v];
             }},
-            '8,4': { sprite: 'sign', interaction: 'Route 1' }
+            '8,4': { sprite: 'sign', interaction: 'Route 1 — 💾 Be sure to save your game!' }
             
         }, 
 encounters: ['Wordworm', 'SimileSlime', 'CommaLeon', 'Hyper-bole', 'Metaphorpillar', 'Haiku-na', 'Crick-it', 'Moth-if', 'Adjectlizard']    },
@@ -3405,7 +3435,7 @@ lexingtonCity: {
 '3,1': { sprite: 'sign', interaction: "🐟 CRANE & ASSOCIATES — Aquatic Specimen Buyers. Shop entrance: the building just south of here." },
 '1,10': { sprite: 'poeFan', interaction: handleCityPoetInteraction },            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
             '7,13': { target: 'route1', x: 7, y: 0 }, '8,13': { target: 'route1', x: 8, y: 0 },
-            '9,12': { sprite: 'sign', interaction: 'Lexington City' },
+            '9,12': { sprite: 'sign', interaction: 'Lexington City - Be sure to save your game!' },
             '11,7': { sprite: 'hiker', interaction: () => {
                 if (!gameState.lexCityHikerVisits) gameState.lexCityHikerVisits = 0;
                 gameState.lexCityHikerVisits++;
@@ -3807,8 +3837,8 @@ objects: {
 '8,2': { sprite: 'shakespeare', interaction: () => handleScholar('poet') },
 
             // Campfire — top-right rest spot
-            '9,3': { sprite: 'campfire', interaction: handleCaveCampfire },
-            '10,2': { sprite: 'hiker', interaction: () => {
+            '14,2': { sprite: 'campfire', interaction: handleCaveCampfire },
+            '11,2': { sprite: 'hiker', interaction: () => {
                 if (!gameState.woodsCamperVisits) gameState.woodsCamperVisits = 0;
                 gameState.woodsCamperVisits++;
                 const lines = [
@@ -3846,7 +3876,7 @@ objects: {
             '7,0': { target: 'synonymCity', x: 7, y: 13 },
             
             // Sign
-'9,12': { sprite: 'sign', interaction: 'Adjective Woods - Watch your descriptions!' },
+'9,12': { sprite: 'sign', interaction: 'Adjective Woods - Watch your descriptions and be sure to save your game!' },
 '6,7': { sprite: 'sign', interaction: "“Not all those who wander are lost. -Tolkien" }                    },
 encounters: ['Metaphorpillar', 'PronounProwler', 'Owl-literation', 'Choral-reef', 'Theme-oth', 'Fantasy-fox', 'Poetry-can', 'Lyrical-loon', 'Para-phrase']    },
 
@@ -4108,7 +4138,7 @@ encounters: ['Haiku-na', 'Hyper-bole', 'SimileSlime', 'Coral-scribe', 'Squid-pro
             '14,2': { sprite: 'boulder', interaction: handleBoulderInteraction },
             '14,3': { sprite: 'lexiconstruct', interaction: handleLegendaryBattle },
             '13,10': { sprite: 'fisherman', interaction: handleCaveFisherInteraction },
-            '3,5':  { sprite: 'campfire', interaction: handleCaveCampfire },
+            '14,10': { sprite: 'campfire', interaction: handleCaveCampfire },
             '1,5':  { sprite: 'candy', interaction: () => handleCaveItem('Great Phrase', 'greatphrases', 1, 'caveLevel1', 1, 5) },
             '11,9': { sprite: 'candy', interaction: () => handleCaveItem('Synonym Roll', 'synonymRoll', 1, 'caveLevel1', 11, 9) },
             '5,3':  { sprite: 'wordorb', interaction: () => handleCaveItem('Ultra Sentence', 'ultrasentences', 1, 'caveLevel1', 5, 3) },
@@ -4157,10 +4187,14 @@ finalCave: {
             [31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31] 
         ],
         objects: {
-            // ENTRANCE
+// ENTRANCE
             '9,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
 '10,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
-            '14,18': { sprite: 'sign', interaction: "Pyramid of the Void\nOnly the mastered may ascend." },
+
+            // CAMPFIRE — mid-pyramid rest point
+            '7,13': { sprite: 'campfire', interaction: handleFinalCaveCampfire },
+'10,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
+            '14,18': { sprite: 'sign', interaction: "Pyramid of the Void\nOnly the mastered may ascend. Be sure to save first." },
 
             // TIER 2 GUARDIANS (Blocking bridges)
             '8,11': { sprite: 'professor', interaction: () => handleEliteBattle('eliteGrammarian', 8, 11) },
@@ -5095,7 +5129,7 @@ const setupTouchButton = (id, key) => {
     
     messageBox.addEventListener('click', (e) => {
 if (e.target.closest('#choices-box')) return;
-        if (gameState.inDialogue && (!gameState.inBattle || gameState.activeScene === null)) {
+        if (gameState.inDialogue) {
             advanceDialogue();
         }
     });
@@ -5424,6 +5458,62 @@ else if (key === 'lostManuscript') {
                     if (!gameState.inBattle) { startDialogue(["You hold up the Red Herring.", "It stares back at you.", "...This only works in battle."]); return; }
                     closeAllMenus();
                     useRedHerring();
+                };
+            }
+else if (key === 'potions') {
+                btn.className = 'p-2 bg-green-500 text-white rounded-lg';
+                btn.textContent = 'Use';
+                btn.onclick = () => {
+                    if (gameState.inBattle) { closeAllMenus(); usePotionInBattle(); return; }
+                    const healTargets = gameState.playerParty.filter(p => p.currentHp < p.maxHp);
+                    if (healTargets.length === 0) { startDialogue("Your party is already at full health!"); return; }
+                    closeAllMenus();
+                    showChoices("Heal which creature? (Potion +35 HP)", gameState.playerParty.map(p => ({
+                        text: `${p.name} (${Math.ceil(p.currentHp)}/${p.maxHp} HP)`,
+                        callback: () => {
+                            if (p.currentHp >= p.maxHp) { startDialogue(`${p.name} is already at full health!`); return; }
+                            gameState.inventory.potions--;
+                            const healed = Math.min(p.maxHp - p.currentHp, 35);
+                            p.currentHp = Math.min(p.maxHp, p.currentHp + 35);
+                            startDialogue([`Used a Potion on ${p.name}!`, `${p.name} recovered ${healed} HP.`]);
+                        }
+                    })));
+                };
+            }
+            else if (key === 'greatphrases') {
+                btn.className = 'p-2 bg-green-500 text-white rounded-lg';
+                btn.textContent = 'Use';
+                btn.onclick = () => {
+                    if (gameState.inBattle) { closeAllMenus(); attemptCatch('greatphrases'); return; }
+                    const healTargets = gameState.playerParty.filter(p => p.currentHp < p.maxHp);
+                    if (healTargets.length === 0) { startDialogue("Your party is already at full health!"); return; }
+                    closeAllMenus();
+                    showChoices("Heal which creature? (Great Phrase +60 HP)", gameState.playerParty.map(p => ({
+                        text: `${p.name} (${Math.ceil(p.currentHp)}/${p.maxHp} HP)`,
+                        callback: () => {
+                            gameState.inventory.greatphrases--;
+                            const healed = Math.min(p.maxHp - p.currentHp, 60);
+                            p.currentHp = Math.min(p.maxHp, p.currentHp + 60);
+                            startDialogue([`Used a Great Phrase on ${p.name}!`, `${p.name} recovered ${healed} HP.`]);
+                        }
+                    })));
+                };
+            }
+            else if (key === 'ultrasentences') {
+                btn.className = 'p-2 bg-purple-600 text-white rounded-lg';
+                btn.textContent = 'Use';
+                btn.onclick = () => {
+                    if (gameState.inBattle) { closeAllMenus(); attemptCatch('ultrasentences'); return; }
+                    closeAllMenus();
+                    showChoices("Full heal which creature? (Ultra Sentence)", gameState.playerParty.map(p => ({
+                        text: `${p.name} (${Math.ceil(p.currentHp)}/${p.maxHp} HP)`,
+                        callback: () => {
+                            gameState.inventory.ultrasentences--;
+                            p.currentHp = p.maxHp;
+                            p.status = null;
+                            startDialogue([`Used an Ultra Sentence on ${p.name}!`, `${p.name} was fully restored!`]);
+                        }
+                    })));
                 };
             }
 else if (key === 'potions') {
@@ -6311,6 +6401,30 @@ function handleBedInteraction() {
     }
     return "A comfy bed.";
 }
+function handleFinalCaveCampfire() {
+    if (gameState.playerParty.length === 0) {
+        return ["🔥 A campfire burns in the heart of the Pyramid.", "'Someone lit it long ago. It has not gone out.'"];
+    }
+    const allFull = gameState.playerParty.every(p => p.currentHp >= p.maxHp);
+    if (allFull) {
+        return [
+            "🔥 The campfire crackles in the dark.",
+            "Your team is already at full strength.",
+            "'The Elite Four are above you. Rest while you can.'"
+        ];
+    }
+    startDialogue([
+        "🔥 A campfire burns in the heart of the Pyramid of the Void.",
+        "'You don't know who lit it. You don't ask.'",
+        "'You sit. Your creatures recover in the warmth.'",
+        "'Above you: the Elite Four. Below you: the way home.'",
+        "'You choose up.'",
+    ], () => {
+        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; });
+        startDialogue(["✨ All creatures fully healed.", "'Press on. The summit is close.'"]);
+    });
+    return null;
+}
 function handleCaveCampfire() {
     if (gameState.playerParty.length === 0) {
         return "A small campfire — someone left it burning. It feels warm.";
@@ -6380,32 +6494,6 @@ function handleVillageNoticeBoard() {
     return notices;
 }
 
-function handleVillageCampfire() {
-    if (gameState.playerParty.length === 0) {
-        return "A warm campfire in the center of the village. It feels inviting.";
-    }
-    const allFull = gameState.playerParty.every(p => p.currentHp >= p.maxHp && !p.status);
-    if (allFull) {
-        return [
-            "🔥 The village campfire crackles warmly.",
-            "Your team is already at full health.",
-            "Rest here whenever you need to."
-        ];
-    }
-    startDialogue([
-        "🔥 A campfire burns in the heart of the village.",
-        "Travelers have always rested here before their journeys.",
-        "Your team gathers around the fire..."
-    ], () => {
-        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; });
-        startDialogue([
-            "The warmth of the fire restores your whole team!",
-            "✨ All creatures fully healed.",
-            "The village campfire is always here for you."
-        ]);
-    });
-    return null;
-}
     
     function handleProfessorInteraction() {
         // Check if player has evolved forms of Synonymouse
@@ -6994,24 +7082,116 @@ if (!gameState.pennVisitCount) gameState.pennVisitCount = 0;
 }
 
 function handleCityPoetInteraction() {
-    if (gameState.gymBadges.synonym && gameState.gymBadges.rhyme) {
+    if (!gameState.paleStrangerVisits) gameState.paleStrangerVisits = 0;
+    gameState.paleStrangerVisits++;
+
+    if (gameState.finalBossDefeated) {
         return [
-            "Poet: 'Two badges. Your journey has rhythm AND meaning now.'",
-            "'That is the mark of a true writer.'",
-            "'5-7-5... the haiku is complete. So are you — for now.'"
+            "The pale stranger nods slowly.",
+            "Stranger: 'You have returned from the Pyramid. I knew you would.'",
+            "'The boundaries which divide Life from Death are at best shadowy and vague.'",
+            "'You have walked that boundary. Few do. Fewer return.'",
+            "'Sleep, those little slices of death — how I loathe them.'",
+            "'But you — you have earned your rest.'"
         ];
     }
-    if (gameState.gymBadges.rhyme) {
+
+    if (gameState.gymBadges.synonym) {
         return [
-            "Poet: 'You earned the Rhyme Badge! You understand rhythm.'",
-            "'Now go find meaning in Synonym City. A haiku needs both.'"
+            "Stranger: 'Two badges. Your journey has weight now.'",
+            "'The true genius shudders at incompleteness.'",
+            "'You are not yet complete. But you are no longer empty.'"
         ];
     }
-    return [
-        "Poet: 'A 5-7-5 syllable structure...'",
-        "'The haiku is a gentle art.'",
-        "'Even a battle can be poetry.'"
+
+    const visits = [
+        // Visit 1 — Introduction
+        [
+            "A pale figure stands very still in the shadow of the building.",
+            "Stranger: 'I have been here a long time. The city moves around me.'",
+            "'From childhood's hour I have not been as others were.'",
+            "'I have not seen as others saw. I could not bring my passions from a common spring.'",
+            "'I am simply... passing through. As I always am.'"
+        ],
+        // Visit 2 — The Raven
+        [
+            "Stranger: 'Quoth the Raven — Nevermore.'",
+            "'People always ask: what does it mean?'",
+            "'It means exactly what it says. The raven does not comfort. It does not lie.'",
+            "'It simply tells the truth that the narrator cannot bear to hear.'",
+            "'That is the most terrifying thing a story can do.'"
+        ],
+        // Visit 3 — Madness and sanity
+        [
+            "Stranger: 'I became insane, with long intervals of horrible sanity.'",
+            "'People assume the madness was the problem. It was the sanity I found difficult.'",
+            "'Men have called me mad. But the question is not yet settled.'",
+            "'That which you mistake for madness is but over-acuteness of the senses.'",
+            "'Most people feel too little. I had the opposite affliction.'"
+        ],
+        // Visit 4 — Gothic atmosphere and dread
+        [
+            "Stranger: 'Do you know what dread is? Not fear. Dread.'",
+            "'Fear has an object. Dread has only... atmosphere.'",
+            "'There is no exquisite beauty without some strangeness in the proportion.'",
+            "'I built my stories from the inside out — emotion first, then architecture.'",
+            "'The House of Usher fell because it had to. The reader felt it long before it happened.'"
+        ],
+        // Visit 5 — The Tell-Tale Heart
+        [
+            "Stranger: '— TRUE! — nervous — very, very dreadfully nervous I had been.'",
+            "'But why will you say that I am mad?'",
+            "'The narrator of that story insists he is sane. That is the point.'",
+            "'A sane person does not need to prove their sanity. They simply act.'",
+            "'Watch what people feel compelled to deny. It tells you everything.'"
+        ],
+        // Visit 6 — Dreams
+        [
+            "Stranger: 'All that we see or seem is but a dream within a dream.'",
+            "'I wrote that on a bad night. Most of my best work was written on bad nights.'",
+            "'The scariest monsters are the ones that lurk within our souls.'",
+            "'Literature does not invent darkness. It names what was already there.'",
+            "'And naming a thing — truly naming it — takes away some of its power.'"
+        ],
+        // Visit 7 — Death and beauty
+        [
+            "Stranger: 'The death of a beautiful woman is, unquestionably, the most poetical topic in the world.'",
+            "'I have been criticized for saying this. I stand by it — with clarification.'",
+            "'Annabel Lee. Ligeia. Lenore. Berenice.'",
+            "'I was not celebrating death. I was refusing to accept it.'",
+            "'That is what grief looks like when a poet holds the pen.'"
+        ],
+        // Visit 8 — Detective story
+        [
+            "Stranger: 'I invented a man named C. Auguste Dupin.'",
+            "'He solved crimes not by chasing criminals — but by thinking about them.'",
+            "'The Murders in the Rue Morgue. 1841.'",
+            "'Every detective story since owes something to that room.'",
+            "'Holmes. Poirot. Marple. They are all Dupin's grandchildren.'",
+            "'Few people know where their favorites come from.'"
+        ],
+        // Visit 9 — On writing
+        [
+            "Stranger: 'I have great faith in fools — self-confidence my friends call it.'",
+            "'I believe nothing you hear, and only one half that you see.'",
+            "'The true genius shudders at incompleteness — and imperfection pains to the soul.'",
+            "'Every word in a story must earn its place. If it does not carry weight — cut it.'",
+            "'I rewrote The Raven more times than I can count.'",
+            "'The poem that looks effortless took the most effort.'"
+        ],
+        // Visit 10 — Parting
+        [
+            "Stranger: 'You have spoken with me many times now.'",
+            "'Most people stop after one. They find me... unsettling.'",
+            "'Beauty of whatever kind, in its supreme development, invariably excites the sensitive soul to tears.'",
+            "'I do not know if I am beautiful. But I am, I think, supreme in my kind.'",
+            "'That is all any of us can hope for.'",
+            "'Come back when you have seen the Pyramid. I will still be here.'"
+        ],
     ];
+
+    const idx = Math.min(gameState.paleStrangerVisits - 1, visits.length - 1);
+    return visits[idx];
 }
 
 function handleGodotInteraction() {
@@ -7871,7 +8051,7 @@ choices.push({ text: "Cancel", callback: () => {
         dialogueQueue = Array.isArray(messages) ? [...messages] : [messages]; dialogueCallback = onComplete; gameState.inDialogue = true;
         battleText.textContent = dialogueQueue.shift(); battleGrid.innerHTML = '';
     }
-    function advanceBattleDialogue() { if (dialogueQueue.length > 0) { battleText.textContent = dialogueQueue.shift(); } else { const cb = dialogueCallback; gameState.inDialogue = false; battleText.textContent = ''; dialogueCallback = null; if (cb) cb(); } }
+    function advanceBattleDialogue() { if (dialogueQueue.length > 0) { battleText.textContent = dialogueQueue.shift(); } else { const cb = dialogueCallback; gameState.inDialogue = false; battleText.textContent = ''; dialogueCallback = null; messageBox.classList.add('hidden'); if (cb) cb(); } }
     
 
 function handleOpponentFaint() {
@@ -8570,14 +8750,19 @@ maps.village.objects['6,5'] = { sprite: 'rival', interaction: ["Andy: Whoa... di
                  // 5. REMOVE OLD OBJECTS (If any existed from previous saves)
                  if(maps.village.objects['4,5']) delete maps.village.objects['4,5'];
             }
-            startDialogue([
+startDialogue([
                 "B-b-brrrring! B-b-brrrring!",
                 "Your phone is ringing. It's Mom!",
-                "Mom: 'Sweetie, are you okay?! There was a huge earthquake!'",
-                "'I've enabled the Home-Warp feature on the PC network. Use it to get back safely!'"
+                "Mom: 'Sweetie! Are you safe?! There was a massive earthquake here in the village!'",
+                "'A hole opened right up in the middle of town. I am not kidding. An actual hole.'",
+                "'Your father is fine. I'm fine. The flowers are fine — priorities.'",
+                "'But listen to me: get home as quickly as possible. I need to see you.'",
+                "'I've enabled the Home-Warp feature on the PC network while you travel.'",
+                "'Find a PC, use it to warp straight home. Please. Don't dawdle.'",
+                "'I love you. Come home.'"
             ], () => {
                 gameState.teleportUnlocked = true;
-                startDialogue("The Home-Warp feature on PCs is now online!");
+                startDialogue("The Home-Warp feature on PCs is now online! Find a PC to warp home instantly.");
             });
         }, 3000);
     });
@@ -8952,11 +9137,24 @@ function showCharacterSelect() {
         grid.appendChild(card);
     });
 
-    confirmBtn.onclick = (e) => {
+confirmBtn.onclick = (e) => {
         e.stopPropagation();
         if (!selectedOpt) return;
         gameState.player.sprite = selectedOpt.id;
         sprites.player = selectedOpt.emoji;
+
+        // Skip name entry if player already has a name from a previous save
+        if (gameState.playerName && gameState.playerName !== '') {
+            titleDiv.classList.add('hidden');
+            gameLoop();
+            startDialogue([
+                "You wake up.",
+                "Mom (downstairs): 'Breakfast is ready!'",
+                "(Arrows: Move | Z/Enter: Interact | M: Menu)",
+                "💾 TIP: Your game saves automatically each time you enter a new area. You can also save anytime from the MENU."
+            ]);
+            return;
+        }
 
         titleDiv.innerHTML = `
             <div style="position:absolute;inset:0;background:#0a0a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;padding:2rem;">
@@ -8979,8 +9177,8 @@ function showCharacterSelect() {
             if (s) s.style.opacity = '1';
         }, 3000);
 
-        const launchGame = () => {
-            gameState.playerName = (nameInput.value || '').trim() || 'Trainer';
+const launchGame = () => {
+            gameState.playerName = (nameInput.value || '').trim() || gameState.playerName || 'Trainer';
             titleDiv.classList.add('hidden');
             gameLoop();
             startDialogue([
@@ -10555,18 +10753,19 @@ function handleVinnieInteraction() {
         "Vinnie: 'Whoa, traveler. Bad vibes ahead.'",
         "'This ancient tree blocked the gate to Synonym City. It didn't want the noise.'",
         "'I can carve it into a flute to release its spirit, but I need new chisels.'",
-        "'Can you spot me $100 for the tools?'"
+"'Can you spot me $1,000 for the tools?'",
+        "'I know. I know. I'm sorry. Art isn't cheap, man.'"
 ], () => {
         gameState.inDialogue = false;
-        const yesText = "Yes, take $100"; // Clean text for immersion
+        const yesText = "Yes, take $1,000";
         
-        showChoices("Give Vinnie $100?", [
+        showChoices("Give Vinnie $1,000?", [
             { 
                 text: yesText, 
                 callback: () => {
                     // Logic: Checks for Money OR Dev Mode silently
-if (gameState.money >= 100 || gameState.devModeActive) {
-                        if (!gameState.devModeActive) gameState.money -= 100;
+if (gameState.money >= 1000 || gameState.devModeActive) {
+                        if (!gameState.devModeActive) gameState.money -= 1000;
                         gameState.treeRemoved = true;
                         gameState.inventory.treeFlute = 1;
                         
@@ -10574,7 +10773,7 @@ if (gameState.money >= 100 || gameState.devModeActive) {
                         draw(); 
                         
 startDialogue([
-                            "You hand Vinnie $100.",
+                            "You hand Vinnie $1000.",
                             "Vinnie smiles, buys the tools, and gets to work.",
                             "*CHOP* ... *WHITTLE* ... *HUM*",
                             "The huge tree is transformed! He hands you the Nature Flute.",
@@ -10582,11 +10781,12 @@ startDialogue([
                             "Vinnie hands your $100 back.",
                             "Vinnie: 'I can't take money for art, man. It's about the vibes.'",
                             "Vinnie: 'Keep your cash. The path is open.'"
-                        ], () => { gameState.money += 100; });
+                        ], () => { gameState.money += 1000; });
                     } else {
                         startDialogue([
-                            "Vinnie: 'Bummer. You're short on cash.'",
-                            "Vinnie: 'I can't buy the tools without the funds. Come back when you have $100.'"
+"Vinnie: 'Bummer. You're short on cash.'",
+                            "Vinnie: 'I'm sorry, I really am. But quality chisels aren't free.'",
+                            "Vinnie: 'Come back when you have $1,000. The tree will wait. Trees are patient.'"
                         ]);
                     }
                 }
@@ -10927,6 +11127,8 @@ function handlePostGameAndyInteraction() {
     return lines[(gameState.postAndyVisits - 1) % lines.length];
 }
 function handleFinalCaveLadder() {
+    gameState._enteredFinalCave = true;
+    if (maps.village && maps.village.objects['9,9']) delete maps.village.objects['9,9'];
     // If Andy hasn't talked to player yet, intercept before warping
     if (!gameState.andyInvited) {
         startDialogue([
@@ -11153,7 +11355,7 @@ if (gameState.safariSteps <= 0) {
     
     // Wild Encounters (Only runs if NOT skipping)
 const isEncounterTile = tile.isTallGrass || tileId === 29 || tileId === 28 || tileId === 23;
-    if (!skipEncounter && isEncounterTile && Math.random() < 0.12) {
+    if (!skipEncounter && isEncounterTile && Math.random() < 0.06) {
                 if (gameState.inSafariZone) {
             startSafariBattle();
         } else if (gameState.playerParty.length > 0) {
@@ -11495,6 +11697,18 @@ function animateLightningBolt() {
         document.head.appendChild(style);
         document.body.appendChild(overlay);
         setTimeout(() => { overlay.remove(); style.remove(); res(); }, 600);
+    });
+}
+function animateLightningBolt() {
+    return new Promise(res => {
+        const bolt = document.createElement('div');
+        bolt.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;pointer-events:none;`;
+        bolt.innerHTML = `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8rem;animation:boltFlash 0.6s ease-out forwards;">⚡</div>`;
+        const style = document.createElement('style');
+        style.textContent = `@keyframes boltFlash { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)} 20%{opacity:1;transform:translate(-50%,-50%) scale(1.8)} 60%{opacity:1;filter:brightness(3)} 100%{opacity:0;transform:translate(-50%,-60%) scale(1.2)} }`;
+        document.head.appendChild(style);
+        document.body.appendChild(bolt);
+        setTimeout(() => { bolt.remove(); style.remove(); res(); }, 700);
     });
 }
 
@@ -12696,6 +12910,11 @@ if (oldBattle.trainerId === 'villageRival' && !gameState.rivalDefeated) {
             await new Promise(res => startBattleDialogue(["Andy: 'What?! I lost?!'", "'Whatever. I'm going to the city to get stronger.'", "Andy ran off."], res));
         }
 
+// Exit battle state so post-battle dialogue is tappable
+        gameState.inBattle = false;
+        battleScene.classList.add('hidden');
+        currentBattle = null;
+
 draw();
         checkAndToastAchievements();
 
@@ -12803,6 +13022,7 @@ if (oldBattle.trainerId === 'senseiWu') {
             return;
         }
     }
+}
 
 
 // ============================================================
@@ -13286,7 +13506,6 @@ function nrQuit(){
     NR.keys={left:false,right:false,space:false};
     NR.touchX=null; NR.touching=false;
     if(NR._keyHandler){ document.removeEventListener('keydown',NR._keyHandler); NR._keyHandler=null; }
-}
 }
 
 // ============================================================
