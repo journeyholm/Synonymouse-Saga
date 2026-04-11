@@ -5727,10 +5727,10 @@ function updateInventoryUI() {
                 btn.textContent = 'Fly';
                 btn.onclick = () => useFastTravel();
             } 
-            else if (key === 'synonymRoll') {
+else if (key === 'synonymRoll') {
                 btn.className = 'p-2 bg-green-500 text-white rounded-lg';
                 btn.textContent = 'Eat';
-                btn.onclick = () => useSynonymRoll(); 
+                btn.onclick = () => { closeAllMenus(); useSynonymRoll(); }
             }
             else if (key === 'peaceTreaty') {
                 btn.className = 'p-2 bg-green-500 text-white rounded-lg';
@@ -10077,7 +10077,7 @@ function useSynonymRoll() {
         startDialogue("You don't have any Synonym Rolls!");
         return;
     }
-    
+    closeAllMenus();
     startDialogue("Who should eat the Synonym Roll?", () => {
         const choices = gameState.playerParty.map((p, index) => ({
             text: `${p.name} (Lvl ${p.level})`,
