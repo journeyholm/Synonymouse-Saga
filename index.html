@@ -2390,7 +2390,15 @@ const creatureDB = {
     { level: 55, move: 'Grand Narrative' }
 ] },
 };
-    
+    // --- MOVE PP SYSTEM ---
+function getMovePP(power) {
+    if (power === 0)   return 20;
+    if (power <= 10)   return 18;
+    if (power <= 25)   return 15;
+    if (power <= 40)   return 12;
+    if (power <= 60)   return 8;
+    return 5; // 61+ power moves
+}
 const createcreature = (species, level) => {
         let baseHp = 15, baseAtk = 8, baseDef = 5, attacks = ['Tackle'];
         switch(species) {
@@ -2484,7 +2492,12 @@ name: isFirstEd ? `✨ Shiny ${species}` : species,
             currentHp: finalHp, maxHp: finalHp, 
             attack: finalAtk, defense: finalDef,
             xp: 0, xpToNextLevel: 100, 
-            attacks: attacks.map(a => attacksDB[a]), 
+            attacks: attacks.map(a => {
+    const atk = attacksDB[a];
+    if (!atk) return null;
+    const maxPP = getMovePP(atk.power || 0);
+    return { ...atk, pp: maxPP, maxPP };
+}).filter(Boolean),
             sprite: creatureDB[species] ? creatureDB[species].sprite : species.toLowerCase(),
 statMods: { attack: 0, defense: 0 },
             status: null,
@@ -3747,7 +3760,13 @@ pocketcenter: {
     "📖 MINI LESSON — AUTOBIOGRAPHY vs. BIOGRAPHY: An autobiography is written by the subject about their own life (Douglass wrote his own). A biography is written by someone else about another person's life. A memoir is a type of autobiography focused on a specific period or theme, not the whole life.",
     "A cross-stitch on the wall: 'Get well soon, or at least use better transitions.' 📖 Transitions signal relationships between ideas: ADDITION (furthermore, also), CONTRAST (however, although), CAUSE-EFFECT (therefore, as a result), SEQUENCE (first, then, finally). They are the connective tissue of writing.",
     "A small sign: 'Please do not diagnose your creatures using online grammar forums. Come see us.' A pamphlet nearby: 'Is It a Fragment or a Sentence? A Self-Assessment.' Step 1: Does it have a subject? Step 2: Does it have a predicate? Step 3: Does it express a complete thought? All three = sentence."
-]; return l[(gameState.pcShelf2-1)%l.length]; }},
+]; const _ip2 = (gameState.pcShelf2 - 1) % l.length;
+if (_ip2 === l.length - 1 && !gameState.pcShelf2Rewarded) {
+    gameState.pcShelf2Rewarded = true;
+    gameState.money += 15;
+    l[_ip2] = l[_ip2] + " ✨ A crisp $15 bill falls from behind the Douglass frame. A note: 'Knowledge is currency.' You found $15!";
+}
+return l[_ip2]; }},
 '2,3': { sprite: 'student', interaction: () => {
     if (!gameState.centerPatientVisits) gameState.centerPatientVisits = 0;
     gameState.centerPatientVisits++;
@@ -3788,7 +3807,13 @@ pocketcenter: {
             '1,2': { sprite: 'table', interaction: "An empty bowl. You hear a ghostly whisper: 'Please, sir, I want some more.'" }, 
             '3,2': { sprite: 'shopkeep', interaction: handleShopInteraction }, 
             // New Decor
-'1,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.shopShelf1) gameState.shopShelf1=0; gameState.shopShelf1++; const l=["Best Sellers: 'Harry Potter and the Adverb of Fire'.","New Arrival: 'The Great Gats-buy' — a story about a man who spends all his money on Word Balls.","Staff Pick: 'Of Mice and Metaphors.' The ending will destroy you.","Hidden behind everything else: a worn copy of 'Charlotte's Web.' Someone has underlined 'It is not often that someone comes along who is a true friend and a good writer.'","Clearance bin: 'Moby Dictionary.' 600 pages. Not a single plot."]; return l[(gameState.shopShelf1-1)%l.length]; }},            
+'1,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.shopShelf1) gameState.shopShelf1=0; gameState.shopShelf1++; const l=["Best Sellers: 'Harry Potter and the Adverb of Fire'.","New Arrival: 'The Great Gats-buy' — a story about a man who spends all his money on Word Balls.","Staff Pick: 'Of Mice and Metaphors.' The ending will destroy you.","Hidden behind everything else: a worn copy of 'Charlotte's Web.' Someone has underlined 'It is not often that someone comes along who is a true friend and a good writer.'","Clearance bin: 'Moby Dictionary.' 600 pages. Not a single plot."]; const _is1 = (gameState.shopShelf1 - 1) % l.length;
+if (_is1 === l.length - 1 && !gameState.shopShelf1Rewarded) {
+    gameState.shopShelf1Rewarded = true;
+    gameState.inventory.wordballs = (gameState.inventory.wordballs || 0) + 1;
+    l[_is1] = l[_is1] + " ✨ A coupon falls from Charlotte's Web: 'Good for 1 free Word Ball. Some friend.' You received 1 Word Ball!";
+}
+return l[_is1]; }},            
 '2,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.shopShelf2) gameState.shopShelf2=0; gameState.shopShelf2++; const l=["Sale! 50% off all metaphors.","Buy one simile, get one free. AS LONG AS supplies last.","Notice: Irony is in the back. It was too obvious up front.","Weekly deal: Alliteration Aisle — buy as many as you like. Boldly. Brilliantly. Basically for free.","The fine print on the metaphor sale says: 'Life is not actually a highway. Results may vary.'"]; return l[(gameState.shopShelf2-1)%l.length]; }},
             '5,1': { sprite: 'bookshelf', interaction: "A sign reads: 'No refunds on broken pencils.'" },
 '5,3': { sprite: 'villager', interaction: handleShopTipInteraction },
@@ -3829,7 +3854,13 @@ const l=[
     "Trophy engraving: 'Rhyme Badge Champion, 7 consecutive years.' The word 'consecutive' is underlined in red pen. 📖 CONSECUTIVE means following in unbroken sequence. It comes from Latin 'consequi' — to follow closely. Seven in a row. Someone is very annoyed.",
     "📖 MINI LESSON — RHYME SCHEME: Poets label rhyme schemes with letters. ABAB means lines 1 and 3 rhyme, lines 2 and 4 rhyme. AABB means consecutive couplets. Shakespearean sonnets end in a GG couplet. A sticky note: 'Note to self: teach the difference between rhythm and rhyme. Again.'"
 ];
-return l[(gameState.gymShelf-1)%l.length]; }},
+const _ig = (gameState.gymShelf - 1) % l.length;
+if (_ig === l.length - 1 && !gameState.gymShelfRewarded) {
+    gameState.gymShelfRewarded = true;
+    gameState.inventory.thesaurusTeas = (gameState.inventory.thesaurusTeas || 0) + 1;
+    l[_ig] = l[_ig] + " ✨ A Thesaurus Tea sits on top of the records book — Rhonda leaves one for students who read everything. You received 1 Thesaurus Tea!";
+}
+return l[_ig]; }},
 '2,3': { sprite: 'hiker', interaction: () => handleTrainerBattle('gymTrainerCassidy') },
 '5,3': { sprite: 'villager2', interaction: () => handleTrainerBattle('gymTrainerMarcus') },
 '1,3': { sprite: 'student', interaction: () => {
@@ -3886,13 +3917,23 @@ cityHouse1: {
                 "'Moby-Dick' sits spine-out with seventeen bookmarks. Someone is serious about this book.",
                 "A thin pamphlet: 'Fish of the ELA Region: A Naturalist's Guide.' Self-published. Limited edition. Volume 1 of 1."
             ];
-            return l[(gameState.fishHouseShelf2 - 1) % l.length];
+const _if2 = (gameState.fishHouseShelf2 - 1) % l.length;
+if (_if2 === l.length - 1 && !gameState.fishHouseShelf2Rewarded) {
+    gameState.fishHouseShelf2Rewarded = true;
+    gameState.money += 30;
+    l[_if2] = l[_if2] + " ✨ A $30 bill falls from inside Moby-Dick. A note reads: 'For whoever reads this far. — C.' You found $30!";
+}
+return l[_if2];
         }},
 // MOUNTED FISH ON WALL
         '3,1': { sprite: 'shell', interaction: "A magnificent Syn-tuna mounted on the wall. The plaque reads: 'Caught in the Synonym City Canal. Vocabulary: exceptional.' Crane's proudest catch." },
         // LOOSE FLOORBOARD (Poe tribute, repurposed)
-        '4,3': { sprite: 'wood_floor', interaction: "A loose floorboard. You lift it. Underneath: a hand-drawn map of every fishing location in the region, and a note — 'The rarest fish appear where the vocabulary is deepest.'" },
-        // THE MERCHANT
+'4,3': { sprite: 'wood_floor', interaction: () => {
+    if (gameState.floorboardFound) return "The map is still there. The note still says the same thing.";
+    gameState.floorboardFound = true;
+    gameState.money += 20;
+    return ["A loose floorboard. You lift it.", "Underneath: a hand-drawn map of every fishing location in the region.", "And a $20 bill with a note: 'For whoever looks closely enough. — C'", "You found $20!"];
+}},        // THE MERCHANT
         '3,2': { sprite: 'fisherman', interaction: handleCityFishMerchant },
         // EXIT
         '3,5': { target: 'lexingtonCity', x: 13, y: 6 }, 
@@ -3925,7 +3966,13 @@ cityHouse2: {
 '1,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.marinerShelf1) gameState.marinerShelf1=0; gameState.marinerShelf1++; const l=["A framed quote: 'Water, water, every where, nor any drop to drink.'","The full title is 'The Rime of the Ancient Mariner.' Rime. Not Rhyme. It means frost. Coleridge was precise.","A note beneath the frame: 'He who harms an Albatross shall carry its burden forever.' The handwriting is shaky.","The poem is 625 lines long. Coleridge wrote it in 1797. The sailor learns that all living things deserve respect.","A second frame on the wall: 'He prayeth best who loveth best all things both great and small.' The smallest creatures matter most."]; return l[(gameState.marinerShelf1-1)%l.length]; }},
 
             // 2. The Old Man and the Sea Reference
-'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.marinerShelf2) gameState.marinerShelf2=0; gameState.marinerShelf2++; const l=["A book about an old man fighting a giant marlin. It looks exhausting.","'The Old Man and the Sea' — Hemingway, 1952. Won the Pulitzer Prize. The whole book is about not giving up.","Santiago: 'A man can be destroyed but not defeated.' He loses the fish. He wins something else.","Hemingway wrote in simple sentences. Short. Clear. Every word earned. He called it the Iceberg Theory — most of the meaning is below the surface.","The marlin is 18 feet long. The old man fights it for three days alone. Sometimes the struggle is the point.","A thin book nearby: 'Notes of a Native Son' by James Baldwin. 'Not everything that is faced can be changed, but nothing can be changed until it is faced.' Underlined three times."]; return l[(gameState.marinerShelf2-1)%l.length]; }},
+'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.marinerShelf2) gameState.marinerShelf2=0; gameState.marinerShelf2++; const l=["A book about an old man fighting a giant marlin. It looks exhausting.","'The Old Man and the Sea' — Hemingway, 1952. Won the Pulitzer Prize. The whole book is about not giving up.","Santiago: 'A man can be destroyed but not defeated.' He loses the fish. He wins something else.","Hemingway wrote in simple sentences. Short. Clear. Every word earned. He called it the Iceberg Theory — most of the meaning is below the surface.","The marlin is 18 feet long. The old man fights it for three days alone. Sometimes the struggle is the point.","A thin book nearby: 'Notes of a Native Son' by James Baldwin. 'Not everything that is faced can be changed, but nothing can be changed until it is faced.' Underlined three times."]; const _im2 = (gameState.marinerShelf2 - 1) % l.length;
+if (_im2 === l.length - 1 && !gameState.marinerShelf2Rewarded) {
+    gameState.marinerShelf2Rewarded = true;
+    gameState.inventory.potions = (gameState.inventory.potions || 0) + 1;
+    l[_im2] = l[_im2] + " ✨ A Potion is tucked between the pages. Santiago would have wanted you ready for the fight ahead. You received 1 Potion!";
+}
+return l[_im2]; }},
 
 '3,5': { target: 'lexingtonCity', x: 6, y: 11 }, 
 '4,5': { target: 'lexingtonCity', x: 7, y: 11 }
@@ -3989,7 +4036,13 @@ cityHouse3: {
 
     villagerHouse1: { layout: [[1,1,1,1,1,1,1,1],[1,0,0,12,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,13,0,0,0,1],[1,0,0,0,0,0,0,1],[1,1,1,2,2,1,1,1]], objects: { 
             // 5. The Red Wheelbarrow (William Carlos Williams)
-'3,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.villHouseShelf) gameState.villHouseShelf=0; gameState.villHouseShelf++; const l=["A painting of a red wheelbarrow, glazed with rain water, beside the white chickens.","The poem is called 'The Red Wheelbarrow' by William Carlos Williams. The whole poem is 16 words. He believed a poem could be built from a single ordinary image.","'So much depends upon' — the opening line. Everything after it is the answer. Williams never explains. He just shows you.","Williams was also a doctor. He wrote poems on prescription pads between patients. He said poetry was about attention — noticing what everyone else walks past.","The painting has no frame. The villager says that's intentional. 'Williams wouldn't have framed it either.'"]; return l[(gameState.villHouseShelf-1)%l.length]; }},            
+'3,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.villHouseShelf) gameState.villHouseShelf=0; gameState.villHouseShelf++; const l=["A painting of a red wheelbarrow, glazed with rain water, beside the white chickens.","The poem is called 'The Red Wheelbarrow' by William Carlos Williams. The whole poem is 16 words. He believed a poem could be built from a single ordinary image.","'So much depends upon' — the opening line. Everything after it is the answer. Williams never explains. He just shows you.","Williams was also a doctor. He wrote poems on prescription pads between patients. He said poetry was about attention — noticing what everyone else walks past.","The painting has no frame. The villager says that's intentional. 'Williams wouldn't have framed it either.'"]; const _iv = (gameState.villHouseShelf - 1) % l.length;
+if (_iv === l.length - 1 && !gameState.villHouseShelfRewarded) {
+    gameState.villHouseShelfRewarded = true;
+    gameState.inventory.wordballs = (gameState.inventory.wordballs || 0) + 1;
+    l[_iv] = l[_iv] + " ✨ Tucked behind the painting: a Word Ball, wrapped in a scrap of poem. You received 1 Word Ball!";
+}
+return l[_iv]; }},            
 '1,3': { sprite: 'villager', interaction: handleWelcomeVillagerInteraction },
 '5,3': { sprite: 'villager2', interaction: () => {
     if (!gameState.villHouseGuestVisits) gameState.villHouseGuestVisits = 0;
@@ -4251,7 +4304,13 @@ encounters: ['Fic-tion', 'Drama-llama', 'Sci-Fi-der', 'Fantasy-fox', 'Mytho-log'
 "📖 MINI LESSON — AMELIORATION: The opposite of pejoration. Some words improve over time. 'Knight' once meant 'servant boy.' 'Pretty' once meant 'cunning.' Language can upgrade as well as downgrade. 'Silly' went from 'blessed' → 'innocent' → 'foolish.' It took 500 years.",
 "A bookmark reads: 'The difference between the almost right word and the right word is the difference between the lightning bug and the lightning.' — Mark Twain. He spent his whole career proving that sentence true.",
 "📖 MINI LESSON — ROOTS & AFFIXES: Knowing roots unlocks thousands of words. 'Scrib/script' = write (describe, manuscript, prescribe). 'Port' = carry (transport, import, portable). 'Aud' = hear (auditorium, audience, audio). Learn 20 roots and you can decode 2,000 words."]; return l[(gameState.synGymShelf1-1)%l.length]; }},
-'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.synGymShelf2) gameState.synGymShelf2=0; gameState.synGymShelf2++; const l=["A complete collection of Roget's Thesaurus.","Peter Mark Roget published the first thesaurus in 1852. He was also a doctor and chess enthusiast. Multitasker.","The word 'thesaurus' comes from Greek, meaning 'treasury' or 'storehouse.' It is literally a treasure chest of words.","Roget organized words by meaning, not alphabetically. He believed ideas connected to other ideas. He was right.","The copy is held together with tape. Someone has used it so many times the spine cracked. Good."]; return l[(gameState.synGymShelf2-1)%l.length]; }},
+'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.synGymShelf2) gameState.synGymShelf2=0; gameState.synGymShelf2++; const l=["A complete collection of Roget's Thesaurus.","Peter Mark Roget published the first thesaurus in 1852. He was also a doctor and chess enthusiast. Multitasker.","The word 'thesaurus' comes from Greek, meaning 'treasury' or 'storehouse.' It is literally a treasure chest of words.","Roget organized words by meaning, not alphabetically. He believed ideas connected to other ideas. He was right.","The copy is held together with tape. Someone has used it so many times the spine cracked. Good."]; const _is2 = (gameState.synGymShelf2 - 1) % l.length;
+if (_is2 === l.length - 1 && !gameState.synGymShelf2Rewarded) {
+    gameState.synGymShelf2Rewarded = true;
+    gameState.inventory.synonymRoll = (gameState.inventory.synonymRoll || 0) + 1;
+    l[_is2] = l[_is2] + " ✨ A Synonym Roll was pressed between the pages. Roget would approve. You received 1 Synonym Roll!";
+}
+return l[_is2]; }},
             '3,5': { target: 'synonymCity', x: 6, y: 3 },
             '4,5': { target: 'synonymCity', x: 7, y: 3 }
         }
@@ -4320,7 +4379,13 @@ return l[(gameState.libShelf3-1)%l.length]; }},
     "📖 MINI LESSON — CENSORSHIP: Bradbury was alarmed by TV, conformity, and the pressure to sanitize ideas. Censorship removes material considered offensive or dangerous. Bradbury's response: the most dangerous book is the one you never read. Montag eventually memorizes books to preserve them. That act of memory is resistance.",
     "The firemen start fires instead of stopping them. 📖 This IRONY — using something for the opposite of its purpose — is central to the novel. Bradbury uses SITUATIONAL IRONY throughout: the thing meant to protect society destroys it. Irony is a signal: look closer. Something is inverted here."
 ];
-return l[(gameState.libShelf4-1)%l.length]; }},
+const _i4 = (gameState.libShelf4 - 1) % l.length;
+if (_i4 === l.length - 1 && !gameState.libShelf4Rewarded) {
+    gameState.libShelf4Rewarded = true;
+    gameState.inventory.ultrasentences = (gameState.inventory.ultrasentences || 0) + 1;
+    l[_i4] = l[_i4] + " ✨ A folded page falls out — an Ultra Sentence Ball, hidden by someone who believed books should have power. You received 1 Ultra Sentence Ball!";
+}
+return l[_i4]; }},
 '1,3': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf5) gameState.libShelf5=0; gameState.libShelf5++; const l=[
     "📖 A WRINKLE IN TIME — Madeleine L'Engle, 1962. Meg Murry, her brother Charles Wallace, and friend Calvin travel through space via 'tesseract' — a wrinkle in time — to rescue Meg's missing father from IT, a disembodied evil brain that controls all thought on the planet Camazotz.",
     "📖 MINI LESSON — SCIENCE FANTASY: The novel blends science (the tesseract, Einstein's theories of space-time) with fantasy (magical beings, mythic journeys). L'Engle called it 'a fantasy with science in it.' Genre blending is common — knowing a genre's conventions helps you recognize when an author is breaking them intentionally.",
@@ -5134,7 +5199,7 @@ function handleDrPowersInteraction() {
                 "'You gave those creatures structure. You gave them an ending.'",
                 "Dr. Powers wipes his glasses, visibly moved.",
                 "Dr. Powers: 'I've upgraded your Potions using the recovery data.'",
-                "Dr. Powers: 'They now heal 30 HP instead of 20. Every battle, forever.'",
+                "Dr. Powers: 'They now heal 50 HP instead of 35. Every battle, forever.'",
                 "Your Potions are now REVISED POTIONS! (Heal 30 HP!)",
                 "Dr. Powers: 'But... wait.'",
                 "'I'm still reading elevated viral signatures. Deeper. Underground.'",
@@ -6558,7 +6623,7 @@ ${isCaught ? `
 
 function handleBedInteraction() {
     if (gameState.playerParty.length > 0) {
-        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; p._roughDraftUsed = false; });
+        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; p._roughDraftUsed = false; p.attacks?.forEach(a => { if(a) a.pp = a.maxPP; }); });
         gameState.dayCount = (gameState.dayCount || 1) + 1;
         gameState.schoolQuizDone = false; // Reset weekly quiz
         const day = gameState.dayCount;
@@ -6594,7 +6659,7 @@ function handleFinalCaveCampfire() {
         "'Above you: the Elite Four. Below you: the way home.'",
         "'You choose up.'",
     ], () => {
-        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; });
+        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; p.attacks?.forEach(a => { if(a) a.pp = a.maxPP; }); });
         startDialogue(["✨ All creatures fully healed.", "'Press on. The summit is close.'"]);
     });
     return null;
@@ -8555,11 +8620,24 @@ currentBattle.isRunOn ? presentRunOnQuestion() : presentQuestion();
         battleGrid.appendChild(ultBtn);
     }
 
-    currentBattle.playercreature.attacks.forEach(attack => {
+currentBattle.playercreature.attacks.forEach(attack => {
         const button = document.createElement('button');
-button.className = 'bb bb-move';
-        button.textContent = attack.name; 
-button.onclick = () => { currentBattle.chosenAttack = attack; currentBattle.isRunOn ? presentRunOnQuestion() : presentQuestion(); };        battleGrid.appendChild(button);
+        button.className = 'bb bb-move';
+        const ppText = (attack.pp !== undefined) ? ` (${attack.pp}/${attack.maxPP})` : '';
+        button.textContent = attack.name + ppText;
+        const outOfPP = attack.pp !== undefined && attack.pp <= 0;
+        if (outOfPP) {
+            button.disabled = true;
+            button.style.opacity = '0.4';
+            button.title = 'No PP left — heal at a campfire or Word Center!';
+        }
+        button.onclick = () => {
+            if (outOfPP) return;
+            attack.pp = Math.max(0, (attack.pp ?? 1) - 1);
+            currentBattle.chosenAttack = attack;
+            currentBattle.isRunOn ? presentRunOnQuestion() : presentQuestion();
+        };
+        battleGrid.appendChild(button);
     });
 
     const backBtn = document.createElement('button');
@@ -10875,29 +10953,6 @@ window.removeEventListener('keydown', handleKey);
     window.addEventListener('keydown', handleKey);
 setupTouchSnake();
 
-        // Swipe-to-steer for Snake on mobile
-        (function() {
-            const snakeCanvas = document.getElementById('snake-canvas');
-            if (!snakeCanvas) return;
-            let swipeStartX = 0, swipeStartY = 0;
-            snakeCanvas.addEventListener('touchstart', e => {
-                swipeStartX = e.touches[0].clientX;
-                swipeStartY = e.touches[0].clientY;
-            }, {passive:true});
-            snakeCanvas.addEventListener('touchend', e => {
-                const dx = e.changedTouches[0].clientX - swipeStartX;
-                const dy = e.changedTouches[0].clientY - swipeStartY;
-                if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return; // ignore taps
-                if (Math.abs(dx) > Math.abs(dy)) {
-                    if (dx > 0 && dir.x !== -1) nextDir = { x: 1, y: 0 };
-                    else if (dx < 0 && dir.x !== 1) nextDir = { x: -1, y: 0 };
-                } else {
-                    if (dy > 0 && dir.y !== -1) nextDir = { x: 0, y: 1 };
-                    else if (dy < 0 && dir.y !== 1) nextDir = { x: 0, y: -1 };
-                }
-            }, {passive:true});
-        })();
-
     overlay.classList.add('active');
     startNewRound();
 }
@@ -11211,7 +11266,7 @@ startDialogue([
         "🔥 A campfire burns steadily beside the path.",
         "'You sit for a moment. Your creatures recover.'"
     ], () => {
-        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; });
+        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; p.attacks?.forEach(a => { if(a) a.pp = a.maxPP; }); });
         if (gameState.schoolQuizDone) gameState.schoolQuizDone = false;
         startDialogue(["✨ All creatures fully healed.", "The road ahead is long — rest when you can."]);
     });
