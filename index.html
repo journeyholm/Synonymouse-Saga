@@ -4532,22 +4532,28 @@ function draw() {
     const realTime = new Date().getHours();
     const isNight = realTime >= 18 || realTime < 6; 
 
-    // --- SMOOTH CAMERA LOGIC ---
-    if (!gameState.camera) {
-        gameState.camera = { 
-            x: gameState.player.x * tileSize, 
-            y: gameState.player.y * tileSize 
-        };
-    }
-
+// --- SMOOTH CAMERA LOGIC ---
     const targetX = gameState.player.x * tileSize;
     const targetY = gameState.player.y * tileSize;
 
-    // Smooth movement (Lerp)
-    gameState.camera.x += (targetX - gameState.camera.x) * 0.1;
-    gameState.camera.y += (targetY - gameState.camera.y) * 0.1;
+    if (!gameState.camera) {
+        // Snap camera instantly on first load
+        gameState.camera = { x: targetX, y: targetY };
+    }
 
-    // FIX: Round the values to prevent "Grid Lines"
+    // Snap camera if it's more than 3 tiles away (e.g. after map change or load)
+    const distX = Math.abs(targetX - gameState.camera.x);
+    const distY = Math.abs(targetY - gameState.camera.y);
+    if (distX > tileSize * 3 || distY > tileSize * 3) {
+        gameState.camera.x = targetX;
+        gameState.camera.y = targetY;
+    } else {
+        // Smooth movement (Lerp) — faster factor so it doesn't lag
+        gameState.camera.x += (targetX - gameState.camera.x) * 0.25;
+        gameState.camera.y += (targetY - gameState.camera.y) * 0.25;
+    }
+
+    // Round the values to prevent "Grid Lines"
     const offsetX = Math.floor(-gameState.camera.x + canvas.width / 2 - 16);
     const offsetY = Math.floor(-gameState.camera.y + canvas.height / 2 - 16);
 
