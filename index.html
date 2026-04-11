@@ -91,7 +91,7 @@ animation: ts-float-mouse 4s ease-in-out infinite;
   <!-- Main content -->
   <div style="position:relative;z-index:1;width:100%;max-width:700px;padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;margin:0 auto;height:100%;justify-content:center;">
 
-    <div class="ts-badge">&#9670; Version 5.0 &#9670; Classroom Edition &#9670;</div>
+    <div class="ts-badge">&#9670; Version 6.0 &#9670; Classroom Edition &#9670;</div>
 
     <div style="text-align:center;margin-bottom:.5rem;">
       <span class="ts-ela">ELA</span>
@@ -4519,9 +4519,13 @@ const tileTypes = {
 
 let gameLoopRunning = false;
 function gameLoop() {
-    if (!gameLoopRunning) gameLoopRunning = true;
     draw();
     requestAnimationFrame(gameLoop);
+}
+function startGameLoop() {
+    if (gameLoopRunning) return;
+    gameLoopRunning = true;
+    gameLoop();
 }
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -5249,8 +5253,9 @@ function handleViralSpecimenInteraction() {
         const canvasX = (event.clientX - rect.left) * scaleX;
         const canvasY = (event.clientY - rect.top) * scaleY;
 
-        const offsetX = -gameState.player.x * tileSize + canvas.width / 2;
-        const offsetY = -gameState.player.y * tileSize + canvas.height / 2;
+if (!gameState.camera) return;
+const offsetX = Math.floor(-gameState.camera.x + canvas.width / 2 - 16);
+const offsetY = Math.floor(-gameState.camera.y + canvas.height / 2 - 16);
 
         const mapX = Math.floor((canvasX - offsetX) / tileSize);
         const mapY = Math.floor((canvasY - offsetY) / tileSize);
@@ -9549,7 +9554,7 @@ confirmBtn.onclick = (e) => {
 const launchGame = () => {
             gameState.playerName = (nameInput.value || '').trim() || gameState.playerName || 'Trainer';
             titleDiv.classList.add('hidden');
-            if (!gameLoopRunning) gameLoop();
+            if (!gameLoopRunning) startGameLoop();
             startDialogue([
                 "You wake up.",
                 "Mom (downstairs): 'Breakfast is ready!'",
