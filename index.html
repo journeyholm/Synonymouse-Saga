@@ -1000,7 +1000,7 @@ button { cursor: pointer; }
   <div id="game-wrapper">
         <div id="game-container">
             <canvas id="gameCanvas"></canvas>
-            <canvas id="sailing-canvas"></canvas>
+            <canvas id="sailing-canvas" style="display:none;"></canvas>
             <div id="root-snake-overlay">
   <!-- Header bar -->
   <div style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:8px 12px;background:rgba(0,0,0,0.85);box-sizing:border-box;flex-shrink:0;">
@@ -4452,8 +4452,6 @@ finalCave: {
         objects: {
 // ENTRANCE
             '9,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
-'10,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
-
             // CAMPFIRE — mid-pyramid rest point
             '7,13': { sprite: 'campfire', interaction: handleFinalCaveCampfire },
 '10,19': { sprite: 'ladder', interaction: handleFinalCaveLadder },
@@ -4519,8 +4517,12 @@ const tileTypes = {
 
     function getTile(map, x, y) { if (y >= 0 && y < map.layout.length && x >= 0 && x < map.layout[y].length) return map.layout[y][x]; return -1; }
 
-    function gameLoop() { draw(); requestAnimationFrame(gameLoop); }
-
+let gameLoopRunning = false;
+function gameLoop() {
+    if (!gameLoopRunning) gameLoopRunning = true;
+    draw();
+    requestAnimationFrame(gameLoop);
+}
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -5479,7 +5481,8 @@ if (mapName === 'village' && gameState.defeatedTrainers.includes('finalRival')) 
         interaction: handlePostGameAndyInteraction
     };
 }
-
+        gameState.camera = { x: gameState.player.x * 32, y: gameState.player.y * 32 };
+        draw();
 // --- FINAL BOSS ROOM SPAWN LOGIC ---
         if (mapName === 'rivalsRoom') {
             if (gameState.andyInvited && !gameState.defeatedTrainers.includes('finalRival')) {
@@ -9546,7 +9549,7 @@ confirmBtn.onclick = (e) => {
 const launchGame = () => {
             gameState.playerName = (nameInput.value || '').trim() || gameState.playerName || 'Trainer';
             titleDiv.classList.add('hidden');
-            gameLoop();
+            if (!gameLoopRunning) gameLoop();
             startDialogue([
                 "You wake up.",
                 "Mom (downstairs): 'Breakfast is ready!'",
@@ -9592,7 +9595,9 @@ window.addEventListener('keydown', (e) => {
 });
 // Remove the old blanket click-to-start so clicking the CONTINUE button doesn't also fire New Game
 // document.getElementById('title-scene').addEventListener('click', () => startGame());
-document.getElementById('touch-controls').addEventListener('click', () => startGame());
+document.getElementById('touch-controls').addEventListener('click', () => {
+    if (!gameHasStarted) startGame();
+});
 function handleSenseiWu() {
         const streak = gameState.trainingStreak;
         // 1. Calculate Difficulty based on Player's Best creature
@@ -14555,7 +14560,7 @@ function ppQuit() {
 }
 
 function ppTogglePause() {
-    if (!PP.active && !PP.gameStarted) return;
+    if (!PP.active) return;
     if (PP.gamePaused && document.getElementById('pp-question-modal').style.display === 'flex') return;
     PP.paused = !PP.paused;
     PP.gamePaused = PP.paused;
