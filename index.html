@@ -6,7 +6,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
+</head>
+<body class="bg-gray-900">
 <div id="title-scene" class="absolute inset-0 z-50" style="background:#0a0a1a;overflow:hidden;font-family:'Nunito',sans-serif;">
 
   <style>
@@ -35,6 +36,7 @@
     .ts-btn:active{transform:scale(.97);}
     @keyframes ts-slideup{to{opacity:1;transform:translateY(0)}}
     @keyframes ts-glow{0%,100%{box-shadow:0 0 0 4px rgba(255,180,0,.2),0 8px 32px rgba(255,140,0,.4)}50%{box-shadow:0 0 0 8px rgba(255,180,0,.35),0 8px 48px rgba(255,140,0,.7)}}
+    @keyframes ts-glow-blue{0%,100%{box-shadow:0 0 0 4px rgba(100,180,255,.2),0 8px 32px rgba(34,139,230,.4)}50%{box-shadow:0 0 0 8px rgba(100,180,255,.35),0 8px 48px rgba(34,139,230,.7)}}
     .ts-footer{margin-top:1.2rem;font-size:.55rem;color:rgba(150,150,200,.5);font-family:'Press Start 2P',monospace;animation:ts-fadein .5s 2.2s ease forwards;opacity:0;text-align:center;line-height:2.2;}
     .ts-scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:10;}
     .ts-corner{position:absolute;width:50px;height:50px;opacity:.3;pointer-events:none;}
@@ -89,7 +91,7 @@ animation: ts-float-mouse 4s ease-in-out infinite;
   <!-- Main content -->
   <div style="position:relative;z-index:1;width:100%;max-width:700px;padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;margin:0 auto;height:100%;justify-content:center;">
 
-    <div class="ts-badge">&#9670; Version 4.0 &#9670; Classroom Edition &#9670;</div>
+    <div class="ts-badge">&#9670; Version 5.0 &#9670; Classroom Edition &#9670;</div>
 
     <div style="text-align:center;margin-bottom:.5rem;">
       <span class="ts-ela">ELA</span>
@@ -113,7 +115,10 @@ animation: ts-float-mouse 4s ease-in-out infinite;
       <div class="ts-card" style="--d:3s;--delay:0.9s"><span style="font-size:1.8rem;">&#x1F9DA;</span><span class="ts-cname">Antonymph</span></div>
     </div>
 
-    <button class="ts-btn">&#9654; PRESS START</button>
+    <div id="ts-btn-group" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
+  <button class="ts-btn" id="ts-btn-new">&#9654; NEW GAME</button>
+  <button class="ts-btn" id="ts-btn-continue" style="display:none;background:linear-gradient(135deg,#74c0fc,#228be6);box-shadow:0 0 0 4px rgba(100,180,255,.2),0 8px 32px rgba(34,139,230,.4);">&#9654; CONTINUE</button>
+</div>
 
     <p class="ts-footer">Arrow Keys: Move &nbsp;|&nbsp; Z / Enter: Action &nbsp;|&nbsp; M: Menu</p>
 
@@ -958,19 +963,28 @@ button { cursor: pointer; }
     .cert-container { box-shadow: none !important; border: 2px solid #ccc !important; }
 }
 }
-    </style>
-</head>
-<body class="bg-gray-900">
-    <div id="passcode-screen" class="hidden">
-    <h2>🔒 Full Version Required</h2>
-    <p>You've completed the <strong style="color:#FFD700;">ELA Quest Demo</strong>!<br><br>
-    To unlock the full game, purchase the complete version on Teachers Pay Teachers and enter your passcode below.</p>
+</style>
+<div id="passcode-screen" class="hidden">
+    <h2>🎉 You've Reached the End of the Demo!</h2>
+    <p style="margin-bottom:0.8rem;">You've explored the Village of Beginnings, battled through Lexington City, and proven yourself in Gym 1.</p>
+    <p style="margin-bottom:1.2rem; color:rgba(200,220,255,0.85);">The full version unlocks:</p>
+    <div style="text-align:left; font-family:'Nunito',sans-serif; font-size:0.78rem; color:rgba(200,220,255,0.9); margin-bottom:1.2rem; line-height:2;">
+        🗺️ <strong>5 more maps</strong> — Route 2, Adjective Woods, Synonym City, Grammar Cave &amp; more<br>
+        🏆 <strong>2 full Gyms + Elite Four + Final Boss</strong><br>
+        🐾 <strong>70+ ELA creatures</strong> to catch and evolve<br>
+        📚 <strong>Deeper quests</strong> — Run-On Outbreak, Lost Manuscript, Island Survival<br>
+        🎣 <strong>Fishing mini-game</strong>, Safari Zone, Word Arcade<br>
+        📋 <strong>Printable Teacher Report</strong> with per-student accuracy data<br>
+        🎓 <strong>Printable Certificate of Mastery</strong> for students<br>
+        🔁 <strong>New Game+</strong> mode — replay with your Lexicon preserved
+    </div>
+    <p style="font-size:0.72rem; margin-bottom:1rem; color:rgba(180,200,255,0.7);">Already purchased? Enter your passcode below to unlock instantly.</p>
     <input type="text" id="passcode-input" placeholder="Enter Passcode" maxlength="20" autocomplete="off" />
     <p id="passcode-error"></p>
-    <button id="passcode-btn-submit">Unlock Full Game</button>
-    <button id="passcode-btn-cancel">Go Back</button>
-    <p style="font-size:0.7rem; margin-top:1rem; color:rgba(150,150,200,0.5);">
-        Find the full version at<br><strong style="color:#FFD700;">Teachers Pay Teachers</strong>
+    <button id="passcode-btn-submit">✅ Unlock Full Game</button>
+    <button id="passcode-btn-cancel">← Go Back to Demo</button>
+    <p style="font-size:0.65rem; margin-top:1rem; color:rgba(150,150,200,0.5);">
+        Available at <strong style="color:#FFD700;">Teachers Pay Teachers</strong>
     </p>
 </div>
     <div id="transition-overlay">
@@ -1264,10 +1278,11 @@ button { cursor: pointer; }
 <div class="w-full max-w-sm bg-white text-black rounded border-4 border-gray-600 p-4 grid grid-cols-1 gap-3" style="overflow-y:auto;max-height:90vh;">        <h2 class="text-2xl text-center mb-1 font-bold">Menu</h2>
         
 <div class="text-center mb-2 border-b-2 border-gray-300 pb-2">
-            <p id="menu-clock" class="text-blue-800 font-bold text-lg"></p>
-            <p id="menu-lexicon" class="text-green-700 font-bold text-sm mt-1"></p>
-            <p id="menu-box-count" class="text-sm text-center text-gray-500 mt-1"></p>
-        </div>
+    <p id="menu-clock" class="text-blue-800 font-bold text-lg"></p>
+    <p id="menu-money" class="text-yellow-600 font-bold text-sm mt-1"></p>
+    <p id="menu-lexicon" class="text-green-700 font-bold text-sm mt-1"></p>
+    <p id="menu-box-count" class="text-sm text-center text-gray-500 mt-1"></p>
+</div>
         <button onclick="useFastTravel()" class="w-full p-3 bg-purple-600 text-white rounded border-2 border-white">Fly / Fast Travel</button>
 <button id="menu-achieve-btn" class="w-full p-3 bg-yellow-500 text-black rounded">🏆 Achievements</button>
         <button id="menu-study-btn" class="w-full p-3 bg-blue-700 text-white rounded">📚 Study Mode</button>
@@ -1939,8 +1954,7 @@ const locationData = {
 };
 
 const heldItemsDB = {
-    'Lucky Comma':    { emoji: '📎', description: 'Boosts accuracy on the first move of each battle. The first attack always lands.',         effect: 'first_strike' },
-    'Grammar Stone':  { emoji: '🪨', description: 'A polished stone carved with grammar rules. Raises the holder\'s Defense by 20%.',         effect: 'defense_boost' },
+'Lucky Comma':    { emoji: '📎', description: 'The first attack in each battle always lands and deals +30% bonus damage.',         effect: 'first_strike' },    'Grammar Stone':  { emoji: '🪨', description: 'A polished stone carved with grammar rules. Raises the holder\'s Defense by 20%.',         effect: 'defense_boost' },
     'Rough Draft':    { emoji: '📝', description: 'An unfinished manuscript. Restores 10 HP when the holder\'s HP drops below 25%.',          effect: 'pinch_heal' },
     'Oxford Pin':     { emoji: '📌', description: 'A golden pin. Prevents the holder from being affected by status conditions.',              effect: 'status_shield' },
     'Thesaurus Chip': { emoji: '🔶', description: 'A fragment of the Grand Thesaurus. Boosts damage by 15% when using a move that matches the holder\'s type.', effect: 'stab_boost' },
@@ -2275,7 +2289,7 @@ const creatureDB = {
     { level: 42, move: 'Iron Defense' },
     { level: 46, move: 'Roar of Knowledge' },
     { level: 50, move: 'Royal Decree' },
-    { level: 55, move: 'Active Voice' },
+    { level: 54, move: 'Active Voice' },
     { level: 62, move: 'Synonym Surge' },
     { level: 70, move: 'Grand Narrative' }
 ] },
@@ -2311,10 +2325,10 @@ const creatureDB = {
     { level: 30, move: 'Royal Decree' }
 ] },
 'Synonymouse': { type: 'Normal', sprite: 'synonymouse', evolvesAt: 18, evolvesTo: 'ThesaurusRex', catchDifficulty: 45, learnset: [
-    { level: 2,  move: 'Synonym Slam' },
-    { level: 7,  move: 'Sharpen' },
-    { level: 11, move: 'Word Crush' },
-    { level: 14, move: 'Cosmic Prose' },
+    { level: 6,  move: 'Synonym Slam' },
+    { level: 9,  move: 'Sharpen' },
+    { level: 12, move: 'Word Crush' },
+    { level: 15, move: 'Cosmic Prose' },
     { level: 17, move: 'Roar of Knowledge' }
 ] },
 'Grammargoyle': { type: 'Normal', sprite: 'grammargoyle', evolvesAt: 28, evolvesTo: 'SyntaxStone', catchDifficulty: 45,
@@ -2501,7 +2515,21 @@ const runOnQuestions = [
     ];
 
 const trainersDB = {
-    'villageRival': { name: "Andy", reward: 100, preBattle: [], postBattle: [] },
+'villageRival': { 
+    name: "Andy", 
+    reward: 100, 
+    preBattle: [
+        "Andy: 'Oh — finally. I was starting to think you weren't going to show.'",
+        "'Professor Lexicon gave you a Synonymouse. I already know.'",
+        "'Mine is stronger. Let's just find that out now and save everyone time.'"
+    ], 
+    postBattle: [
+        "Andy: '...Hm.'",
+        "'Okay. That was better than I expected.'",
+        "'Don't read into it. I was holding back.'",
+        "He doesn't look like he was holding back."
+    ] 
+},
     'postGymRival': { name: "Andy", reward: 200, preBattle: [], postBattle: [] },
     'senseiWu': { name: "Sensei Wu", reward: 0, preBattle: [], postBattle: [] },
     'hikerTom': { name: "Hiker Tom", creature: [createcreature('Wordworm', 6)], preBattle: ["A trainer! Finally a challenge! Let's battle!"], postBattle: ["Huff... puff... you're pretty strong. Keep it up!"], reward: 60 },
@@ -2509,53 +2537,125 @@ const trainersDB = {
     'bookwormBarry': { name: "Bookworm Barry", creature: [createcreature('PronounProwler', 15)], preBattle: ["I've read about every creature! Let's see if your skills are textbook!"], postBattle: ["Wow, a real-world lesson! You're tougher than the texts said."], reward: 150 },
     'artistAdeline': { name: "Artist Adeline", creature: [createcreature('VerbViper', 17)], preBattle: ["I'm painting a picture of a perfect battle. You're my subject!"], postBattle: ["Such vivid action! You've inspired my next masterpiece."], reward: 170 },
     'profGrendel': { name: "Professor Grendel", creature: [createcreature('ThesaurusRex', 25), createcreature('VerbViper', 28)], preBattle: ["You dare challenge the master of semantics? Your story ends here!"], postBattle: ["Hmph. A mere fluke. You have not seen the last of my literary might!"], reward: 300 },
-    'gymLeaderRhonda': { 
-        name: "Middle School Master Rhonda", 
-        creature: [createcreature('Haiku-na', 12), createcreature('Adjectlizard', 14)], 
-        preBattle: ["Rhonda: 'To pass my class, you have to climb,'", "'And beat my team in a rhyme-fueled crime!'"], 
-        postBattle: ["Your skills are sharp, your victory's prime,", "Here's the Rhyme Badge, for your time!"], 
-        reward: 400 
-    },
-    'gymLeaderLex': { 
-        name: "High School Hero Lex", 
-        creature: [createcreature('ThesaurusRex', 30), createcreature('Grammargoyle', 28)], 
-        preBattle: ["Welcome to the Honors Class!", "Let's see if your lexicon is ready for High School!"], 
-        postBattle: ["Astounding!", "You have graduated with honors!", "You've earned this!"], 
-        reward: 500 
-    },
+'gymTrainerCassidy': {
+    name: "Gym Trainer Cassidy",
+    creature: [createcreature('Haiku-na', 10), createcreature('Poetry-can', 11)],
+    preBattle: [
+        "Cassidy: 'You want to reach Rhonda? You go through me first.'",
+        "'Poetry is not just pretty words — it is PRECISION.'",
+        "'Every syllable in a haiku is a choice. Every word I use in battle is a choice.'",
+        "'Let's see how deliberate YOU are.'"
+    ],
+    postBattle: [
+        "Cassidy: 'You read the rhythm. I didn't expect that.'",
+        "'📖 Remember — a haiku is three lines: 5 syllables, 7 syllables, 5 syllables.'",
+        "'It forces the writer to cut everything that isn't essential.'",
+        "'Rhonda is through there. She won't go easy on you like I did.'"
+    ],
+    reward: 220
+},
+'gymTrainerMarcus': {
+    name: "Gym Trainer Marcus",
+    creature: [createcreature('Adjectlizard', 11), createcreature('Metaphorpillar', 12)],
+    preBattle: [
+        "Marcus: 'Adjectives describe. Metaphors transform.'",
+        "'My Adjectlizard can paint you in ten words.'",
+        "'My Metaphorpillar will make you see yourself differently.'",
+        "'That is what figurative language DOES. Now — defend yourself.'"
+    ],
+    postBattle: [
+        "Marcus: 'Strong. Direct. No wasted moves.'",
+        "'📖 FIGURATIVE LANGUAGE uses words beyond their literal meaning.'",
+        "'Simile: she runs LIKE the wind. Metaphor: she IS the wind.'",
+        "'The difference is subtle but it matters — metaphor is more powerful because it commits fully.'",
+        "'Good luck with Rhonda. She commits fully too.'"
+    ],
+    reward: 240
+},
+'gymTrainerVera': {
+    name: "Gym Trainer Vera",
+    creature: [createcreature('PronounProwler', 24), createcreature('CommaLeon', 25)],
+    preBattle: [
+        "Vera: 'Grammar is not a cage. It is architecture.'",
+        "'My PronounProwler knows every referent. My CommaLeon knows every pause.'",
+        "'A misplaced comma can change a sentence's entire meaning.'",
+        "'\"Let's eat, Grandma\" versus \"Let's eat Grandma.\" Punctuation saves lives.'",
+        "'Now show me yours saves yours.'"
+    ],
+    postBattle: [
+        "Vera: 'You held your structure. Impressive.'",
+        "'📖 COMMA RULE: Use a comma before a coordinating conjunction joining two independent clauses.'",
+        "'For, And, Nor, But, Or, Yet, So — FANBOYS. Each one joins, but each changes the relationship.'",
+        "'Lex is at the back. His ThesaurusRex has never been beaten in this gym.'",
+        "'Not yet, anyway.'"
+    ],
+    reward: 490
+},
+'gymTrainerDante': {
+    name: "Gym Trainer Dante",
+    creature: [createcreature('Wordworm', 26), createcreature('Were-word', 27)],
+    preBattle: [
+        "Dante: 'Word choice is everything. EVERYTHING.'",
+        "'\"Skinny\" and \"slender\" mean the same thing technically.'",
+        "'But they don't feel the same. One is an insult. One is a compliment.'",
+        "'That difference is CONNOTATION. And my creatures exploit it ruthlessly.'"
+    ],
+    postBattle: [
+        "Dante: 'You adapted. That's what good writers do.'",
+        "'📖 CONNOTATION vs. DENOTATION: Denotation is the dictionary meaning.'",
+        "'Connotation is the emotional weight a word carries.'",
+        "'\"Home\" and \"house\" denote the same place — but only one of them feels like somewhere you belong.'",
+        "'Lex chose his gym name carefully. Think about what \"Synonym\" implies.'"
+    ],
+    reward: 510
+},
+'gymLeaderRhonda': { 
+    name: "Middle School Master Rhonda", 
+    creature: [createcreature('Haiku-na', 12), createcreature('Adjectlizard', 13), createcreature('Poetry-can', 14)], 
+    preBattle: ["Rhonda: 'To pass my class, you have to climb,'", "'Three creatures stand between you and the Rhyme!'", "'My Poetry-can has never lost. Let's see what you've got.'"], 
+    postBattle: ["Rhonda: 'Your skills are sharp, your victory's prime,'", "'Here's the Rhyme Badge — you've earned your time!'", "'Don't think high school will be this easy.'"], 
+    reward: 750 
+},
+'gymLeaderLex': { 
+    name: "High School Teacher Lex",
+    creature: [createcreature('Grammargoyle', 26), createcreature('CommaLeon', 28), createcreature('ThesaurusRex', 32)], 
+    preBattle: ["Lex: 'Welcome to AP ELA. Seats are assigned by vocabulary range.'", "'I've failed stronger trainers than you.'", "'Three creatures. Each one a lesson. Let's begin.'"], 
+    postBattle: ["Lex: 'Exceptional. I don't say that lightly.'", "'You've earned the Synonym Badge — and an A in my gradebook.'", "'Now go. College-level challenges await you.'"], 
+    reward: 650 
+},
     'caveExplorerDon': { name: "Explorer Don", creature: [createcreature('Grammargoyle', 22)], preBattle: ["This cave is full of rare grammar! Don't get in my way!"], postBattle: ["Hmph. Fine, you can pass. But I'll find the rarest ones first!"], reward: 220 },
     'goblinBoss': { name: "Goblin Grunt", creature: [createcreature('ThesaurusRex', 32)], preBattle: ["GRAR! You found me! But you won't stop me from finding the legendary creature of language!"], postBattle: ["Grah! Beaten... But the master will succeed... You'll need this to get out of here."], reward: 1000 },
     'shipwreckedPilot': { name: "Disoriented Pilot", creature: [createcreature('Hyper-bole', 35)], preBattle: ["Who... who are you? Is this my ship? Get away from my ship!"], postBattle: ["Ugh... my head... a plane crash... I've been here for years...", "My love... in Lexington City... I have to get back!", "You... you saved me from my delirium. Take this. It's a special technique.", "I should have used it to fly home ages ago... I must see her!"], reward: 600 },
     
     // --- THE ELITE FOUR (FINAL CAVE GAUNTLET) ---
-    'elitePoet': { 
-        name: "Elite Poet Frost", 
-        creature: [createcreature('Haiku-na', 45), createcreature('Lyrical-loon', 48)], 
-        preBattle: ["Two roads diverged in a yellow wood...", "And you took the one that leads to DEFEAT!"], 
-        postBattle: ["You have poetry in your soul... You may pass."], 
-        reward: 1000 
-    },
-    'eliteDramatist': { 
-        name: "Elite Actor Bard", 
-        creature: [createcreature('Drama-llama', 48), createcreature('ThesaurusRex', 50)], 
-        preBattle: ["All the world's a stage...", "And you are merely a player about to lose!"], 
-        postBattle: ["Parting is such sweet sorrow. Go on."], 
-        reward: 1100 
-    },
-    'eliteJournalist': { 
-        name: "Elite Writer Woolf", 
-        creature: [createcreature('Biogra-bee', 50), createcreature('Auto-biogra-bee', 52)], 
-        preBattle: ["I only deal in cold, hard facts.", "Fact: You are underprepared."], 
-        postBattle: ["This will make a great headline. Proceed."], 
-        reward: 1200 
-    },
-    'eliteGrammarian': { 
-        name: "Elite Prof. Strunk", 
-        creature: [createcreature('Grammargoyle', 53), createcreature('CommaLeon', 55)], 
-        preBattle: ["Your sentence structure is sloppy!", "I will correct your behavior!"], 
-        postBattle: ["Perfect syntax... impressive. The King awaits."], 
-        reward: 1300 
-    },
+'elitePoet': { 
+    name: "Professor Dickins", 
+    creature: [createcreature('Haiku-na', 45), createcreature('Lyrical-loon', 48)], 
+    preBattle: ["Prof. Dickins: 'I've taught graduate seminars on verse for twenty years.'", "'Office hours are not a substitute for preparation.'", "'Let's see if you've done the reading.'"], 
+    postBattle: ["Prof. Dickins: 'Impressive. You clearly did more than skim the syllabus.'", "'You may proceed. The other professors will not be as patient.'"],
+    reward: 1000 
+},
+'eliteDramatist': { 
+    name: "Professor Bard", 
+    creature: [createcreature('Drama-llama', 48), createcreature('ThesaurusRex', 50)], 
+    preBattle: ["Prof. Bard: 'I hold a doctorate in dramatic literature.'", "'My dissertation was 400 pages on a single monologue.'", "'You have exactly one act to impress me.'"], 
+    postBattle: ["Prof. Bard: 'You performed under pressure. That is all I ask of any student.'", "'Parting is such sweet sorrow. Go on — my colleagues are waiting.'"], 
+    reward: 1100 
+},
+'eliteJournalist': { 
+    name: "Professor Woolf", 
+    creature: [createcreature('Biogra-bee', 50), createcreature('Auto-biogra-bee', 52)], 
+    preBattle: ["Prof. Woolf: 'I publish. I peer-review. I do not lose battles.'", "'My research on narrative nonfiction has 400 citations.'", "'Cite your sources — or prepare to be corrected.'"], 
+    postBattle: ["Prof. Woolf: 'Rigorous. Well-argued. I will allow it.'", "'This will make an interesting case study. Proceed.'"], 
+    reward: 1200 
+},
+'eliteGrammarian': { 
+    name: "Professor Strunk", 
+    creature: [createcreature('Grammargoyle', 53), createcreature('CommaLeon', 55)], 
+    preBattle: ["Prof. Strunk: 'I have corrected grammar since before you were born.'", "'Omit needless moves. Omit needless excuses.'", "'Your sentence structure will be graded.'"], 
+    postBattle: ["Prof. Strunk: 'Perfect syntax. I did not expect that.'", "'The final examination lies ahead. Do not embarrass the faculty.'"], 
+    reward: 1300 
+},
 
     // --- FINAL BOSSES ---
 'finalBoss1': { 
@@ -2981,14 +3081,15 @@ const maps = {
 '6,2': { sprite: 'tv', interaction: () => {
     if (!gameState.tvVisits) gameState.tvVisits = 0;
     gameState.tvVisits++;
-    const lines = [
-        "'The course of true love never did run smooth.' It's 'A Midsummer Night's Dream.'",
-        "A documentary about a whale. The narrator keeps saying 'Call me Ishmael.' You already have a book about this.",
-        "A cooking show. The host says: 'If you give a mouse a cookie, he's going to want a glass of milk.'",
-        "Breaking news: a man named Gatsby is throwing a party. Nobody knows who he is. Everyone is going anyway.",
-        "A nature program. A mockingbird is singing. The narrator says: 'It is a sin to kill a mockingbird.'",
-        "A movie about a boy going to wizard school. The TV turns off before you can find out if he makes it."
-    ];
+const lines = [
+    "📺 A Midsummer Night's Dream — Shakespeare, 1600. 'The course of true love never did run smooth.' Four lovers flee into enchanted woods, where a fairy king's spell causes chaos. It's a comedy about how irrational love is — and how it sorts itself out anyway. Also: a guy gets turned into a donkey.",
+    "📺 Moby Dick — Melville, 1851. 'Call me Ishmael.' Captain Ahab is obsessed with hunting the white whale that took his leg. The whale is not just a whale — it's obsession, nature, the unknowable. Melville was largely ignored in his lifetime. The book is now considered one of the greatest American novels ever written.",
+    "📺 The Great Gatsby — F. Scott Fitzgerald, 1925. Jay Gatsby throws lavish parties hoping his lost love Daisy will walk in. Across the bay, a green light blinks at the end of her dock. It represents everything he reaches for but can never quite hold. The 'American Dream.' The impossibility of the past.",
+    "📺 To Kill a Mockingbird — Harper Lee, 1960. 'It is a sin to kill a mockingbird.' The mockingbird does nothing wrong — it only sings. In the novel it symbolizes innocence destroyed by prejudice. Set in Depression-era Alabama. Narrated by a child who sees what adults refuse to.",
+    "📺 Harry Potter — J.K. Rowling, 1997. An orphan discovers he is a wizard, enters a hidden school, and faces a dark lord who killed his parents. A hero's journey: ordinary world → call to adventure → transformation. Rowling wrote the first book as a single mother, on napkins in a café.",
+    "📺 If You Give a Mouse a Cookie — Laura Numeroff, 1985. A deceptively simple picture book. The mouse keeps needing one more thing. It's circular narrative — the story ends where it began. Numeroff used cause and effect to teach young readers about story structure. Every children's author is also a teacher.",
+    "📺 A documentary about language. A linguist says: 'Every language that dies takes an entire way of seeing the world with it.' There are approximately 7,000 languages spoken today. Linguists estimate one dies every two weeks. You sit with that for a while."
+];
     return lines[(gameState.tvVisits - 1) % lines.length];
 }},            
             // MIRROR (Change Avatar)
@@ -3049,58 +3150,114 @@ const maps = {
 '3,1': { sprite: 'bookshelf', interaction: () => {
     if (!gameState.homeShelfVisits) gameState.homeShelfVisits = 0;
     gameState.homeShelfVisits++;
-    const lines = [
-        "Tales of adventure: 'The Odyssey' and 'Treasure Island'.",
-        "You find a worn copy of 'Where the Wild Things Are.' A note inside reads: 'Let the wild rumpus start.'",
-        "'Charlotte's Web' is on the shelf. Someone wrote 'SOME PIG' in pencil on the cover.",
-        "A book called 'The Phantom Tollbooth.' The main character is named Milo. He was also bored before his adventure started.",
-        "'Bridge to Terabithia.' You put it back immediately. You are not ready."
-    ];
+const lines = [
+    "📚 The Odyssey — Homer, ~800 BCE. A hero named Odysseus spends 10 years trying to get home after the Trojan War. Every story about a long journey home echoes this one. The word 'odyssey' now means any long, eventful journey. His wife Penelope waits, outwitting suitors for years. She's the real hero.",
+    "📚 Where the Wild Things Are — Maurice Sendak, 1963. Max acts out, gets sent to his room, imagines a world of monsters, becomes their king, and chooses to come home. It's a picture book about anger and love — and how imagination is a way of surviving both. Art Spiegelman called it the most important picture book ever written.",
+    "📚 Charlotte's Web — E.B. White, 1952. A spider writes words in her web to save a pig's life. 'SOME PIG.' 'TERRIFIC.' 'RADIANT.' The words are not magic — they just make people look more carefully. That's what writing does. White said: 'Writing is an act of faith, not a trick.'",
+    "📚 The Phantom Tollbooth — Norton Juster, 1961. Milo is bored until a magical tollbooth appears in his room. Beyond it: a world where Rhyme and Reason have been banished, and words and numbers are at war. The book argues that curiosity is the cure for boredom — and that language is an adventure, not a chore.",
+    "📚 Bridge to Terabithia — Katherine Paterson, 1977. Two lonely kids create an imaginary kingdom in the woods. Then something happens that you never see coming. Paterson wrote it after her son's best friend was struck by lightning. It remains one of the most honest books ever written about loss, friendship, and imagination. You put it back. You are not ready."
+];
     return lines[(gameState.homeShelfVisits - 1) % lines.length];
 }},            
 '1,3': { sprite: 'sister', interaction: () => {
     if (!gameState.sisterVisits) gameState.sisterVisits = 0;
     gameState.sisterVisits++;
-    if (gameState.playerParty.length === 0) return "Sis: 'Professor Lexicon is waiting. Go already. You're embarrassing me.'";
+
+    if (gameState.playerParty.length === 0) return [
+        "Sis: 'Professor Lexicon is waiting for you.'",
+        "'He's been talking about this day for weeks.'",
+        "'Go. You've got this.'"
+    ];
+
     if (gameState.defeatedTrainers.includes('finalRival')) return [
-        "Sis: 'Wait... you actually won? Against Andy?'",
-        "'That's... okay that's actually kind of impressive.'",
-        "'Don't make it weird. I'm still not doing your chores.'",
-        "'...but seriously. That's amazing. I'm proud of you.'"
+        "Sis: 'Champion. My sibling is an actual Champion.'",
+        "'I always knew you had something special in you — I just didn't say it because I didn't want it to go to your head.'",
+        "'It can go to your head now. You've earned it.'",
+        "'I'm so proud of you. Genuinely, completely proud.'"
     ];
+
     if (gameState.gymBadges.synonym) return [
-        "Sis: 'Two badges. Fine. You're not completely hopeless.'",
-        "'Mom called. She wants us to come to Lexington City for dinner.'",
-        "'Don't tell her I said this, but... nice work.'"
+        "Sis: 'Two badges. You've actually done it.'",
+        "'Mom called — she heard. She cried a little. The good kind.'",
+        "'I told her you'd been working really hard out there.'",
+        "'Because you have been. I see it. Keep going.'"
     ];
+
     if (gameState.gymBadges.rhyme) return [
-        "Sis: 'Is that a gym badge?'",
-        "'Okay, I'll admit that's kind of cool.'",
-        "'Don't get a big head about it though.'"
+        "Sis: 'Is that a Rhyme Badge?'",
+        "'That's from Rhonda's gym. She's supposed to be unbeatable.'",
+        "'You beat her.'",
+        "'I'm not surprised. I just want you to know that.'"
     ];
+
+    if (gameState.defeatedTrainers.includes('villageRival') && !gameState.gymBadges.rhyme) return [
+        "Sis: 'You beat Andy already?'",
+        "'He came by looking smug and left looking considerably less smug.'",
+        "'I don't know exactly what you did out there — but whatever it was, keep doing it.'",
+        "'You're going to be great at this. I mean that.'"
+    ];
+
     if ((gameState.dayCount || 1) >= 10 && !gameState.sisDay10Seen) {
         gameState.sisDay10Seen = true;
         return [
-            "Sis: 'Day 10. I counted.'",
-            "'Mom asked about you. I told her you were fine.'",
-            "'I may have slightly exaggerated how fine you were.'",
-            "'Come back soon. Or don't. But do.'"
+            "Sis: 'Day 10. I've been counting.'",
+            "'Mom asked about you. I told her you were doing wonderfully.'",
+            "'That wasn't an exaggeration this time.'",
+            "'Come home when you can. We'll be here.'"
         ];
     }
+
     const lines = [
-        ["Sis: 'You're back already? That was fast.'", "'Did you at least check the PC before coming home?'"],
-        ["Sis: 'I found one of your old creature drawings in the closet.'", "'It was terrible. But also kind of cute?'", "'Don't tell anyone I said that.'"],
-        ["Sis: 'Mom and dad are in Lexington City. Did you visit them?'", "'They have their own place there now. It's cozy.'", "'Mom put flowers everywhere. Obviously.'"],
-        ["Sis: 'I've been reading about ELA while you've been out.'", "'Did you know onomatopoeia sounds like what it means?'", "'...Okay maybe I get why you like this stuff.'"],
-        ["Sis: 'Your rival came by while you were gone.'", "'Andy. He said — and I quote — that he definitely wasn't checking to see if you were home.'", "'He was absolutely checking. Total disaster.'"],
-        ["Sis: 'Don't forget to save before you leave.'", "'I'm only saying it because last time you lost two hours of progress and cried about it.'", "'...I did NOT comfort you. That never happened.'"]
+        [
+            "Sis: 'You came back to check in. That matters.'",
+            "'A lot of trainers just disappear and never look back.'",
+            "'Not you. That says something good about you.'"
+        ],
+        [
+            "Sis: 'I found one of your old creature drawings in the closet.'",
+            "'You had this one labeled \"Future Team\" with a little star next to Synonymouse.'",
+            "'I kept it. Don't ask me why. I just did.'"
+        ],
+        [
+            "Sis: 'Mom and dad are in Lexington City. Did you visit them yet?'",
+            "'They'd love to see you. Dad keeps painting and mom keeps reading.'",
+            "'They talk about you all the time. Always good things.'"
+        ],
+        [
+            "Sis: 'I've been reading about ELA while you've been out.'",
+            "'Did you know onomatopoeia actually sounds like what it means?'",
+            "'Buzz. Hiss. Crash. I get it now.'",
+            "'...Okay I get why you like this stuff. Don't tell anyone.'"
+        ],
+        [
+            "Sis: 'Andy came by while you were gone.'",
+            "'He said — and I quote — that he definitely wasn't checking to see if you were home.'",
+            "'He was absolutely checking. He stayed for twenty minutes pretending to look at the notice board.'",
+            "'Your rivalry is the most entertaining thing happening in this village.'"
+        ],
+        [
+            "Sis: 'The game auto-saves every time you change areas, so you're usually covered.'",
+            "'But if you want extra peace of mind, hit Menu and save manually before logging off.'",
+            "'You've put real time into this. Worth protecting.'",
+            "'Now go — your team needs the exercise more than you need my advice.'"
+        ]
     ];
-    
+
     const line = lines[(gameState.sisterVisits - 1) % lines.length];
     return Array.isArray(line) ? line : [line];
 }},
-            '2,3': { sprite: 'dictionary', interaction: "Onomatopoeia: (n.) the formation of a word from a sound associated with what is named (e.g., cuckoo, sizzle)." }, 
-            '3,5': { target: 'village', x: 10, y: 10 }, 
+'2,3': { sprite: 'dictionary', interaction: () => {
+    if (!gameState.dictVisits) gameState.dictVisits = 0;
+    gameState.dictVisits++;
+    const lines = [
+        "📖 ONOMATOPOEIA (on-uh-mat-uh-PEE-uh): A word that imitates the sound it describes. Buzz. Crash. Sizzle. Hiss. Murmur. These words are their own definition. Poets use them to make language physical — to put sound directly into the reader's ear.",
+        "📖 ALLITERATION: The repetition of the same consonant sound at the beginning of nearby words. 'Peter Piper picked a peck.' 'She sells seashells.' It creates rhythm and makes phrases stick in memory. Advertising uses it constantly. So do great titles: Pride and Prejudice. Sense and Sensibility.",
+        "📖 ASSONANCE: The repetition of vowel sounds within nearby words. 'The rain in Spain stays mainly in the plain.' Notice the long 'A' sounds. Assonance is subtler than rhyme — it creates mood without obvious repetition. Great poets use it to make lines feel inevitable.",
+        "📖 CONNOTATION vs. DENOTATION: Denotation = the dictionary definition. Connotation = the feelings and associations the word carries. 'Home' and 'house' denote the same place. But 'home' connotes warmth, memory, belonging. 'House' is just a structure. Word choice shapes meaning beyond definition.",
+        "📖 FIGURATIVE LANGUAGE: Language that means more than its literal definition. Simile compares using 'like' or 'as.' Metaphor says one thing IS another. Personification gives human qualities to non-human things. Hyperbole exaggerates for effect. All of these make language more vivid, surprising, and true."
+    ];
+    return lines[(gameState.dictVisits - 1) % lines.length];
+}},            '3,5': { target: 'village', x: 10, y: 10 }, 
             '4,5': { target: 'village', x: 11, y: 10 }, 
             '4,1': { sprite: 'stairsUp', target: 'playerRoom', x: 4, y: 4 }, 
             '6,1': { sprite: 'computer', interaction: handlePCInteraction } 
@@ -3126,8 +3283,17 @@ const maps = {
         objects: {
             '12,2': { sprite: 'candy', interaction: () => handleCaveItem('Synonym Roll', 'synonymRoll', 1, 'village', 12, 2) },
             // The Secret Tree
-            '13,8': { sprite: 'tree', interaction: "Carved into the bark: 'LH ❤️ BH'" },
-            // Langston Hughes
+'13,8': { sprite: 'tree', interaction: () => {
+    if (!gameState.treeVisits) gameState.treeVisits = 0;
+    gameState.treeVisits++;
+    const lines = [
+        "Carved into the bark: 'LH ❤️ BH' — the letters are old and grown-over. Someone loved someone here, a long time ago.",
+        "📖 MOTIF: A motif is a recurring element in a work of literature — an image, idea, or symbol that appears multiple times and accumulates meaning. Trees appear everywhere in literature: the Tree of Knowledge, Tolkien's Ents, the tree in To Kill a Mockingbird where Boo leaves gifts. They represent time, rootedness, and things that outlast us.",
+        "The initials again. LH. BH. You try to think of famous literary pairs. None fit. Maybe they weren't famous. Maybe they were just two people in a village who loved each other and wanted the tree to remember.",
+        "📖 IMAGERY: This tree, these carved letters — this is imagery. A concrete, specific detail that creates a picture in the reader's mind. Good writers don't say 'there was evidence of love.' They show you the bark, the carving, the moss growing over the letters. The reader's imagination does the rest."
+    ];
+    return lines[(gameState.treeVisits - 1) % lines.length];
+}},            // Langston Hughes
             '6,6': { sprite: 'hughes', interaction: handleHughesInteraction },
 '6,9': { sprite: 'maya', interaction: handleMayaInteraction },
             '3,4': { target: 'rivalsHouse', x: 4, y: 5, symbol: '', symbolOffsetY: -2 },
@@ -3139,7 +3305,7 @@ const maps = {
             '4,9': { sprite: 'sign', interaction: handleVillageNoticeBoard },
             '7,0': { sprite: 'gate', interaction: handleGateInteraction },
             '8,0': { sprite: 'gate', interaction: handleGateInteraction },
-            '10,10': { sprite: 'sign', interaction: 'Village of Beginnings' },
+            '10,10': { sprite: 'sign', interaction: 'Village of Beginnings - Load Game to restore saved data!' },
             '7,12': { target: 'homeBay', x: 7, y: 1 },
             '8,12': { target: 'homeBay', x: 8, y: 1 },
             '4,5': { interaction: handleHoleEntrance }
@@ -3162,12 +3328,32 @@ encounters: []    },
         ],
         objects: {
             // 9. The Great Gatsby (Green Light at end of dock)
-            '8,6': { sprite: 'lightbulb', interaction: "A green light shines across the bay. It feels so close, yet impossible to grasp." },
-'6,3': { sprite: 'candy', interaction: () => handleCaveItem('Synonym Roll', 'synonymRoll', 1, 'homeBay', 6, 3) },
+'8,6': { sprite: 'lightbulb', interaction: () => {
+    if (!gameState.greenLightVisits) gameState.greenLightVisits = 0;
+    gameState.greenLightVisits++;
+    const lines = [
+        "A green light blinks at the end of the dock. It feels so close. It always feels close.",
+        "📖 THE GREAT GATSBY — F. Scott Fitzgerald, 1925. Jay Gatsby stares at this green light every night from across the bay. It belongs to Daisy — the woman he loves, the past he cannot recover. The green light is the most famous symbol in American literature. It stands for the American Dream: always visible, always just out of reach.",
+        "📖 SYMBOLISM: A symbol is an object that represents something beyond itself. The green light = desire, hope, the unattainable past. Fitzgerald chose green deliberately: green means 'go,' means envy, means money, means life. All of those meanings are in the light at once.",
+        "📖 THE AMERICAN DREAM: Gatsby was born poor and reinvented himself as rich. He believed that in America, you could become whoever you decided to be. The novel asks: is that true? His answer is complicated. The green light never gets closer, no matter how far you swim.",
+        "The light blinks steadily. It doesn't know you're watching. It doesn't know anything. That's what makes it so easy to project meaning onto. You stand there longer than you planned.",
+        "📖 FITZGERALD'S FINAL LINE: 'So we beat on, boats against the current, borne back ceaselessly into the past.' The novel ends with this sentence. It means: we keep striving forward, but the past pulls us back. Gatsby is destroyed by his refusal to let go. The green light is beautiful and it is a trap."
+    ];
+    return lines[(gameState.greenLightVisits - 1) % lines.length];
+}},'6,3': { sprite: 'candy', interaction: () => handleCaveItem('Synonym Roll', 'synonymRoll', 1, 'homeBay', 6, 3) },
             '7,0': { target: 'village', x: 7, y: 12 },
             '8,0': { target: 'village', x: 8, y: 12 },
-            '7,1': { sprite: 'sign', interaction: 'Village Bay — Home of the legendary Old Rod fisherman.' },
-'11,7': { sprite: 'boat', interaction: () => { if(!gameState.captainBoatVisits) gameState.captainBoatVisits=0; gameState.captainBoatVisits++; const l=["It's the captain's boat. Looks like it's seen many voyages.","The hull is painted with the words 'The Pequod II.' Someone learned nothing from Melville.","A rope is coiled on the deck with practiced precision. The captain knows his knots.","Scratched into the side of the boat: 'Not all those who wander are lost — but this boat was, twice.'","The boat smells like salt and old paperbacks. You could get used to this."]; return l[(gameState.captainBoatVisits-1)%l.length]; }},            '12,5': { sprite: 'pilot', interaction: handleCaptainInteraction },
+'7,1': { sprite: 'sign', interaction: () => {
+    if (!gameState.baySignVisits) gameState.baySignVisits = 0;
+    gameState.baySignVisits++;
+    const lines = [
+        "HOME BAY — Village waterfront. Home of the legendary Old Rod fisherman. 🎣",
+        "📖 WATER IN LITERATURE: Water appears in almost every great story — as a boundary, a journey, a source of danger and renewal. The Odyssey. Moby Dick. The Old Man and the Sea. Adventures of Huckleberry Finn. Beloved. Water separates worlds and connects them. Look for it whenever you read.",
+        "📖 THE OLD MAN AND THE SEA — Hemingway, 1952. An old fisherman named Santiago hasn't caught a fish in 84 days. Then he hooks a massive marlin and fights it alone for three days at sea. He loses the fish. He wins something harder to name. Hemingway: 'A man can be destroyed but not defeated.'",
+        "A notice pinned to the sign: 'The fisherman at the dock lost his lucky lure years ago. He says he can't catch a thing without it. — Village Record, year 3.'"
+    ];
+    return lines[(gameState.baySignVisits - 1) % lines.length];
+}},'11,7': { sprite: 'boat', interaction: () => { if(!gameState.captainBoatVisits) gameState.captainBoatVisits=0; gameState.captainBoatVisits++; const l=["It's the captain's boat. Looks like it's seen many voyages.","The hull is painted with the words 'The Pequod II.' Someone learned nothing from Melville.","A rope is coiled on the deck with practiced precision. The captain knows his knots.","Scratched into the side of the boat: 'Not all those who wander are lost — but this boat was, twice.'","The boat smells like salt and old paperbacks. You could get used to this."]; return l[(gameState.captainBoatVisits-1)%l.length]; }},            '12,5': { sprite: 'pilot', interaction: handleCaptainInteraction },
             '6,6': { sprite: 'fisherman', interaction: handleFishermanInteraction }
         },
         encounters: []
@@ -3357,8 +3543,8 @@ rivalsRoom: {
             '5,0': { target: 'lexingtonCity', x: 7, y: 13 }, '6,0': { target: 'lexingtonCity', x: 8, y: 13 }, 
             '7,0': { target: 'lexingtonCity', x: 7, y: 13 }, '8,0': { target: 'lexingtonCity', x: 8, y: 13 }, 
             '7,3': { sprite: 'rival', interaction: handleRoute1Rival },
-            '7,1': { sprite: 'campfire', interaction: handleRoute1Campfire },
-            '6,1': { sprite: 'hiker', interaction: () => {
+            '7,2': { sprite: 'campfire', interaction: handleRoute1Campfire },
+            '6,2': { sprite: 'hiker', interaction: () => {
                 if (!gameState.route1CamperVisits) gameState.route1CamperVisits = 0;
                 gameState.route1CamperVisits++;
                 const lines = [
@@ -3432,8 +3618,8 @@ lexingtonCity: {
             '9,9': { symbol: '🏡', symbolOffsetY: -2 },
             '9,10': { target: 'parentsCottage', x: 3, y: 5 },
 
-'3,1': { sprite: 'sign', interaction: "🐟 CRANE & ASSOCIATES — Aquatic Specimen Buyers. Shop entrance: the building just south of here." },
-'1,10': { sprite: 'poeFan', interaction: handleCityPoetInteraction },            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
+'3,1': { sprite: 'poeFan', interaction: handleCityPoetInteraction },
+            '7,0': { sprite: 'gate', interaction: handleNorthGate }, '8,0': { sprite: 'gate', interaction: handleNorthGate },
             '7,13': { target: 'route1', x: 7, y: 0 }, '8,13': { target: 'route1', x: 8, y: 0 },
             '9,12': { sprite: 'sign', interaction: 'Lexington City - Be sure to save your game!' },
             '11,7': { sprite: 'hiker', interaction: () => {
@@ -3464,7 +3650,7 @@ school: {
         layout: [
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
             [1,12,0,0,0,0,0,0,0,0,0,0,12,1], 
-            [1,16,0,13,0,16,0,16,0,13,0,16,1], 
+[1,16,0,13,0,16,0,16,0,13,0,16,0,1],
             [1,0,2,2,0,2,2,0,2,2,0,2,2,1], 
             [1,0,2,2,0,2,2,0,2,2,0,2,2,1], 
             [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -3481,35 +3667,45 @@ school: {
 '2,3': { sprite: 'student', interaction: handleSchoolStudent1Interaction },
 '10,4': { sprite: 'student', interaction: handleSchoolStudent2Interaction },
             // BOOKS
-            '1,1': { sprite: 'bookshelf', interaction: "Textbooks: 'Grammar for Goblins' and 'Spelling for Sprites'." },
-
+'1,1': { sprite: 'bookshelf', interaction: () => {
+    if (!gameState.schoolShelf0) gameState.schoolShelf0 = 0;
+    gameState.schoolShelf0++;
+    const lines = [
+        "Textbooks: 'Grammar for Goblins' and 'Spelling for Sprites.' You flip one open.",
+        "📖 MINI LESSON — COMMAS: A comma tells the reader to pause. Use one between items in a list: 'I like reading, writing, and thinking.' That last comma before 'and' is called the Oxford comma. It prevents confusion.",
+        "📖 MINI LESSON — COMMAS: Use a comma before a coordinating conjunction (for, and, nor, but, or, yet, so) that joins two independent clauses. 'I studied, but the test was still hard.' FANBOYS helps you remember them.",
+        "📖 MINI LESSON — COMMAS: Use a comma after an introductory element. 'After the storm, the sky cleared.' 'Before you write, think.' The comma tells the reader: setup is done, main idea is coming.",
+        "📖 MINI LESSON — COMMA SPLICE: A comma splice is a common error. It joins two complete sentences with only a comma: 'I was tired, I went to sleep.' Fix it with a period, semicolon, or FANBOYS conjunction."
+    ];
+    return lines[(gameState.schoolShelf0 - 1) % lines.length];
+}},
 // ADDITIONAL NPCs
             '10,2': { sprite: 'student', interaction: handleSchoolStudent3Interaction },
             '4,2': { sprite: 'graduate', interaction: handleSchoolLibrarianInteraction },
-            '11,1': { sprite: 'bookshelf', interaction: () => {
-                if (!gameState.schoolShelf1) gameState.schoolShelf1 = 0;
-                gameState.schoolShelf1++;
-                const lines = [
-                    "A grammar textbook. Chapter 1: 'The Sentence and Its Parts.' Chapter 2: 'Why Commas Matter More Than You Think.'",
-                    "A writing handbook. Inside the cover: 'A sentence is a group of words that contains a subject and a predicate and expresses a complete thought.'",
-                    "A vocabulary workbook. Someone has filled in all the answers already. Most are correct. One says 'vibes' instead of 'connotation.'",
-                    "A copy of 'The Elements of Style' by Strunk & White. Rule 17: 'Omit needless words.' The irony of writing a book about this is noted.",
-                    "A student's essay is tucked inside. At the top, in red: 'Strong thesis. Evidence needs work. See me.' Below that, in pencil: 'I did see her. She said the same thing.'"
-                ];
-                return lines[(gameState.schoolShelf1 - 1) % lines.length];
-            }},
-            '12,1': { sprite: 'bookshelf', interaction: () => {
-                if (!gameState.schoolShelf2) gameState.schoolShelf2 = 0;
-                gameState.schoolShelf2++;
-                const lines = [
-                    "A shelf of novels: 'The Giver,' 'The Outsiders,' 'Hatchet,' 'Island of the Blue Dolphins,' 'Roll of Thunder Hear My Cry.'",
-                    "Someone marked up 'The Giver' heavily. Every use of precise language is underlined. There are a lot of underlines.",
-                    "A paperback copy of 'Hatchet.' The spine is cracked in three places — clearly the most read book on the shelf.",
-                    "'Roll of Thunder, Hear My Cry' — Mildred Taylor. A sticky note inside: 'This one changed how I read everything else.'",
-                    "A reading log left by a student: 'Book 1: okay. Book 2: good. Book 3: I cried on the bus and I'm not sorry.'"
-                ];
-                return lines[(gameState.schoolShelf2 - 1) % lines.length];
-            }},
+'11,1': { sprite: 'bookshelf', interaction: () => {
+    if (!gameState.schoolShelf1) gameState.schoolShelf1 = 0;
+    gameState.schoolShelf1++;
+    const lines = [
+        "📖 MINI LESSON — THE SENTENCE: A sentence needs two things: a subject (who or what) and a predicate (what they do or are). 'Birds sing.' Subject = Birds. Predicate = sing. That's a complete thought. A fragment is missing one of those.",
+        "📖 MINI LESSON — SUBJECT & PREDICATE: 'The old dog with the torn ear ran across the field.' Subject = 'The old dog with the torn ear.' Predicate = 'ran across the field.' Strip away the extras and you find the core: dog ran.",
+        "📖 MINI LESSON — CONNOTATION vs. DENOTATION: Denotation is the dictionary definition. Connotation is the feeling a word carries. 'Home' and 'house' both mean a dwelling. But 'home' feels warm. A vocabulary workbook here has 'vibes' written instead of 'connotation.' Close enough, actually.",
+        "📖 MINI LESSON — STRUNK & WHITE: William Strunk Jr. published 'The Elements of Style' in 1918. His student E.B. White — who also wrote Charlotte's Web — revised it in 1959. Rule 17: Omit needless words. A vigorous sentence carries no unnecessary weight. Every word must earn its place.",
+        "📖 MINI LESSON — STRONG EVIDENCE: A good thesis makes a claim. Evidence proves it. But evidence alone isn't enough — you need REASONING. Reasoning explains the connection between your evidence and your claim. Without it, the reader has to guess. Don't make them guess."
+    ];
+    return lines[(gameState.schoolShelf1 - 1) % lines.length];
+}},
+'12,1': { sprite: 'bookshelf', interaction: () => {
+    if (!gameState.schoolShelf2) gameState.schoolShelf2 = 0;
+    gameState.schoolShelf2++;
+    const lines = [
+        "📖 THE GIVER — Lois Lowry, 1993. In a society without color, pain, or memory, a boy named Jonas is chosen to hold all of humanity's past. Lowry uses 'precision of language' as a central theme — words matter because they shape how we understand reality.",
+        "📖 HATCHET — Gary Paulsen, 1987. Thirteen-year-old Brian survives alone in the Canadian wilderness after a plane crash. The novel is about resilience, attention, and learning by doing. The hatchet — a gift from his mother — becomes the symbol of survival. Paulsen based details on his own wilderness experience.",
+        "📖 THE OUTSIDERS — S.E. Hinton, 1967. Written when Hinton was 16 years old. The Greasers vs. the Socs — two groups divided by class, not character. Ponyboy Curtis narrates. The novel argues that empathy crosses social boundaries. 'Stay gold' comes from a Robert Frost poem Ponyboy memorizes.",
+        "📖 ROLL OF THUNDER, HEAR MY CRY — Mildred D. Taylor, 1976. The Logan family owns their land in 1930s Mississippi and refuses to surrender it despite racial violence and economic pressure. Taylor based it on her own family's history. It won the Newbery Medal. It is one of the most honest books about racism written for young readers.",
+        "📖 ISLAND OF THE BLUE DOLPHINS — Scott O'Dell, 1960. Based on the true story of a Chumash woman who lived alone on an island off California for 18 years. The novel is about solitude, survival, and identity. The protagonist, Karana, breaks tribal law to survive — and the book never judges her for it."
+    ];
+    return lines[(gameState.schoolShelf2 - 1) % lines.length];
+}},
             // QUIZ BOARD — Ms. Katrina's weekly challenge
             '9,1': { sprite: 'sign', interaction: handleSchoolQuizBoard },
            // ARGUMENT QUEST — Two debating students
@@ -3535,8 +3731,21 @@ pocketcenter: {
             '3,2': { sprite: 'nurse', interaction: handleNurseInteraction }, 
             '1,2': { sprite: 'computer', interaction: handlePCInteraction }, 
             // New Decor
-            '1,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.pcShelf1) gameState.pcShelf1=0; gameState.pcShelf1++; const l=["Medical Journals: 'Curing Run-on Sentences' and 'Treating Dangling Participles'.","New issue: 'The Semicolon: Friend or Foe?' The answer is friend. Always friend.","Case Study: 'Patient presented with acute comma splice. Treated with a coordinating conjunction. Full recovery expected.'","Research abstract: 'The Oxford Comma: A longitudinal study of clarity and family inheritance disputes.' Turns out, punctuation saves fortunes.","Dr. Powers submitted a paper here once. Title: 'Linguistic Pathogens and the Grammar Cave Outbreak.' Peer review pending."]; return l[(gameState.pcShelf1-1)%l.length]; }},
-'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.pcShelf2) gameState.pcShelf2=0; gameState.pcShelf2++; const l=["A poster reads: 'Reading is Fundamental to Healing.'","Another poster: 'Words are free. It's how you use them that may cost you.' — Anonymous.","A cross-stitch on the wall: 'Get well soon, or at least use better transitions.'","The nurse framed a quote by Frederick Douglass: 'Once you learn to read, you will be forever free.' It's above the door.","A small sign: 'Please do not diagnose your creatures using online grammar forums. Come see us.'"]; return l[(gameState.pcShelf2-1)%l.length]; }},
+            '1,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.pcShelf1) gameState.pcShelf1=0; gameState.pcShelf1++; const l=[
+    "Medical Journals: 'Curing Run-on Sentences' and 'Treating Dangling Participles.' Both highly contagious in first drafts.",
+    "📖 MINI LESSON — THE SEMICOLON: A semicolon joins two independent clauses without a conjunction. 'I studied hard; the test was still difficult.' Both sides must be complete sentences. It's stronger than a comma, weaker than a period. Use it when the ideas are closely related.",
+    "📖 MINI LESSON — COMMA SPLICE vs. RUN-ON: A comma splice joins two sentences with only a comma: 'I was tired, I went to sleep.' A run-on joins them with nothing: 'I was tired I went to sleep.' Both are errors. Fix with: a period, a semicolon, or a coordinating conjunction (FANBOYS).",
+    "📖 MINI LESSON — THE OXFORD COMMA: 'I love my parents, Batman and Wonder Woman.' Without the Oxford comma, your parents ARE Batman and Wonder Woman. Add it: 'I love my parents, Batman, and Wonder Woman.' It's the comma before the final item in a list. It prevents ambiguity. Always use it.",
+    "Dr. Powers submitted a paper here once. Title: 'Linguistic Pathogens and the Grammar Cave Outbreak.' Peer review pending. The abstract describes run-on sentences as 'aggressively self-replicating.' Accurate."
+];
+            return l[(gameState.pcShelf1-1)%l.length]; }},
+'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.pcShelf2) gameState.pcShelf2=0; gameState.pcShelf2++; const l=[
+    "A poster reads: 'Reading is Fundamental to Healing.' Below it, smaller: 'And so is a well-placed comma.'",
+    "📖 FREDERICK DOUGLASS (c.1818–1895): Born into slavery, Douglass taught himself to read — an illegal act at the time. He escaped and became one of the most powerful writers and orators in American history. His autobiography, 'Narrative of the Life of Frederick Douglass,' remains essential reading. 'Once you learn to read, you will be forever free.'",
+    "📖 MINI LESSON — AUTOBIOGRAPHY vs. BIOGRAPHY: An autobiography is written by the subject about their own life (Douglass wrote his own). A biography is written by someone else about another person's life. A memoir is a type of autobiography focused on a specific period or theme, not the whole life.",
+    "A cross-stitch on the wall: 'Get well soon, or at least use better transitions.' 📖 Transitions signal relationships between ideas: ADDITION (furthermore, also), CONTRAST (however, although), CAUSE-EFFECT (therefore, as a result), SEQUENCE (first, then, finally). They are the connective tissue of writing.",
+    "A small sign: 'Please do not diagnose your creatures using online grammar forums. Come see us.' A pamphlet nearby: 'Is It a Fragment or a Sentence? A Self-Assessment.' Step 1: Does it have a subject? Step 2: Does it have a predicate? Step 3: Does it express a complete thought? All three = sentence."
+]; return l[(gameState.pcShelf2-1)%l.length]; }},
 '2,3': { sprite: 'student', interaction: () => {
     if (!gameState.centerPatientVisits) gameState.centerPatientVisits = 0;
     gameState.centerPatientVisits++;
@@ -3597,11 +3806,30 @@ pocketcenter: {
         ], 
         objects: { 
             // 14. Hamilton Reference
-            '2,1': { sprite: 'sign', interaction: "A motivational poster: 'I am not throwing away my shot!'" }, 
-            '4,1': { sprite: 'gymLeader', interaction: handleGymLeaderInteraction }, 
+'2,1': { sprite: 'sign', interaction: () => { if(!gameState.gymPoster) gameState.gymPoster=0; gameState.gymPoster++; const l=["A motivational poster: 'I am not throwing away my shot!' — Hamilton, the musical. Someone has circled it in red marker and written 'THIS IS THE THESIS.'","📖 HAMILTON — Lin-Manuel Miranda's musical (2015) tells the story of Alexander Hamilton, America's first Treasury Secretary, using hip-hop, R&B, and show tunes. It broke Broadway records and won 11 Tony Awards. Miranda wrote it after reading Ron Chernow's 800-page biography on vacation.","📖 MINI LESSON — ALLUSION IN CONTEXT: 'Not throwing away my shot' is Hamilton's declaration that he will seize every opportunity. A 'shot' means both a literal gunshot (the duel that killed him) and a chance. Miranda layers meanings intentionally. When a single word carries two meanings, that's called AMBIGUITY — and great writers use it deliberately.","📖 MINI LESSON — BIOGRAPHY to ART: Ron Chernow wrote the nonfiction biography. Miranda transformed it into musical theater. Same story, different genre, different effect. This is called ADAPTATION. Studying how a story changes across genres — novel to film, biography to musical — reveals what each form does best."]; return l[(gameState.gymPoster-1)%l.length]; }},            '4,1': { sprite: 'gymLeader', interaction: handleGymLeaderInteraction }, 
             // New Decor
-            '1,1': { sprite: 'adjectlizard', interaction: "This Adjectlizard is pumping iron! It looks strong, muscular, and buff." },
-'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.gymShelf) gameState.gymShelf=0; gameState.gymShelf++; const l=["Gym Records: 'Rhonda hasn't lost a battle in 3 years!'","Hall of Fame plaque: 'She who controls the rhyme, controls the rhythm.' — Rhonda.","A poem framed on the wall: 'I carry your heart with me (I carry it in my heart)' — E.E. Cummings. Rhonda says it's about battle strategy.","Trophy engraving: 'Rhyme Badge Champion, 7 consecutive years.' The word 'consecutive' is underlined in red pen. Someone is annoyed.","A sticky note on the records book: 'Note to self: teach the difference between rhythm and rhyme. Again.'"]; return l[(gameState.gymShelf-1)%l.length]; }},
+'1,1': { sprite: 'adjectlizard', interaction: () => {
+    if (!gameState.gymLizardVisits) gameState.gymLizardVisits = 0;
+    gameState.gymLizardVisits++;
+    const lines = [
+        "This Adjectlizard is pumping iron. It looks strong, muscular, and — most importantly — well-described.",
+        "📖 TYPE TIP: Rhonda uses Poetry-type creatures. Normal moves deal normal damage. Ghost-type moves are SUPER EFFECTIVE against Poetry. Check your Lexicon for type matchups!",
+        "The Adjectlizard flexes. You're not sure if it's showing off or just warming up.",
+        "📖 ADJECTIVES describe nouns. This Adjectlizard is: determined, focused, and slightly intimidating. Three adjectives. That's a strong description."
+    ];
+    return lines[(gameState.gymLizardVisits - 1) % lines.length];
+}},
+'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.gymShelf) gameState.gymShelf=0; gameState.gymShelf++; 
+const l=[
+    "Gym Records: 'Rhonda hasn't lost a battle in 3 years!'",
+    "Hall of Fame plaque: 'She who controls the rhyme, controls the rhythm.' — Rhonda. 📖 RHYME is when words share ending sounds: cat/hat, moon/June. END RHYME is at the line's end. INTERNAL RHYME is mid-line. NOT all poetry rhymes — and forced rhyme weakens a poem.",
+    "📖 MINI LESSON — RHYTHM vs. RHYME: Rhythm is the beat of a poem — the pattern of stressed and unstressed syllables. Rhyme is the matching of sounds. A poem can have strong rhythm without rhyming at all. Free verse has rhythm but no required rhyme scheme. Don't confuse them.",
+    "Trophy engraving: 'Rhyme Badge Champion, 7 consecutive years.' The word 'consecutive' is underlined in red pen. 📖 CONSECUTIVE means following in unbroken sequence. It comes from Latin 'consequi' — to follow closely. Seven in a row. Someone is very annoyed.",
+    "📖 MINI LESSON — RHYME SCHEME: Poets label rhyme schemes with letters. ABAB means lines 1 and 3 rhyme, lines 2 and 4 rhyme. AABB means consecutive couplets. Shakespearean sonnets end in a GG couplet. A sticky note: 'Note to self: teach the difference between rhythm and rhyme. Again.'"
+];
+return l[(gameState.gymShelf-1)%l.length]; }},
+'2,3': { sprite: 'hiker', interaction: () => handleTrainerBattle('gymTrainerCassidy') },
+'5,3': { sprite: 'villager2', interaction: () => handleTrainerBattle('gymTrainerMarcus') },
 '1,3': { sprite: 'student', interaction: () => {
     if (!gameState.gymStudentVisits) gameState.gymStudentVisits = 0;
     gameState.gymStudentVisits++;
@@ -3811,7 +4039,8 @@ cityHouse3: {
             '2,7': { sprite: 'bookworm', interaction: () => handleTrainerBattle('bookwormBarry') },
             '2,3': { sprite: 'professor', interaction: () => handleTrainerBattle('profGrendel') },
             '9,12': { sprite: 'sign', interaction: 'Route 2 - Path to the Woods' },
-            '12,6': { sprite: 'graduate', interaction: handleSenseiWu } 
+            '12,6': { sprite: 'graduate', interaction: handleSenseiWu },
+'7,6': { sprite: 'campfire', interaction: handleRoute2Campfire }
         },
 encounters: ['PronounProwler', 'VerbViper', 'Rhyth-mite', 'Were-word', 'Biogra-bee', 'Syn-tuna', 'Tempo-toad', 'Haiku-na', 'Poetry-can']    },
 adjectiveWoods: {
@@ -3833,7 +4062,7 @@ adjectiveWoods: {
         ],
 objects: {
     // 13. Into the Wild / Walden (Thoreau)
-            '1,2': { sprite: 'sign', interaction: "I went to the woods because I wished to live deliberately." },
+'1,2': { sprite: 'sign', interaction: () => { if(!gameState.thdSign) gameState.thdSign=0; gameState.thdSign++; const l=["'I went to the woods because I wished to live deliberately.' — Henry David Thoreau, Walden, 1854.","📖 THOREAU & WALDEN: Thoreau spent two years, two months, and two days living alone in a cabin he built near Walden Pond in Massachusetts. He was testing a theory: could a person live simply, deliberately, and find what mattered? He wrote about it in Walden. It became one of America's most influential books.","📖 MINI LESSON — TRANSCENDENTALISM: Thoreau and Ralph Waldo Emerson led the Transcendentalist movement — the belief that truth is found through nature, intuition, and individual experience rather than institutions and society. Key ideas: self-reliance, the natural world as teacher, civil disobedience when laws are unjust.","'To live deliberately' means to make conscious choices — not to drift through life on autopilot. Thoreau wanted to find out what was truly essential. He concluded most of what people chase is noise. The woods, he said, taught him to hear himself think."]; return l[(gameState.thdSign-1)%l.length]; }},
 '8,2': { sprite: 'shakespeare', interaction: () => handleScholar('poet') },
 
             // Campfire — top-right rest spot
@@ -3877,7 +4106,7 @@ objects: {
             
             // Sign
 '9,12': { sprite: 'sign', interaction: 'Adjective Woods - Watch your descriptions and be sure to save your game!' },
-'6,7': { sprite: 'sign', interaction: "“Not all those who wander are lost. -Tolkien" }                    },
+'6,7': { sprite: 'sign', interaction: () => { if(!gameState.tolkienSign) gameState.tolkienSign=0; gameState.tolkienSign++; const l=['"Not all those who wander are lost." — J.R.R. Tolkien, The Fellowship of the Ring. The full poem is about Aragorn, the hidden king whose worth isn\'t visible at first glance.',"📖 TOLKIEN ON LANGUAGE: J.R.R. Tolkien was a professor of medieval languages at Oxford. He invented Quenya and Sindarin — complete Elvish languages — before writing the stories set in Middle-earth. He believed language and mythology were inseparable. The stories grew from the languages, not the other way around.","📖 MINI LESSON — ARCHETYPE: The 'hidden king' is one of literature's oldest archetypes — a hero of unknown or concealed greatness who must be revealed. Aragorn, King Arthur, Harry Potter, Simba. The archetype appears across cultures because it speaks to something universal: the idea that worth isn't always visible.","The sign is weathered. Someone has traced the letters with their finger many times. The path beyond it is dark and unmarked. You go anyway."]; return l[(gameState.tolkienSign-1)%l.length]; }},                    },
 encounters: ['Metaphorpillar', 'PronounProwler', 'Owl-literation', 'Choral-reef', 'Theme-oth', 'Fantasy-fox', 'Poetry-can', 'Lyrical-loon', 'Para-phrase']    },
 
 genreJungle: {
@@ -4013,7 +4242,13 @@ encounters: ['Fic-tion', 'Drama-llama', 'Sci-Fi-der', 'Fantasy-fox', 'Mytho-log'
         layout: [[1,1,1,1,1,1,1,1],[1,12,0,0,0,0,12,1],[1,0,0,0,0,0,0,1],[1,12,0,0,0,0,12,1],[1,0,0,0,0,0,0,1],[1,1,1,2,2,1,1,1]],
         objects: {
             '4,1': { sprite: 'gymLeader', interaction: handleSynonymGymLeaderInteraction },
-'2,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.synGymShelf1) gameState.synGymShelf1=0; gameState.synGymShelf1++; const l=["Books on advanced synonyms and etymology.","Etymology: the history of a word. 'Terrible' once meant 'causing terror.' Now it just means bad. Words weaken over time. That's called pejoration.","'Silly' used to mean 'blessed' in Old English. Language drifts. Pay attention to where words come from.","A bookmark reads: 'The difference between the almost right word and the right word is the difference between the lightning bug and the lightning.' — Mark Twain.","The whole shelf smells like a dictionary. You breathe it in. You feel smarter."]; return l[(gameState.synGymShelf1-1)%l.length]; }},
+            '2,3': { sprite: 'hiker', interaction: () => handleTrainerBattle('gymTrainerVera') },
+'5,3': { sprite: 'villager2', interaction: () => handleTrainerBattle('gymTrainerDante') },
+'2,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.synGymShelf1) gameState.synGymShelf1=0; gameState.synGymShelf1++; const l=["Books on advanced synonyms and etymology. Etymology is the study of word origins — where words come from and how they've changed.",
+"📖 MINI LESSON — PEJORATION: Pejoration is when a word's meaning weakens or becomes more negative over time. 'Terrible' once meant 'causing terror' — powerful. Now it just means bad. 'Awful' meant 'full of awe.' 'Villain' meant 'farmhand.' Words decay through overuse.",
+"📖 MINI LESSON — AMELIORATION: The opposite of pejoration. Some words improve over time. 'Knight' once meant 'servant boy.' 'Pretty' once meant 'cunning.' Language can upgrade as well as downgrade. 'Silly' went from 'blessed' → 'innocent' → 'foolish.' It took 500 years.",
+"A bookmark reads: 'The difference between the almost right word and the right word is the difference between the lightning bug and the lightning.' — Mark Twain. He spent his whole career proving that sentence true.",
+"📖 MINI LESSON — ROOTS & AFFIXES: Knowing roots unlocks thousands of words. 'Scrib/script' = write (describe, manuscript, prescribe). 'Port' = carry (transport, import, portable). 'Aud' = hear (auditorium, audience, audio). Learn 20 roots and you can decode 2,000 words."]; return l[(gameState.synGymShelf1-1)%l.length]; }},
 '6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.synGymShelf2) gameState.synGymShelf2=0; gameState.synGymShelf2++; const l=["A complete collection of Roget's Thesaurus.","Peter Mark Roget published the first thesaurus in 1852. He was also a doctor and chess enthusiast. Multitasker.","The word 'thesaurus' comes from Greek, meaning 'treasury' or 'storehouse.' It is literally a treasure chest of words.","Roget organized words by meaning, not alphabetically. He believed ideas connected to other ideas. He was right.","The copy is held together with tape. Someone has used it so many times the spine cracked. Good."]; return l[(gameState.synGymShelf2-1)%l.length]; }},
             '3,5': { target: 'synonymCity', x: 6, y: 3 },
             '4,5': { target: 'synonymCity', x: 7, y: 3 }
@@ -4055,17 +4290,45 @@ library: {
             
 
             // 11. Hitchhiker's Guide
-            '5,3': { sprite: 'bookshelf', interaction: "A book with the words 'DON'T PANIC' in large, friendly letters on the cover." },
-            // 12. Don Quixote
-            '2,3': { sprite: 'bookshelf', interaction: "A story about a man fighting windmills. He insists they are giants." },
+'5,3': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelfHHG) gameState.libShelfHHG=0; gameState.libShelfHHG++; const l=["A book with the words 'DON'T PANIC' in large, friendly letters on the cover. This is good advice in most situations.","📖 THE HITCHHIKER'S GUIDE TO THE GALAXY — Douglas Adams, 1979. Earth is demolished to make way for a hyperspace bypass. Arthur Dent, in his pajamas, survives because his friend Ford Prefect is actually an alien researcher. The answer to life, the universe, and everything is 42. The question is unknown.","📖 MINI LESSON — ABSURDIST FICTION: Absurdism presents a world where logic breaks down and meaning is elusive — and plays it completely straight. The humor comes from treating the impossible as mundane. Adams uses absurdism to satirize bureaucracy, technology, and the human need to find meaning where there may be none.","📖 MINI LESSON — SATIRE vs. PARODY: Satire critiques something real using humor and exaggeration. Parody imitates a specific work or style for comic effect. Adams is satirizing science fiction conventions AND human society. The Guide itself — an encyclopedia that's mostly wrong but very confident — satirizes reference books. And the internet. Decades early.","The number 42. Adams said he chose it because it was an ordinary, unremarkable number — deliberately anticlimactic. The joke is that we expect the answer to the universe to be profound. It isn't. That IS the point. Sometimes meaning is something we make, not something we find."]; return l[(gameState.libShelfHHG-1)%l.length]; }},            // 12. Don Quixote
+'2,3': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelfQuixote) gameState.libShelfQuixote=0; gameState.libShelfQuixote++; const l=["A story about a man fighting windmills. He insists they are giants. His name is Don Quixote. He has read too many adventure novels and lost his grip on reality.","📖 DON QUIXOTE — Miguel de Cervantes, 1605. Often called the first modern novel. Don Quixote is so consumed by chivalric romances that he believes himself a knight. He is delusional — or the only person honest enough to live by his ideals. Cervantes leaves that question open.","📖 MINI LESSON — SATIRE: Cervantes was satirizing the popular adventure novels of his time — exaggerating their conventions to expose how ridiculous they were. Satire uses humor, irony, and exaggeration to critique something. Think of it as criticism disguised as comedy.","📖 'TILTING AT WINDMILLS': The phrase now means attacking imaginary enemies or fighting impossible battles. It entered the language directly from this novel. When a single book gives language a permanent phrase, that is how you measure its impact.","Don Quixote's companion Sancho Panza is his opposite — practical, humble, grounded. Together they represent the tension between idealism and realism. Every great story has both. You need both."]; return l[(gameState.libShelfQuixote-1)%l.length]; }},
 '4,2': { sprite: 'professor', interaction: handleDrPowersInteraction },
 '6,4': { sprite: 'graduate', interaction: () => handleScholar('archivist') },
 '1,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf1) gameState.libShelf1=0; gameState.libShelf1++; const l=["You pull out 'The Giver'. The cover is black and white, but you swear you see a flash of red.","The Giver: 'When you receive the memories... you will understand why the community chose Sameness.'","A sticky note falls out: 'Precision of language!'","The last page. You close the book quietly.","You find 'Beloved' by Toni Morrison. Nobel Prize, 1993. She said: 'If you have some power, then your job is to empower somebody else.' The library is the most powerful room in any school."]; return l[(gameState.libShelf1-1)%l.length]; }},
-'2,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf2) gameState.libShelf2=0; gameState.libShelf2++; const l=["It's 'The Outsiders'. Stay gold, Ponyboy.","'Nothing gold can stay.' — Robert Frost. S.E. Hinton put a poem inside a novel. Respect.","The Socs vs. the Greasers. Two groups. Both human. That's the whole point.","Someone wrote 'STAY GOLD' on the inside cover. You leave it there."]; return l[(gameState.libShelf2-1)%l.length]; }},            '3,1': { sprite: 'bookshelf', interaction: () => handleLibraryPuzzle() }, 
-'5,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf3) gameState.libShelf3=0; gameState.libShelf3++; const l=["It's 'To Kill a Mockingbird'. You shouldn't kill mockingbirds; they just sing their hearts out.","Atticus Finch: 'You never really understand a person until you consider things from his point of view.'","Scout Finch is one of the most important narrators in American literature. She sees everything adults miss.","The mockingbird is a symbol. It represents innocence. Remember that."]; return l[(gameState.libShelf3-1)%l.length]; }},            
-'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf4) gameState.libShelf4=0; gameState.libShelf4++; const l=["You find 'Fahrenheit 451'. The pages feel unusually warm.","451°F is the temperature at which paper ignites. Bradbury chose the title carefully.","Montag: 'We have everything we need to be happy, but we aren't happy. Something's missing.'","The firemen in this book start fires instead of putting them out. Think about why that matters."]; return l[(gameState.libShelf4-1)%l.length]; }},
-'1,3': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf5) gameState.libShelf5=0; gameState.libShelf5++; const l=["It's 'A Wrinkle in Time'. It was a dark and stormy night...","Mrs. Whatsit, Mrs. Who, and Mrs. Which. Three celestial beings who travel by tessering through time.","Meg Murry is not the typical hero. She is awkward, stubborn, and imperfect. That's why it works.","'Love. That was what she had that IT did not have.' The whole book is about this one sentence."]; return l[(gameState.libShelf5-1)%l.length]; }},            
-'6,3': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf6) gameState.libShelf6=0; gameState.libShelf6++; const l=["You find 'The Raven' by Poe. Nevermore.","'Once upon a midnight dreary, while I pondered, weak and weary...' The meter is called trochaic octameter.","The Raven represents the narrator's grief. It never actually says anything meaningful. It just says 'Nevermore.' That's the point.","Poe wrote this in 1845. People memorized it immediately. Some things don't fade."]; return l[(gameState.libShelf6-1)%l.length]; }},
+'2,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf2) gameState.libShelf2=0; gameState.libShelf2++; const l=[
+    "📖 THE OUTSIDERS — S.E. Hinton wrote this novel when she was 15 and published it at 17. It follows Ponyboy Curtis, a Greaser, navigating class conflict and violence in 1960s Tulsa. It was one of the first young adult novels written from a teenager's perspective, for teenagers.",
+    "'Nothing gold can stay.' — Robert Frost. Ponyboy recites this poem to Johnny. It means innocence doesn't last. Johnny's last words echo it: 'Stay gold, Ponyboy.' It's one of literature's most effective uses of an allusion — a reference to another text that deepens meaning.",
+    "📖 MINI LESSON — ALLUSION: An allusion is a reference to another work, person, or event without fully explaining it. Hinton alludes to Frost's poem. The reader who knows it feels the full weight. Allusions reward readers and create layers of meaning. Literary allusions are very common on standardized tests.",
+    "The Socs vs. the Greasers. Two groups. Both human. That's the whole point. 📖 THEME: The novel's central theme is that class and appearance divide people who are fundamentally the same. Hinton uses CONFLICT — external (gang violence) and internal (Ponyboy's identity) — to develop it.",
+    "Someone wrote 'STAY GOLD' on the inside cover in pencil. You leave it there. 📖 POINT OF VIEW: Ponyboy narrates in FIRST PERSON LIMITED — we only know what he knows and feels. This makes us trust him, then question him when his understanding of events is incomplete. That gap is intentional."
+];
+ return l[(gameState.libShelf2-1)%l.length]; }},            '3,1': { sprite: 'bookshelf', interaction: () => handleLibraryPuzzle() }, 
+'5,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf3) gameState.libShelf3=0; gameState.libShelf3++; const l=[
+    "📖 TO KILL A MOCKINGBIRD — Harper Lee, 1960. Set in Maycomb, Alabama during the 1930s Depression era. Atticus Finch defends Tom Robinson, a Black man falsely accused of a crime, in a racially unjust court. The novel won the Pulitzer Prize in 1961 and remains one of the most widely taught novels in American schools.",
+    "Atticus Finch: 'You never really understand a person until you consider things from his point of view — until you climb into his skin and walk around in it.' 📖 This is PERSPECTIVE-TAKING, a core reading skill. Authors build empathy by making readers inhabit characters unlike themselves.",
+    "📖 MINI LESSON — SYMBOLISM: The mockingbird symbolizes innocence — something harmless that only brings joy. Atticus says it's a sin to kill one. Tom Robinson IS a mockingbird. So is Boo Radley. Symbols gain power through repetition. By the end, the title resonates differently than it did on page one.",
+    "📖 SCOUT AS NARRATOR: Scout Finch is a child narrator — she sees and reports without fully understanding. This is called NAIVE NARRATION. It creates dramatic irony: the reader understands more than the narrator does. Lee uses Scout's innocence to expose adult hypocrisy more powerfully than an adult narrator could.",
+    "The mockingbird is a symbol. It represents innocence. 📖 HISTORICAL CONTEXT matters here. The Scottsboro Boys — nine Black teenagers falsely accused in Alabama in 1931 — are widely believed to have inspired Tom Robinson's case. Understanding context deepens literary interpretation."
+];
+return l[(gameState.libShelf3-1)%l.length]; }},            
+'6,1': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf4) gameState.libShelf4=0; gameState.libShelf4++; const l=[
+    "📖 FAHRENHEIT 451 — Ray Bradbury, 1953. In a future America, books are banned and firemen burn them. Guy Montag is a fireman who begins to question the system. Bradbury wrote it during the McCarthy era, when political censorship and book banning were real and rising. The novel is about what happens when a society stops thinking.",
+    "451°F is the temperature at which paper ignites. Bradbury chose the title carefully — it's a fact, not metaphor. 📖 MINI LESSON — DYSTOPIA: A dystopia is a fictional society designed to show the dangers of current trends taken to extremes. Other examples: The Giver, The Hunger Games, 1984. Dystopian literature asks: what are we becoming?",
+    "Montag: 'We have everything we need to be happy, but we aren't happy. Something's missing.' 📖 That something is MEANING — found through literature, history, and genuine human connection. Bradbury argues that a society built on entertainment and speed loses the ability to think deeply. Does that sound familiar?",
+    "📖 MINI LESSON — CENSORSHIP: Bradbury was alarmed by TV, conformity, and the pressure to sanitize ideas. Censorship removes material considered offensive or dangerous. Bradbury's response: the most dangerous book is the one you never read. Montag eventually memorizes books to preserve them. That act of memory is resistance.",
+    "The firemen start fires instead of stopping them. 📖 This IRONY — using something for the opposite of its purpose — is central to the novel. Bradbury uses SITUATIONAL IRONY throughout: the thing meant to protect society destroys it. Irony is a signal: look closer. Something is inverted here."
+];
+return l[(gameState.libShelf4-1)%l.length]; }},
+'1,3': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf5) gameState.libShelf5=0; gameState.libShelf5++; const l=[
+    "📖 A WRINKLE IN TIME — Madeleine L'Engle, 1962. Meg Murry, her brother Charles Wallace, and friend Calvin travel through space via 'tesseract' — a wrinkle in time — to rescue Meg's missing father from IT, a disembodied evil brain that controls all thought on the planet Camazotz.",
+    "📖 MINI LESSON — SCIENCE FANTASY: The novel blends science (the tesseract, Einstein's theories of space-time) with fantasy (magical beings, mythic journeys). L'Engle called it 'a fantasy with science in it.' Genre blending is common — knowing a genre's conventions helps you recognize when an author is breaking them intentionally.",
+    "Meg Murry is not the typical hero. She is angry, awkward, and insecure. 📖 CHARACTER DEVELOPMENT: Meg's flaw — her inability to accept imperfection — becomes her greatest strength. Only she can save Charles Wallace because she loves him unconditionally. L'Engle shows that vulnerability is not weakness. It is the source of power.",
+    "'Love. That was what she had that IT did not have.' 📖 THEME: The novel's central argument is that love — imperfect, irrational, personal — defeats conformity and control. IT forces sameness. Love insists on individuality. L'Engle was drawing on both physics and theology. The book was rejected 26 times before publication.",
+    "📖 TESSERACT EXPLAINED: L'Engle describes tessering as the fifth dimension — folding space so two distant points touch. She uses a simple image: an ant walking across a string vs. folding the string so the two ends meet. This is a real theoretical concept in physics. L'Engle believed science and wonder belonged together."
+];
+return l[(gameState.libShelf5-1)%l.length]; }},            
+'6,3': { sprite: 'bookshelf', interaction: () => { if(!gameState.libShelf6) gameState.libShelf6=0; gameState.libShelf6++; const l=["You find 'The Raven' by Poe. Nevermore.","📖 MINI LESSON — TROCHAIC OCTAMETER: The Raven's meter is trochaic octameter. A trochee is a two-syllable foot: STRESS-unstress. 'Once u-PON a MID-night DREAR-y.' Eight feet per line = octameter. Poe chose this rhythm deliberately — it feels heavy, relentless, like dread itself.","The Raven represents the narrator's grief. It says only one word — 'Nevermore' — but the narrator keeps asking questions he already knows the answer to. That's the horror: he tortures himself.","Poe wrote this in 1845. He published it under a pseudonym first. Within weeks, everyone in New York was reciting it. Some things don't fade.","📖 POE'S THEORY: Poe believed every element of a story — word, image, rhythm — should serve a single emotional effect. He called it Unity of Effect. Read 'The Philosophy of Composition' — he describes writing The Raven backward, starting from the effect he wanted to create."]; 
+return l[(gameState.libShelf6-1)%l.length]; }},
             '6,2': { sprite: 'wordorb', interaction: () => {
                 if (gameState.pickedItems && gameState.pickedItems.includes('library_6_2')) return "An empty desk drawer.";
                 if (!gameState.pickedItems) gameState.pickedItems = [];
@@ -5149,7 +5412,7 @@ const mapDisplayNames = {
     'profHouse':        ['Professor\'s Lab',     'Prof. Lexicon'],
     'lexingtonCity':    ['Lexington City',       'The City of Words'],
     'synonymCity':      ['Synonym City',         'City of Similar Words'],
-    'synonymCityGym':   ['Synonym City Gym',     'Leader: Lex'],
+    'synonymCityGym':   ['Synonym City Gym',     'High School Teacher: Lex'],
     'synonymCityCenter':['Word Center',          'Heal your team'],
     'synonymCityShop':  ['Item Shop',            'Stock up!'],
     'pocketcenter':     ['Word Center',          'Heal your team'],
@@ -5333,6 +5596,10 @@ const lexiconEl = document.getElementById('menu-lexicon');
             const btnCount = document.getElementById('journal-btn-count');
             if (btnCount) btnCount.textContent = `(${caught}/${CATCHABLE_TOTAL})`;
         }
+        const moneyEl = document.getElementById('menu-money');
+if (moneyEl) {
+    moneyEl.textContent = `💰 Money: $${gameState.money}`;
+}
         const boxEl = document.getElementById('menu-box-count');
         if (boxEl) {
             const boxCount = gameState.creatureBox.length;
@@ -6391,12 +6658,15 @@ function handleBedInteraction() {
         gameState.dayCount = (gameState.dayCount || 1) + 1;
         gameState.schoolQuizDone = false; // Reset weekly quiz
         const day = gameState.dayCount;
-        const dayMsg = day === 2 ? "Day 2. The adventure continues." :
-                       day === 5 ? "Day 5. You're getting further from home." :
-                       day === 10 ? "Day 10. Your mom called. She misses you." :
-                       day === 20 ? "Day 20. The Professor says you've come further than any student he's known." :
-                       day === 30 ? "Day 30. A month on the road. The village feels distant." :
-                       `Day ${day}.`;
+const dayMsg = day === 2 ? "Day 2. The village feels familiar but the world feels bigger." :
+               day === 3 ? "Day 3. You can almost hear the city from here." :
+               day === 4 ? "Day 4. Your team is getting stronger. So are you." :
+               day === 5 ? "Day 5. You're getting further from home. Keep going." :
+               day === 7 ? "Day 7. One week. The professor would be impressed." :
+               day === 10 ? "Day 10. Your mom called. She misses you. She also wants to know your accuracy percentage." :
+               day === 20 ? "Day 20. The Professor says you've come further than any student he's known." :
+               day === 30 ? "Day 30. A month on the road. The village feels like a story you read once." :
+               `Day ${day}.`;
         return ["You slept in your bed.", "Your team is fully healed!", `☀️ ${dayMsg}`];
     }
     return "A comfy bed.";
@@ -6424,6 +6694,32 @@ function handleFinalCaveCampfire() {
         startDialogue(["✨ All creatures fully healed.", "'Press on. The summit is close.'"]);
     });
     return null;
+}
+function handleRoute2Campfire() {
+    if (gameState.playerParty.length === 0) {
+        return "🔥 A campfire burns in the middle of Route 2. Someone left it for passing travelers.";
+    }
+    const allFull = gameState.playerParty.every(p => p.currentHp >= p.maxHp && !p.status);
+    if (allFull) {
+        return [
+            "🔥 A campfire crackles on the side of the path.",
+            "Your team is already at full health.",
+            "'Rest here anytime you need it.'"
+        ];
+    }
+    startDialogue([
+        "🔥 A campfire burns steadily in the heart of Route 2.",
+        "'Left here by a traveler who came before you.'",
+        "'Keep it burning for the ones who come after.'",
+        "Your team gathers around the warmth..."
+    ], () => {
+        gameState.playerParty.forEach(p => { p.currentHp = p.maxHp; p.status = null; p._roughDraftUsed = false; });
+        gameState.dayCount = (gameState.dayCount || 1) + 1;
+        startDialogue([
+            `☀️ Day ${gameState.dayCount}. The fire burns through the night.`,
+            "✨ Your whole team is restored!"
+        ]);
+    });
 }
 function handleCaveCampfire() {
     if (gameState.playerParty.length === 0) {
@@ -6490,7 +6786,15 @@ function handleVillageNoticeBoard() {
     }
     notices.push('🔥 Community campfire open 24 hours. Free healing for all travelers.');
     notices.push('📖 Professor Lexicon\'s Lab: starter creatures, advice, and research — always open.');
-
+// Always-present ELA tip, rotates by day
+const elaTips = [
+    "📖 ELA TIP: When reading, ask yourself: Who is narrating? What do they know? What might they be hiding? Point of view shapes everything.",
+    "📖 ELA TIP: A theme is a universal message — not a topic. 'Friendship' is a topic. 'True friendship requires honesty even when it's painful' is a theme.",
+    "📖 ELA TIP: Context clues can help you decode unfamiliar words. Look at the words and sentences surrounding the unknown word for hints about its meaning.",
+    "📖 ELA TIP: The difference between PLOT and STORY: plot is what happens. Story is why it matters. Good writers make both count.",
+    "📖 ELA TIP: TONE is the author's attitude toward the subject. MOOD is how the reader feels while reading. Both are created through word choice, imagery, and pacing.",
+];
+notices.push(elaTips[(gameState.dayCount || 0) % elaTips.length]);
     return notices;
 }
 
@@ -6598,12 +6902,18 @@ if (gameState.finalBossDefeated) {
         if (gameState.playerParty.length > 0) {
             return "Now that you have a partner, a great adventure begins! Go on, get out there!";
         }
-        startDialogue([
-            "Ah, you're here! I'm Professor Lexicon.",
-            "Your rival, Andy, and the other trainers were early and took the first pickings...",
-            "But I saved one special creature just for you!",
-            "It's a Synonymouse! Please, take good care of it.",
-        ], () => {
+const introLines = [
+    gameState.playerName && gameState.playerName !== 'Trainer' && gameState.playerName !== ''
+        ? `Ah — ${gameState.playerName}! I've been expecting you. I'm Professor Lexicon.`
+        : "Ah — there you are! I'm Professor Lexicon.",
+    "I study the creatures of this region. They are not just animals — they are living embodiments of language.",
+    "Every species represents something you'll encounter in ELA: synonyms, grammar, poetry, figurative language.",
+    "Your rival Andy was here early and took his pick. Typical.",
+    "But I saved one for you — the one I always save for the trainer I think will go the furthest.",
+    "It's a Synonymouse. Small. Clever. Adaptable. It represents one of the most important vocabulary skills there is.",
+    "Take good care of it. It will grow into something extraordinary — if you do."
+];
+startDialogue(introLines, () => {
             const newcreature = createcreature("Synonymouse", 5);
             addcreatureToParty(newcreature);
             startDialogue([
@@ -6629,12 +6939,21 @@ function handleGateInteraction() {
         }
 
         // Andy defeated — now check full version passcode
-        if (!isFullVersionUnlocked()) {
-            showPasscodeScreen(() => {
-                changeMap('route1', 7, 4);
-            });
-            return null;
-        }
+if (!isFullVersionUnlocked()) {
+    startDialogue([
+        "You step through the north gate.",
+        "Route 1 stretches out before you — leading to Lexington City and beyond.",
+        "Somewhere past those trees: Synonym City. The Grammar Cave. The Pyramid of the Void.",
+        "Seventy species to catch. Four Elite professors to face. A champion to defeat.",
+        "Your journey is just beginning.",
+        "..."
+    ], () => {
+        showPasscodeScreen(() => {
+            changeMap('route1', 7, 4);
+        });
+    });
+    return null;
+}
 
         changeMap('route1', 7, 4);
         return null;
@@ -6726,8 +7045,16 @@ if (gameState.defeatedTrainers.includes('goblinBoss') && gameState.inventory.boa
         }
 
         // 3. Default text
-        return "Arr, my boat's engine is sputtering. It's out of order right now. But I have a feeling it will be important later... that's called foreshadowing.";
-    }
+if (!gameState.captainChats) gameState.captainChats = 0;
+gameState.captainChats++;
+const captainLines = [
+    "Captain: 'Arr, my boat's engine is sputtering. Out of order. But I have a feeling it'll be important later... that's called foreshadowing.'",
+    "Captain: 'You know what I miss? The open sea. Nothing but horizon in every direction. Melville got that right — the sea makes you feel very small and very alive at the same time.'",
+    "Captain: 'My grandfather was a sailor. Said the ocean taught him patience. You can't fight a current. You work with it or you wait.'",
+    "Captain: 'The Pequod II — named after Captain Ahab's ship in Moby Dick. The original Pequod sank. I thought naming mine after it would be ironic. Now I'm not so sure.'",
+    "Captain: 'If you ever find an Engine Cog out in those caves — I'll know who to thank. The Goblin Boss supposedly dropped mine in the fight. Long story.'"
+];
+return captainLines[(gameState.captainChats - 1) % captainLines.length];    }
     
 function startSailingSequence() {
     startDialogue([
@@ -6990,52 +7317,139 @@ function handlePoeInteraction() {
 }
 
 function handleMayaInteraction() {
+    if (!gameState.mayaVisits) gameState.mayaVisits = 0;
+    gameState.mayaVisits++;
+
     if (gameState.defeatedTrainers.includes('finalRival')) {
         return [
-            "Maya Angelou: 'You have finished your story, young trainer.'",
-            "'But remember — every ending is just the beginning of the next chapter.'",
-            "'I am proud of you.'"
+            "Maya Angelou: 'You have finished this chapter. But a life is not one chapter.'",
+            "'There is no greater agony than bearing an untold story inside you.'",
+            "'Yours is no longer untold. You told it — with every step, every battle, every choice.'",
+            "'Now go write what comes next. The best authors never stop.'"
         ];
     }
     if (gameState.gymBadges.synonym) {
         return [
-            "Maya Angelou: 'Two badges. You are writing your own legend now.'",
-            "'There is no greater agony than bearing an untold story inside you.'",
-            "'Yours is being told. Keep going.'"
+            "Maya Angelou: 'Two badges. You are becoming who you were meant to be.'",
+            "'I've learned that people will forget what you said, people will forget what you did,'",
+            "'but people will never forget how you made them feel.'",
+            "'Your journey is making people feel something. Keep going.'"
         ];
     }
     if (gameState.gymBadges.rhyme) {
         return [
-            "Maya Angelou: 'A Rhyme Badge! You found your rhythm.'",
-            "'Now find your meaning. The next gym awaits.'"
+            "Maya Angelou: 'You found your rhythm. Now find your meaning.'",
+            "'I Know Why the Caged Bird Sings — that was my autobiography.'",
+            "'The caged bird sings not despite its cage — but because of it.'",
+            "'Constraint can produce the most powerful art. Remember that when things are hard.'"
         ];
     }
-    return [
-        "Maya Angelou: 'There is no greater agony than bearing an untold story inside you.'",
-        "'Go! Write your own story, young trainer!'"
+
+    const visits = [
+        [
+            "A woman sits reading on a bench. She looks up with calm, steady eyes.",
+            "Maya Angelou: 'There is no greater agony than bearing an untold story inside you.'",
+            "'You are just beginning yours. Go tell it.'",
+            "'Every step you take is a sentence. Every choice is a word. Live deliberately.'"
+        ],
+        [
+            "Maya Angelou: 'I am a human being. Nothing human can be alien to me.'",
+            "'That is a quote from Terence — an African playwright in Ancient Rome. I carry it with me.'",
+            "'Literature is how human beings say to each other: I felt this too. You are not alone.'",
+            "'When you read widely, you gain the lives of thousands. That is not a small thing.'"
+        ],
+        [
+            "Maya Angelou: 'You may not control all the events that happen to you, but you can decide not to be reduced by them.'",
+            "'I grew up in Stamps, Arkansas. I went through things no child should go through.'",
+            "'I stopped speaking for five years. Trauma can do that.'",
+            "'But words came back. They always come back if you let them.'",
+            "'Writing saved me. I believe it can save anyone who needs saving.'"
+        ],
+        [
+            "Maya Angelou: 'I Know Why the Caged Bird Sings — do you know that book?'",
+            "'It is my life, written in words. My childhood. My silence. My voice returning.'",
+            "'It was the first autobiography by a Black woman to become a bestseller in America.'",
+            "'The caged bird sings of freedom. That song is not defeat. It is resistance.'",
+            "'Every voice that rises despite pressure is singing the same song.'"
+        ],
+        [
+            "Maya Angelou: 'A word after a word after a word is power.'",
+            "'That is Margaret Atwood, not me — but I agree with her completely.'",
+            "'People underestimate what language can do. It can start wars. End them.'",
+            "'It can make a stranger feel seen. It can heal a wound no doctor can find.'",
+            "'Use it carefully. Use it bravely. Use it often.'"
+        ]
     ];
+    const v = visits[(gameState.mayaVisits - 1) % visits.length];
+    return Array.isArray(v) ? v : [v];
 }
 
 function handleHughesInteraction() {
-    const quotes = [
-        "Hold fast to dreams, for if dreams die, life is a broken-winged bird that cannot fly.",
-        "My soul has grown deep like the rivers.",
-        "Life is for the living.",
-        "Humor is your own unconscious therapy."
-    ];
+    if (!gameState.hughesVisits) gameState.hughesVisits = 0;
+    gameState.hughesVisits++;
+
+    if (gameState.defeatedTrainers.includes('finalRival')) {
+        return [
+            "Langston Hughes: 'You've done it. Champion.'",
+            "'Life is for the living. And you have been living it — fully, completely, the way a story should be lived.'",
+            "'Now go write what comes next.'"
+        ];
+    }
     if (gameState.defeatedTrainers.includes('goblinBoss')) {
         return [
             "Langston Hughes: 'You cleared the cave. That took courage.'",
-            "'Life is for the living — and you are living it well.'"
+            "'Hold fast to dreams — you did exactly that.'",
+            "'Life is for the living, young trainer. And you are living it well.'"
         ];
     }
     if (gameState.gymBadges.rhyme) {
         return [
             "Langston Hughes: 'A Rhyme Badge! Now THAT is poetry in motion.'",
-            "'Hold fast to dreams, young trainer. Hold fast.'"
+            "'Rhyme is memory. It is how people carried knowledge before books existed.'",
+            "'Hold fast to dreams. The road ahead has more badges — and more poems.'"
         ];
     }
-    return quotes[Math.floor(Math.random() * quotes.length)];
+
+    const visits = [
+        [
+            "Langston Hughes tips his hat as you approach.",
+            "Hughes: 'Hold fast to dreams, for if dreams die —'",
+            "'Life is a broken-winged bird that cannot fly.'",
+            "'That poem is called Dream. Sixteen words. I wrote it when I was seventeen.'",
+            "'The Harlem Renaissance was a time when Black artists finally had a stage. I tried to make the most of it.'"
+        ],
+        [
+            "Hughes: 'My soul has grown deep like the rivers.'",
+            "'That line is from The Negro Speaks of Rivers — one of my most known poems.'",
+            "'I wrote it on a train, crossing the Mississippi, when I was eighteen years old.'",
+            "'The river connects history — the Euphrates, the Nile, the Mississippi, the Congo.'",
+            "'When you read a poem, ask: what is the speaker connecting to? What runs beneath the surface?'"
+        ],
+        [
+            "Hughes: 'What happens to a dream deferred?'",
+            "'Does it dry up like a raisin in the sun? Or fester like a sore?'",
+            "'Does it stink like rotten meat? Or crust and sugar over — like a syrupy sweet?'",
+            "'Maybe it just sags like a heavy load. Or does it explode?'",
+            "'That poem is called Harlem. Lorraine Hansberry named her play A Raisin in the Sun from it.'",
+            "'One poem can seed another work. That is how literature talks to itself across time.'"
+        ],
+        [
+            "Hughes: 'I wrote about jazz. About blues. About what it sounded like to be alive in Harlem in the 1920s.'",
+            "'Some critics said it was too common, too street-level.'",
+            "'I said: that is exactly the point.'",
+            "'Poetry belongs to everyone. Not just the educated. Not just the wealthy.'",
+            "'I wanted any person walking down a Harlem street to read my work and say: that is my life, put into words.'"
+        ],
+        [
+            "Hughes: 'Humor is your own unconscious therapy.'",
+            "'I wrote serious work. I also wrote funny work. Both were honest.'",
+            "'Jesse B. Semple — Simple, I called him — was a character I invented who said true things while making you laugh.'",
+            "'Comedy and tragedy are not opposites. They are neighbors.'",
+            "'The best writers know how to move between them without warning.'"
+        ]
+    ];
+    const v = visits[(gameState.hughesVisits - 1) % visits.length];
+    return Array.isArray(v) ? v : [v];
 }
 
 function handleWilliamPennInteraction() {
@@ -7377,153 +7791,101 @@ function handleArgumentQuest() {
     ], () => askArgumentStep());
 
     function askArgumentStep() {
-        if (step >= debate.length) {
-            // Done
-            gameState.argumentQuestDone = true;
-            const perfect = score === debate.length;
-            if (perfect) {
-                if (!gameState.inventory.heldItems) gameState.inventory.heldItems = {};
-                gameState.inventory.heldItems['Grammar Stone'] = (gameState.inventory.heldItems['Grammar Stone'] || 0) + 1;
-            }
-            startDialogue([
-                `You labeled ${score}/${debate.length} parts correctly!`,
-                perfect
-                    ? "Ms. Katrina: 'Perfect score. You understand argument structure better than most adults.'"
-                    : score >= 3
-                    ? "Ms. Katrina: 'Well done. The structure of argument is one of the most important things you'll ever learn.'"
-                    : "Ms. Katrina: 'Good effort. Review those labels in Study Mode — argument structure is on every test.'",
-                "Maya: 'Claim. Evidence. Reasoning. Counterclaim. Rebuttal.'",
-                "Ethan: 'I'm going to make a claim right now: I'm hungry.'",
-                "Maya: 'That needs evidence.'",
-                perfect ? "You received a GRAMMAR STONE for your perfect score! 🪨" : ""
-            ].filter(Boolean));
-            return;
+if (step >= debate.length) {
+    const perfect = score === debate.length;
+    const passing = score >= 3;
+
+    if (passing) {
+        gameState.argumentQuestDone = true;
+        if (perfect) {
+            if (!gameState.inventory.heldItems) gameState.inventory.heldItems = {};
+            gameState.inventory.heldItems['Grammar Stone'] = (gameState.inventory.heldItems['Grammar Stone'] || 0) + 1;
         }
+        startDialogue([
+            `You labeled ${score}/${debate.length} parts correctly!`,
+            perfect
+                ? "Ms. Katrina: 'Perfect score. You understand argument structure better than most adults.'"
+                : "Ms. Katrina: 'Well done. The structure of argument is one of the most important things you'll ever learn.'",
+            "Maya: 'Claim. Evidence. Reasoning. Counterclaim. Rebuttal.'",
+            "Ethan: 'I'm going to make a claim right now: I'm hungry.'",
+            "Maya: 'That needs evidence.'",
+            perfect ? "You received a GRAMMAR STONE for your perfect score! 🪨" : ""
+        ].filter(Boolean));
+    } else {
+        startDialogue([
+            `You labeled ${score}/${debate.length} parts correctly.`,
+            "Ms. Katrina: 'Not quite there yet. Argument structure takes practice.'",
+            "Ms. Katrina: 'Review the parts: Claim, Evidence, Reasoning, Counterclaim, Rebuttal.'",
+            "'Talk to Maya or Ethan again when you're ready to try once more.'"
+        ], () => {
+            showChoices("Would you like to try again?", [
+                {
+                    text: "🔁 Try again",
+                    callback: () => {
+                        step = 0;
+                        score = 0;
+                        startDialogue([
+                            "Ms. Katrina: 'Alright. Let's go through it again.'",
+                            "Each statement they make has a label. Name it correctly.",
+                            "The labels are: Claim, Evidence, Reasoning, Counterclaim, Rebuttal."
+                        ], () => askArgumentStep());
+                    }
+                },
+                {
+                    text: "📚 Study first, come back later",
+                    callback: () => startDialogue([
+                        "Ms. Katrina: 'Good idea. Use Study Mode to review argument structure.'",
+                        "'Maya and Ethan will be here when you're ready.'"
+                    ])
+                }
+            ]);
+        });
+    }
+    return;
+}
 
         const current = debate[step];
         startDialogue([current.statement], () => {
-            const showAnswerChoices = () => {
-                const answerChoices = [
-                    ...current.options.map(opt => ({
-                        text: opt,
-                        callback: () => {
-                            if (opt === current.correct) {
-                                score++;
-                                startDialogue([
-                                    `✅ Correct! That's the ${current.correct}.`,
-                                    `📖 ${current.explanation}`
-                                ], () => { step++; askArgumentStep(); });
-                            } else {
-                                startDialogue([
-                                    `❌ Not quite. That was the ${current.correct}.`,
-                                    `📖 ${current.explanation}`
-                                ], () => { step++; askArgumentStep(); });
-                            }
-                        }
-                    })),
-                    {
-                        text: '🔁 Re-read the statement',
-                        callback: () => startDialogue([current.statement], showAnswerChoices)
-                    }
-                ];
-                showChoices(`What part of an argument is this?`, answerChoices);
-            };
-            showAnswerChoices();
-        });
-    }
-
-    return null;
-}
-function handleWritingProcessQuest() {
-    if (gameState.writingQuestDone) {
-        return [
-            "Student: 'My essay is done! Prewrite, draft, revise, edit, publish.'",
-            "'I can't believe I was trying to skip straight to publish.'",
-            "'Ms. Katrina said that's like trying to eat a cake before you bake it.'",
-            "'...I'm still thinking about cake.'"
-        ];
-    }
-
-    const questions = [
-        {
-            q: "The student has ideas but hasn't written anything yet. Which stage comes first?",
-            a: ["Prewriting", "Drafting", "Editing", "Publishing"],
-            c: "Prewriting",
-            ex: "Prewriting is the first stage — brainstorming, outlining, and organizing ideas BEFORE you write."
-        },
-        {
-            q: "The student writes their essay for the first time, getting all ideas down without worrying about mistakes. This is called...",
-            a: ["Revising", "Editing", "Drafting", "Publishing"],
-            c: "Drafting",
-            ex: "A draft is your first attempt. The goal is to get ideas down — perfection comes later."
-        },
-        {
-            q: "The student re-reads their draft and rearranges paragraphs, strengthens their thesis, and adds better evidence. This stage is...",
-            a: ["Editing", "Revising", "Prewriting", "Publishing"],
-            c: "Revising",
-            ex: "Revising focuses on IDEAS — structure, clarity, and strength of argument. It's different from editing."
-        },
-        {
-            q: "Now the student fixes spelling errors, grammar mistakes, and punctuation. Which stage is this?",
-            a: ["Revising", "Drafting", "Editing", "Prewriting"],
-            c: "Editing",
-            ex: "Editing focuses on MECHANICS — grammar, spelling, punctuation. You edit AFTER you revise."
-        },
-        {
-            q: "What is the correct ORDER of the writing process?",
-            a: [
-                "Prewrite → Draft → Revise → Edit → Publish",
-                "Draft → Prewrite → Edit → Revise → Publish",
-                "Edit → Draft → Revise → Prewrite → Publish",
-                "Prewrite → Edit → Draft → Publish → Revise"
-            ],
-            c: "Prewrite → Draft → Revise → Edit → Publish",
-            ex: "The five stages always go in this order. Skipping stages — especially revision — is the most common writing mistake."
-        }
-    ];
-
-    let step = 0;
-    let score = 0;
-
-    startDialogue([
-        "A student is staring at a blank page, looking panicked.",
-        "Student: 'I have to turn in an essay tomorrow and I don't know where to START.'",
-        "'Do I just... write it? Do I fix it first? In what ORDER do I do things?'",
-        "You recognize this problem. The writing process.",
-        "Answer 5 questions and teach them the stages.",
-    ], () => askWritingStep());
-
-    function askWritingStep() {
-        if (step >= questions.length) {
-            gameState.writingQuestDone = true;
-            const perfect = score === questions.length;
-            startDialogue([
-                `You answered ${score}/${questions.length} correctly!`,
-                "Student: 'Prewrite. Draft. Revise. Edit. Publish. Got it.'",
-                perfect
-                    ? "Student: 'You just saved my grade. And possibly my entire academic career.'"
-                    : "Student: 'I'll look up the ones I missed in Study Mode before I start writing.'",
-                "Ms. Katrina nods from across the room. She saw everything.",
-                perfect ? "You received a SYNONYM ROLL for your help! 🍞" : "Student: 'Thank you. Seriously.'"
-            ]);
-            if (perfect) {
-                gameState.inventory.synonymRoll = (gameState.inventory.synonymRoll || 0) + 1;
-            }
-            return;
-        }
-
-        const q = questions[step];
-        showChoices(q.q, q.a.map(ans => ({
-            text: ans,
+const showAnswerChoices = () => {
+    const answerChoices = [
+        ...current.options.map(opt => ({
+            text: opt,
             callback: () => {
-                if (ans === q.c) {
+                if (opt === current.correct) {
                     score++;
-                    startDialogue([`✅ ${q.ex}`], () => { step++; askWritingStep(); });
+                    startDialogue([
+                        `✅ Correct! That's the ${current.correct}.`,
+                        `📖 ${current.explanation}`
+                    ], () => { step++; askArgumentStep(); });
                 } else {
-                    startDialogue([`❌ The correct answer: ${q.c}`, `📖 ${q.ex}`], () => { step++; askWritingStep(); });
+                    startDialogue([
+                        `❌ Not quite. That was the ${current.correct}.`,
+                        `📖 ${current.explanation}`
+                    ], () => { step++; askArgumentStep(); });
                 }
             }
-        })));
+        })),
+        {
+            text: '🔁 Re-read this statement',
+            callback: () => startDialogue([current.statement], showAnswerChoices)
+        },
+        ...(step > 0 ? [{
+            text: '📜 Review previous statements',
+            callback: () => {
+                const previousLines = debate.slice(0, step).map(
+                    (d, i) => `${i + 1}. [${d.label}] ${d.statement}`
+                );
+                startDialogue(
+                    ['📜 Here are the statements so far:', ...previousLines, '— Now back to the current one —', current.statement],
+                    showAnswerChoices
+                );
+            }
+        }] : [])
+    ];
+    showChoices(`What part of an argument is this?`, answerChoices);
+};
+            showAnswerChoices();
+        });
     }
 
     return null;
@@ -7872,8 +8234,7 @@ function handleTomReturnDialogue() {
     }
 
 function handleGymLeaderInteraction() {
-        if (gameState.gymBadges.rhyme) return "Rhonda: 'You've already graduated Middle School. Continue your journey!'";
-        if (gameState.playerParty.length === 0) return "You need a partner to challenge a Master!";
+if (gameState.gymBadges.rhyme) return "Rhonda: 'You've passed my class. High school is next — don't slack off.'";        if (gameState.playerParty.length === 0) return "You need a partner to challenge a Master!";
         if (gameState.playerParty.length > 0 && gameState.playerParty.every(p => p.level < 10)) return ["My rhymes are tough, my rhythm's tight,", "A level 10 you'll need to fight!"];
         
         startDialogue(trainersDB.gymLeaderRhonda.preBattle, () => startBattle(
@@ -7884,13 +8245,12 @@ function handleGymLeaderInteraction() {
     }
 
     function handleSynonymGymLeaderInteraction() {
-        if (gameState.gymBadges.synonym) return "Lex: 'Your vocabulary is college-ready. Go and continue your quest.'";
-        if (gameState.playerParty.length === 0) return "You need a partner to challenge a Hero!";
-        if (gameState.playerParty.length > 0 && gameState.playerParty.every(p => p.level < 25)) return ["My words are weighty, my knowledge deep.", "Return when your team's level has made a leap.", "(Recommended Level: 25+)"];
+if (gameState.gymBadges.synonym) return "Lex: 'You passed my class. That puts you in rare company. College is next — don't embarrass me.'";        
+if (gameState.playerParty.length === 0) return "You need a partner to challenge a Teacher!";        if (gameState.playerParty.length > 0 && gameState.playerParty.every(p => p.level < 25)) return ["My words are weighty, my knowledge deep.", "Return when your team's level has made a leap.", "(Recommended Level: 26+)"];
         
         startDialogue(trainersDB.gymLeaderLex.preBattle, () => startBattle(
             trainersDB.gymLeaderLex.creature.map(p => createcreature(p.species, p.level)), 
-            'High School Hero Lex', // <--- Updated Display Name
+            'High School Teacher Lex', // <--- Updated Display Name
             'gymLeaderLex'
         ));
     }
@@ -9195,10 +9555,38 @@ const launchGame = () => {
     };
 }
 
-    // Listen for inputs to start the game
-    window.addEventListener('keydown', () => startGame());
-    document.getElementById('title-scene').addEventListener('click', () => startGame());
-    document.getElementById('touch-controls').addEventListener('click', () => startGame());
+// Show CONTINUE button if a save exists
+if (localStorage.getItem('elaQuestSave')) {
+    const continueBtn = document.getElementById('ts-btn-continue');
+    if (continueBtn) {
+        continueBtn.style.display = 'block';
+        continueBtn.style.animation = 'ts-slideup .5s ease forwards, ts-glow-blue 2s 0.5s ease-in-out infinite';
+        continueBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (gameHasStarted) return;
+            gameHasStarted = true;
+            document.getElementById('title-scene').style.display = 'none';
+            loadGame();
+        });
+    }
+}
+
+// NEW GAME button
+const newBtn = document.getElementById('ts-btn-new');
+if (newBtn) {
+    newBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startGame();
+    });
+}
+
+// Keyboard / tap fallback (only triggers New Game if no save; ignored if save exists, so player must choose)
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') startGame();
+});
+// Remove the old blanket click-to-start so clicking the CONTINUE button doesn't also fire New Game
+// document.getElementById('title-scene').addEventListener('click', () => startGame());
+document.getElementById('touch-controls').addEventListener('click', () => startGame());
 function handleSenseiWu() {
         const streak = gameState.trainingStreak;
         // 1. Calculate Difficulty based on Player's Best creature
@@ -9724,16 +10112,49 @@ function useSynonymRoll() {
                         `...Wait! ${p.name} is evolving!`
                     ], () => {
                         // FIX: TRANSFORM logic preserves stats
-                        p.species = speciesData.evolvesTo;
-                        p.sprite = creatureDB[p.species].sprite;
-                        p.name = p.isFirstEdition ? `✨ Shiny ${p.species}` : p.species;
-                        p.hasEvolved = true;
-                        p.maxHp += Math.floor(p.level * 1.5); 
+p.species = speciesData.evolvesTo;
+p.sprite = creatureDB[p.species].sprite;
+p.name = p.isFirstEdition ? `✨ Shiny ${p.species}` : p.species;
+p.hasEvolved = true;
+p.maxHp += Math.floor(p.level * 1.5); 
 p.attack += Math.floor(p.level * 0.8);
 p.defense += Math.floor(p.level * 0.3);
 p.currentHp = p.maxHp;
 
-                        startDialogue(`Congratulations! It evolved into ${p.species}!`, () => updateInventoryUI());
+// --- EVOLUTION MOVE CATCH-UP ---
+const evolvedData = creatureDB[p.species];
+const catchUpMoves = (evolvedData?.learnset || []).filter(m =>
+    m.level <= p.level && !p.attacks.find(a => a && a.name === m.move)
+);
+function offerNextCatchUpMove(index) {
+    if (index >= catchUpMoves.length) {
+        startDialogue(`Congratulations! It evolved into ${p.species}!`, () => updateInventoryUI());
+        return;
+    }
+    const moveName = catchUpMoves[index].move;
+    if (!attacksDB[moveName]) { offerNextCatchUpMove(index + 1); return; }
+    if (p.attacks.length < 4) {
+        p.attacks.push(attacksDB[moveName]);
+        startDialogue(`${p.name} learned ${moveName}!`, () => offerNextCatchUpMove(index + 1));
+    } else {
+        startDialogue([
+            `${p.name} wants to learn ${moveName}!`,
+            `But ${p.name} already knows 4 moves.`,
+            `Which move should be forgotten?`
+        ], () => {
+            const choices = p.attacks.map((atk, i) => ({
+                text: `Forget ${atk.name}`,
+                callback: () => {
+                    p.attacks[i] = attacksDB[moveName];
+                    startDialogue([`${p.name} forgot ${atk.name}...`, `...and learned ${moveName}!`], () => offerNextCatchUpMove(index + 1));
+                }
+            }));
+            choices.push({ text: `Don't learn ${moveName}`, callback: () => offerNextCatchUpMove(index + 1) });
+            showChoices(`Which move should ${p.name} forget?`, choices);
+        });
+    }
+}
+offerNextCatchUpMove(0);
                     });
                 } else {
                     startDialogue([`${p.name} ate the roll.`, `${p.name} grew to Level ${p.level}!`], () => updateInventoryUI());
@@ -10033,8 +10454,16 @@ const tips = [
             "'Every fish goes straight to your bag. Take them to Merchant Crane in the city for the best prices.'"
         ];
     }
-    return "Fisherman: 'Sigh... I lost my lucky lure years ago. It was swept out to sea. Can't catch a thing without it.'";
-}
+if (!gameState.fishermanChats) gameState.fishermanChats = 0;
+gameState.fishermanChats++;
+const fishLines = [
+    "Fisherman: 'Sigh... lost my lucky lure years ago. Swept out to sea during a storm. Can't catch a thing without it. Strange how one small thing can change everything.'",
+    "Fisherman: 'You know Hemingway wrote a whole novel about fishing? The Old Man and the Sea. Santiago goes out alone, hooks the biggest marlin of his life. Three days. Just him and the fish and the ocean. I think about that book every time I cast.'",
+    "Fisherman: 'People underestimate patience. You can't hurry a fish. You can't hurry anything worth having. My grandfather told me that. I'm still learning it.'",
+    "Fisherman: 'The lucky lure — it was my father's. Silver with a red stripe. He caught everything with it. Some tools become part of how you think. Lose them and you lose part of yourself.'",
+    "Fisherman: 'If you ever find yourself on a deserted island — check the beach carefully. Things wash up. Things that were thought lost for good.'"
+];
+return fishLines[(gameState.fishermanChats - 1) % fishLines.length];}
     
 function handleArcadeInteraction() {
     const best = gameState.arcadeHighScore || 0;
@@ -10520,7 +10949,7 @@ window.removeEventListener('keydown', handleKey);
 }
 
 function handleCityFisherInteraction() {
-    if (gameState.inventory.oldRod <= 0) {
+    if (!(gameState.inventory.oldRod > 0)) {
         return "City Angler: 'The canal runs beneath the whole city. Strange creatures live down there, I'm sure of it.'";
     }
     const fish = gameState.inventory.caughtFish || {};
@@ -10541,7 +10970,7 @@ return [
     ];
 }
 function handleCaveFisherInteraction() {
-    if (gameState.inventory.oldRod <= 0) {
+    if (!(gameState.inventory.oldRod > 0)) {
         return "Cave Hermit: 'I've been down here so long I started fishing in the dark. Haven't caught anything... yet.'";
     }
     const fish = gameState.inventory.caughtFish || {};
@@ -10585,8 +11014,7 @@ return [
                     callback: () => startDialogue([
                         "Creatures can hold ONE item each!",
                         "Held items give passive bonuses during battle.",
-                        "Lucky Comma boosts your first hit. Grammar Stone raises defense.",
-                        "Rough Draft heals you when you're nearly out. Oxford Pin blocks status.",
+"Lucky Comma makes your first hit always land with +30% bonus damage. Grammar Stone raises defense by 20%.",                        "Rough Draft heals you when you're nearly out. Oxford Pin blocks status.",
                         "Thesaurus Chip powers up same-type moves. Red Ink chips away at opponents.",
                         "Find held items hidden in the world or earn them from NPCs.",
                         "Give items to creatures in the CREATURES menu!"
@@ -10602,13 +11030,15 @@ return [
                     ]) 
                 },
                 { 
-                    text: "Menu & Saving", 
-                    callback: () => startDialogue([
-                        "This is VERY important!",
-                        "Press 'M' or click the 'MENU' button to open your options.",
-                        "You must click 'SAVE GAME' before you leave.",
-                        "If you close this tab without saving, your progress is lost forever!"
-                    ]) 
+text: "Menu & Saving", 
+callback: () => startDialogue([
+    "Great news — the game AUTO-SAVES every time you change maps!",
+    "So simply walking into a building or traveling to a new area saves your progress automatically.",
+    "You can also manually save anytime: press 'M' or tap the MENU button, then choose 'Save Game'.",
+    "Manual saving is a good habit before logging off — especially after a big battle or finding a rare creature.",
+    "To continue a saved game, choose CONTINUE on the title screen.",
+    "One warning: 'Reset Data' in the menu will permanently erase everything. Don't tap that by accident!"
+])
                 },
                 { 
                     text: "Status Effects", 
@@ -10618,6 +11048,17 @@ return [
                         "Use a 'Thesaurus Tea' from the item menu to cure it!"
                     ]) 
                 },
+                { 
+    text: "ELA Basics",
+    callback: () => startDialogue([
+        "ELA stands for English Language Arts.",
+        "It covers reading, writing, speaking, and listening.",
+        "In this game, every battle tests your ELA knowledge.",
+        "📖 KEY TERMS TO KNOW: Theme (universal message), Main Idea (what a text is mostly about), Inference (a conclusion drawn from evidence + reasoning), Point of View (who is narrating and what they know), Text Structure (how a text is organized: chronological, compare/contrast, cause/effect, problem/solution).",
+        "The more you explore, read shelves and signs, and talk to NPCs — the better you'll do in battles.",
+        "Professor Lexicon's lab is always open. Use Study Mode in the menu to review ELA concepts anytime."
+    ])
+},
                 { 
                     text: "I'm good, thanks.", 
                     callback: () => startDialogue("Good luck, young writer! Go find Professor Lexicon.") 
@@ -10753,19 +11194,19 @@ function handleVinnieInteraction() {
         "Vinnie: 'Whoa, traveler. Bad vibes ahead.'",
         "'This ancient tree blocked the gate to Synonym City. It didn't want the noise.'",
         "'I can carve it into a flute to release its spirit, but I need new chisels.'",
-"'Can you spot me $1,000 for the tools?'",
+"'Can you spot me $150 for the tools?'",
         "'I know. I know. I'm sorry. Art isn't cheap, man.'"
 ], () => {
         gameState.inDialogue = false;
-        const yesText = "Yes, take $1,000";
+        const yesText = "Yes, take $150";
         
-        showChoices("Give Vinnie $1,000?", [
+        showChoices("Give Vinnie $150?", [
             { 
                 text: yesText, 
                 callback: () => {
                     // Logic: Checks for Money OR Dev Mode silently
-if (gameState.money >= 1000 || gameState.devModeActive) {
-                        if (!gameState.devModeActive) gameState.money -= 1000;
+if (gameState.money >= 150 || gameState.devModeActive) {
+                        if (!gameState.devModeActive) gameState.money -= 150;
                         gameState.treeRemoved = true;
                         gameState.inventory.treeFlute = 1;
                         
@@ -10773,20 +11214,20 @@ if (gameState.money >= 1000 || gameState.devModeActive) {
                         draw(); 
                         
 startDialogue([
-                            "You hand Vinnie $1000.",
+                            "You hand Vinnie $150.",
                             "Vinnie smiles, buys the tools, and gets to work.",
                             "*CHOP* ... *WHITTLE* ... *HUM*",
                             "The huge tree is transformed! He hands you the Nature Flute.",
                             "Vinnie: 'Wait, hold on.'",
-                            "Vinnie hands your $100 back.",
+                            "Vinnie hands your $150 back.",
                             "Vinnie: 'I can't take money for art, man. It's about the vibes.'",
                             "Vinnie: 'Keep your cash. The path is open.'"
-                        ], () => { gameState.money += 1000; });
+                        ], () => { gameState.money += 150; });
                     } else {
                         startDialogue([
 "Vinnie: 'Bummer. You're short on cash.'",
                             "Vinnie: 'I'm sorry, I really am. But quality chisels aren't free.'",
-                            "Vinnie: 'Come back when you have $1,000. The tree will wait. Trees are patient.'"
+                            "Vinnie: 'Come back when you have $150. The tree will wait. Trees are patient.'"
                         ]);
                     }
                 }
@@ -11697,18 +12138,6 @@ function animateLightningBolt() {
         document.head.appendChild(style);
         document.body.appendChild(overlay);
         setTimeout(() => { overlay.remove(); style.remove(); res(); }, 600);
-    });
-}
-function animateLightningBolt() {
-    return new Promise(res => {
-        const bolt = document.createElement('div');
-        bolt.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;pointer-events:none;`;
-        bolt.innerHTML = `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8rem;animation:boltFlash 0.6s ease-out forwards;">⚡</div>`;
-        const style = document.createElement('style');
-        style.textContent = `@keyframes boltFlash { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)} 20%{opacity:1;transform:translate(-50%,-50%) scale(1.8)} 60%{opacity:1;filter:brightness(3)} 100%{opacity:0;transform:translate(-50%,-60%) scale(1.2)} }`;
-        document.head.appendChild(style);
-        document.body.appendChild(bolt);
-        setTimeout(() => { bolt.remove(); style.remove(); res(); }, 700);
     });
 }
 
@@ -12708,7 +13137,7 @@ async function endBattle(ranAway = false, caught = false) {
         });
         return;
     } else {
-        const money = oldBattle.trainerId ? trainersDB[oldBattle.trainerId].reward : 15;
+const money = Math.floor((oldBattle.trainerId ? trainersDB[oldBattle.trainerId].reward : 15) * 1.75);
         let winMsg = [];
         gameState.money += money;
 
@@ -12835,6 +13264,40 @@ if (oldBattle.trainerId) {
                 p.attack += Math.floor(p.level * 0.8);
                 p.defense += Math.floor(p.level * 0.3);
                 p.currentHp = p.maxHp;
+                // --- EVOLUTION MOVE CATCH-UP (like Pokemon Blue) ---
+                // Offer any moves from the new species' learnset at or below current level
+                const newSpeciesData = creatureDB[p.species];
+                if (newSpeciesData && newSpeciesData.learnset) {
+                    const catchUpMoves = newSpeciesData.learnset.filter(m =>
+                        m.level <= p.level && !p.attacks.find(a => a && a.name === m.move)
+                    );
+                    for (const entry of catchUpMoves) {
+                        const moveName = entry.move;
+                        if (!attacksDB[moveName]) continue;
+                        if (p.attacks.length < 4) {
+                            p.attacks.push(attacksDB[moveName]);
+                            await new Promise(res => startBattleDialogue([`${p.name} learned ${moveName}!`], res));
+                        } else {
+                            await new Promise(res => {
+                                startBattleDialogue([
+                                    `${p.name} wants to learn ${moveName}!`,
+                                    `But ${p.name} already knows 4 moves.`,
+                                    `Which move should be forgotten?`
+                                ], () => {
+                                    const choices = p.attacks.map((atk, i) => ({
+                                        text: `Forget ${atk.name}`,
+                                        callback: () => {
+                                            p.attacks[i] = attacksDB[moveName];
+                                            startBattleDialogue([`${p.name} forgot ${atk.name}...`, `...and learned ${moveName}!`], res);
+                                        }
+                                    }));
+                                    choices.push({ text: `Don't learn ${moveName}`, callback: () => startBattleDialogue([`${p.name} did not learn ${moveName}.`], res) });
+                                    showChoices(`Which move should ${p.name} forget?`, choices);
+                                });
+                            });
+                        }
+                    }
+                }
 
                 // Unique evolution cutscenes for the Synonymouse line
                 if (oldSpecies === 'Synonymouse' && p.species === 'ThesaurusRex') {
@@ -14092,7 +14555,7 @@ function ppTogglePause() {
     PP.gamePaused = PP.paused;
     const ps = document.getElementById('pp-pause-screen');
     ps.style.display = PP.paused ? 'flex' : 'none';
-    if (!PP.paused) PP._gameLoop();
+if (!PP.paused) { cancelAnimationFrame(PP.raf); PP._gameLoop(); }
 }
 </script>
 </body>
