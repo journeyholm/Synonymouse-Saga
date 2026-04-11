@@ -10140,8 +10140,38 @@ function offerNextCatchUpMove(index) {
 }
 offerNextCatchUpMove(0);
                     });
-                } else {
-                    startDialogue([`${p.name} ate the roll.`, `${p.name} grew to Level ${p.level}!`], () => updateInventoryUI());
+} else {
+                    // Check if a new move is learned at this level
+                    const newMove = speciesData?.learnset?.find(m => m.level === p.level);
+                    if (newMove && attacksDB[newMove.move] && !p.attacks.find(a => a && a.name === newMove.move)) {
+                        if (p.attacks.length < 4) {
+                            p.attacks.push(attacksDB[newMove.move]);
+                            startDialogue([
+                                `${p.name} ate the roll.`,
+                                `${p.name} grew to Level ${p.level}!`,
+                                `${p.name} learned ${newMove.move}!`
+                            ], () => updateInventoryUI());
+                        } else {
+                            startDialogue([
+                                `${p.name} ate the roll.`,
+                                `${p.name} grew to Level ${p.level}!`,
+                                `${p.name} wants to learn ${newMove.move}!`,
+                                `But ${p.name} already knows 4 moves. Which move should be forgotten?`
+                            ], () => {
+                                const forgetChoices = p.attacks.map((atk, i) => ({
+                                    text: `Forget ${atk.name}`,
+                                    callback: () => {
+                                        p.attacks[i] = attacksDB[newMove.move];
+                                        startDialogue([`${p.name} forgot ${atk.name}...`, `...and learned ${newMove.move}!`], () => updateInventoryUI());
+                                    }
+                                }));
+                                forgetChoices.push({ text: `Don't learn ${newMove.move}`, callback: () => updateInventoryUI() });
+                                showChoices(`Which move should ${p.name} forget?`, forgetChoices);
+                            });
+                        }
+                    } else {
+                        startDialogue([`${p.name} ate the roll.`, `${p.name} grew to Level ${p.level}!`], () => updateInventoryUI());
+                    }
                 }
             }
         }));
