@@ -91,7 +91,7 @@ animation: ts-float-mouse 4s ease-in-out infinite;
   <!-- Main content -->
   <div style="position:relative;z-index:1;width:100%;max-width:700px;padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;margin:0 auto;height:100%;justify-content:center;">
 
-    <div class="ts-badge">&#9670; Version 6.0 &#9670; Classroom Edition &#9670;</div>
+    <div class="ts-badge">&#9670; Version 5.0 &#9670; Classroom Edition &#9670;</div>
 
     <div style="text-align:center;margin-bottom:.5rem;">
       <span class="ts-ela">ELA</span>
@@ -1484,10 +1484,12 @@ function loadGame() {
                     }
                 }
 
-                // 4. Refresh Screen
-                closeAllMenus();
-                draw(); 
-                startDialogue("Game loaded successfully!");
+// 4. Refresh Screen
+closeAllMenus();
+gameState.camera = { x: gameState.player.x * 32, y: gameState.player.y * 32 };
+startGameLoop();
+draw(); 
+startDialogue("Game loaded successfully!");
             } catch (e) {
                 console.error(e);
                 startDialogue("Error loading save file.");
@@ -9520,7 +9522,7 @@ confirmBtn.onclick = (e) => {
         // Skip name entry if player already has a name from a previous save
         if (gameState.playerName && gameState.playerName !== '') {
             titleDiv.classList.add('hidden');
-            gameLoop();
+            startGameLoop();
             startDialogue([
                 "You wake up.",
                 "Mom (downstairs): 'Breakfast is ready!'",
