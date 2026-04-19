@@ -10406,7 +10406,7 @@ const heldOffMult = (attacker === currentBattle?.playercreature)
         ? getHeldItemDamageMultiplier(attacker, attack) : 1;
     const heldDefMult = (defender === currentBattle?.playercreature)
         ? getHeldItemDefenseMultiplier(defender) : 1;
-const levelFactor = (attacker.level * 0.4 + 2) / 50;
+const levelFactor = (attacker.level * 2 + 10) / 50;
     const baseDamage = (attack.power * levelFactor * multiplier * critMultiplier * heldOffMult * (attackStat / defenseStat)) / 4;
     const finalDamage = Math.max(1, Math.floor(baseDamage * (heldDefMult || 1)));
     if (isCrit) message = message ? `⚡ Critical hit! ${message}` : '⚡ Critical hit!';
