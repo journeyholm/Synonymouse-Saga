@@ -5209,16 +5209,36 @@ if (gameState.journal['Auto-biogra-bee']?.caught) {
 // 8b. RESTORE DAY-EFFECT NPCs
     // These are placed by applyDayEffects() but guarded by a "already triggered" flag,
     // so they must also be re-placed here on load if still relevant.
-    if (gameState.dayEffect_scholar && maps.village && !maps.village.objects['9,5']) {
+if (gameState.dayEffect_scholar && maps.village && !maps.village.objects['9,5']) {
         maps.village.objects['9,5'] = {
             sprite: 'graduate',
             interaction: () => {
                 if (gameState.dayScholarVisits === undefined) gameState.dayScholarVisits = 0;
                 gameState.dayScholarVisits++;
                 const lines = [
-                    ["Scholar: 'Thirty days into my research and I keep finding the same thing.'", "'The students who improve fastest aren't the ones who study hardest.'", "'They're the ones who notice when they're wrong and adjust.'", "'That's it. That's the whole secret.'", "✨ +1 Potion — for listening.", () => { gameState.inventory.potions = (gameState.inventory.potions || 0) + 1; }],
-                    ["Scholar: 'Still here. The village is quieter than I expected.'", "'I find I do my best thinking when nobody's watching.'"],
-                    ["Scholar: 'Come back anytime. I'm not going anywhere soon.'"]
+                    [
+                        "Scholar: 'Ah — a young trainer. I've been wandering this region for years.'",
+                        "'Day three out here, and you already have that look in your eye.'",
+                        "'Here — take this. A reminder that every journey needs supplies.'",
+                        "You received a Potion!",
+                        "'A VOCAB TIP: The word \"journey\" comes from the Old French \"journée\" — meaning a day\\'s travel.'",
+                        "'Every word has a history. That\\'s what makes language worth studying.'"
+                    ],
+                    [
+                        "Scholar: 'Still traveling. Good.'",
+                        "'Most students who start this journey stop after a week.'",
+                        "'The ones who don\\'t — they\\'re the ones I remember.'"
+                    ],
+                    [
+                        "Scholar: 'A VOCAB TIP: The word \"vocab\" is a clipping — a shortened form of \"vocabulary.\"'",
+                        "'\"Vocabulary\" comes from Latin \"vocabulum\" — a word, a name.'",
+                        "'The root is \"vocare\" — to call. Words are how we call things into existence.'",
+                        "'Name something precisely and you understand it better. That\\'s the whole game.'"
+                    ],
+                    [
+                        "Scholar: 'I should move on soon. Other routes to walk.'",
+                        "'But I\\'ll be here a while longer if you need me.'"
+                    ]
                 ];
                 const idx = Math.min(gameState.dayScholarVisits - 1, lines.length - 1);
                 if (gameState.dayScholarVisits === 1) {
@@ -5428,6 +5448,13 @@ stepsSinceBattle: 0,
         // Misc save-safety defaults
         sewerRiddleSolved: false,
         fathomAbleDefeated: false,
+    // ── Deep Lexicon Trials (reverse-tower post-game) ──
+    trialsUnlocked: false,        // set true after Fathom-able is defeated
+    trialsBestFloor: 0,           // deepest floor ever cleared (for bragging/score)
+    trialsCurrentFloor: 0,        // floor the player is actively on during a run
+    trialsRunActive: false,       // true while a run is in progress
+    lexiconMaster: false,         // true once all 5 floors cleared in one run
+    trialsShinyClaimed: false,    // one-time First Edition reward claimed
         canalKeeperVisits: 0,
         senseiPostStreak: 0,
         andyInvited: false,
@@ -6554,6 +6581,67 @@ const runOnQuestions = [
     ];
 
 const trainersDB = {
+// ── DEEP LEXICON TRIALS — five descending floors, level 50→70 ──
+'trialGrammar': {
+name: "Trial Master of Structure",
+reward: 0,
+creature: [createcreature('SyntaxStone', 50), createcreature('Grammargoyle', 52)],
+preBattle: [
+"A figure of carved stone sits cross-legged in the dark.",
+"Trial Master: 'You descend into Structure. The bones of language.'",
+"'Answer wrongly even once, and the deep returns you to the surface.'",
+"'Begin.'"
+],
+postBattle: ["Trial Master: 'Structure holds. Descend.'"]
+},
+'trialRoots': {
+name: "Trial Master of Roots",
+reward: 0,
+creature: [createcreature('ThesaurusRex', 54), createcreature('Syn-tuna', 56)],
+preBattle: [
+"Tangled roots break through the sewer walls here, glowing faintly.",
+"Trial Master: 'Every word grows from older words. Show me you know their roots.'",
+"'One error and the climb begins again.'"
+],
+postBattle: ["Trial Master: 'Your roots run deep. Go deeper.'"]
+},
+'trialFigLang': {
+name: "Trial Master of Figures",
+reward: 0,
+creature: [createcreature('SimileSlime', 58), createcreature('Echo-chamber', 60)],
+preBattle: [
+"The water here reflects things that aren't there.",
+"Trial Master: 'Nothing down here means only what it says.'",
+"'Read between the lines, or return to the surface.'"
+],
+postBattle: ["Trial Master: 'You see beneath the surface. Fitting. Descend.'"]
+},
+'trialStory': {
+name: "Trial Master of Story",
+reward: 0,
+creature: [createcreature('Novel-lion', 62), createcreature('Gram-reaper', 64)],
+preBattle: [
+"Torn pages drift on the black water — a thousand half-told stories.",
+"Trial Master: 'Every story has a shape. Prove you can read it.'",
+"'No second chances in the deep.'"
+],
+postBattle: ["Trial Master: 'You know how stories move. One trial remains.'"]
+},
+'trialWriting': {
+name: "Trial Master of the Craft",
+reward: 0,
+creature: [createcreature('LexiconLord', 68), createcreature('Para-phrase', 70)],
+preBattle: [
+"The deepest chamber. Still water, perfect silence. Something ancient listens.",
+"Trial Master: 'You have reached the bottom. Here we test not what you know — but how you build.'",
+"'Answer true, and earn the only title the deep gives. Falter, and rise with nothing.'"
+],
+postBattle: [
+"Trial Master: 'It is done.'",
+"'You have passed through Structure, Roots, Figures, Story, and Craft.'",
+"'Rise, Lexicon Master. The deep knows your name now.'"
+]
+},
 'villageRival': { 
     name: "Andy", 
     reward: 100, 
@@ -9353,6 +9441,26 @@ objects: {
 
 // Fathom-able's chamber entrance — the deep pool in the east
             '13,5': { sprite: 'fathom-able', interaction: () => handleFathomAbleBattle() },
+            // Descent to the Deep Lexicon Trials — opens once Fathom-able is defeated
+        '13,6': { sprite: 'hole', interaction: () => {
+            if (!gameState.fathomAbleDefeated && !gameState.journal['Fathom-able']?.caught) {
+                return "A shaft sinks into deeper dark, but Fathom-able's pool blocks the way. Face it first.";
+            }
+            gameState.trialsUnlocked = true;
+            const best = gameState.trialsBestFloor || 0;
+            const bestLine = gameState.lexiconMaster
+                ? "You have already earned the title Lexicon Master — but the deep always welcomes a return."
+                : best > 0
+                    ? `Your deepest descent so far: Floor ${best} of 5.`
+                    : "No one who has gone down has come back the same.";
+            return showChoices(
+                `THE DEEP LEXICON TRIALS\nFive floors. Themed tests. One wrong answer sends you back to the surface.\n${bestLine}\nDescend?`,
+                [
+                    { text: "Descend into the Trials", callback: () => startTrialsRun() },
+                    { text: "Not yet", callback: () => startDialogue("You step back from the shaft. The deep will keep.") }
+                ]
+            );
+        }},
 
             // ── SEWER POST-GAME ATMOSPHERE ──
             // Drowned bookshelf — books that fell from the city library
@@ -9414,7 +9522,32 @@ objects: {
             }},
         },
 encounters: ['Drain-pipe', 'Drain-pipe', 'Echo-chamber', 'Echo-chamber', 'Para-phrase', 'Para-phrase', 'Syn-tuna', 'Syn-tuna', 'SimileSlime', 'SimileSlime', 'Gram-reaper']
-    },
+},
+// ── THE DEEP LEXICON TRIALS — single reused chamber for all 5 floors ──
+trialChamber: {
+layout: [
+[27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27],
+[27,28,28,28,28,28,28,28,28,28,28,28,28,28,28,27],
+[27,28,28,28,28,28,28,28,28,28,28,28,28,28,28,27],
+[27,28,28, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,28,28,27],
+[27,28,28, 5,27,27,27,27,27,27,27,27, 5,28,28,27],
+[27,28,28, 5,27,28,28,28,28,28,28,27, 5,28,28,27],
+[27,28,28, 5,27,28,28,28,28,28,28,27, 5,28,28,27],
+[27,28,28, 5,27,27,27,27,27,27,27,27, 5,28,28,27],
+[27,28,28, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,28,28,27],
+[27,28,28,28,28,28,28,28,28,28,28,28,28,28,28,27],
+[27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27],
+],
+objects: {
+// Trial Master stands in the center; interaction routes by current floor
+'8,6': { sprite: 'fathom-able', interaction: () => handleTrialMaster() },
+// Exit ladder back to the sewer — always available (abandons the run)
+'1,1': { sprite: 'ladder', interaction: () => handleTrialExit() },
+// Floor sign
+'13,1': { sprite: 'sign', interaction: () => `You are in the Deep Trials. Floor ${gameState.trialsCurrentFloor || 1} of 5. One wrong answer sends you to the surface.` },
+},
+encounters: []  // no wild encounters in the Trials — pure test
+},
 };
     
 // Updated Colors for better contrast
@@ -11916,6 +12049,8 @@ function checkAndToastAchievements() {
 { name: 'Full Kit', earned: () => gameState.playerParty.filter(p => p.heldItem !== null).length >= 3 },
 { name: 'Status Effect', earned: () => !!(gameState.statusInflicted) }, // set gameState.statusInflicted=true when you inflict one
 { name: 'Day 10', earned: () => (gameState.dayCount || 1) >= 10 },
+{ name: 'Deep Diver', earned: () => (gameState.trialsBestFloor || 0) >= 1 },
+{ name: 'Sovereign of the Deep', earned: () => !!gameState.lexiconMaster },
 { name: 'Perfect Quiz', earned: () => !!(gameState.schoolPerfectQuiz) }, // set when 3/3 on school quiz
             { name: 'Rhyme Badge', earned: () => gameState.gymBadges.rhyme },
             { name: 'Synonym Badge', earned: () => gameState.gymBadges.synonym },
@@ -12515,6 +12650,8 @@ earned: () => gameState.journal['LexiconLord']?.caught
     // --- MISSING FROM DISPLAY (were only toasted) ---
     { icon: '🎯', name: 'Bounty Hunter', desc: 'Complete 3 of Professor Verso\'s collection quests.', earned: () => (gameState.collectorQuestIndex || 0) >= 3 },
     { icon: '☀️', name: 'Day 10', desc: 'Reach Day 10 — prove you stayed with the journey.', earned: () => (gameState.dayCount || 1) >= 10 },
+    { icon: '🌀', name: 'Deep Diver', desc: 'Clear at least one floor of the Deep Lexicon Trials.', earned: () => (gameState.trialsBestFloor || 0) >= 1 },
+{ icon: '👑', name: 'Sovereign of the Deep', desc: 'Clear all five floors of the Deep Lexicon Trials in a single run.', earned: () => !!gameState.lexiconMaster },
     { icon: '📎', name: 'Equipped', desc: 'Give a held item to any creature.', earned: () => gameState.playerParty.some(p => p.heldItem !== null) },
     { icon: '🎒', name: 'Full Kit', desc: 'Equip 3 creatures with held items.', earned: () => gameState.playerParty.filter(p => p.heldItem !== null).length >= 3 },
     { icon: '📚', name: 'Lexicon Master', desc: 'Complete the Lexicon — catch every creature in the region.', earned: () => !!gameState.lexiconComplete },
@@ -14147,6 +14284,127 @@ function handleLegendaryBattle() {
     // Pre-battle ritual: riddle must be solved, creature rises from depths
     // Only one encounter per catch — once caught, chamber is empty
     // ════════════════════════════════════════════════════════════
+    // ───────────────────────────────────────────────────────────
+// THE DEEP LEXICON TRIALS
+// Five floors, level 50→70, each a themed Trial Master.
+// One wrong battle question ends the run. Clearing all 5 = Lexicon Master.
+// ───────────────────────────────────────────────────────────
+const TRIAL_FLOORS = [
+    { floor: 1, trainerId: 'trialGrammar',  strand: 'grammar',  label: 'Structure' },
+    { floor: 2, trainerId: 'trialRoots',    strand: 'roots',    label: 'Roots' },
+    { floor: 3, trainerId: 'trialFigLang',  strand: 'figlang',  label: 'Figures' },
+    { floor: 4, trainerId: 'trialStory',    strand: 'story',    label: 'Story' },
+    { floor: 5, trainerId: 'trialWriting',  strand: 'writing',  label: 'Craft' },
+];
+
+function startTrialsRun() {
+    gameState.trialsRunActive = true;
+    gameState.trialsCurrentFloor = 1;
+    startDialogue([
+        "You lower yourself past Fathom-able's pool, into a shaft that goes deeper still.",
+        "The Deep Lexicon Trials. Five floors down. One wrong answer, and the water carries you back up.",
+        "Floor 1: Structure."
+    ], () => changeMap('trialChamber', 8, 9));
+}
+
+function handleTrialMaster() {
+    const cur = gameState.trialsCurrentFloor || 1;
+    const def = TRIAL_FLOORS[cur - 1];
+    if (!def) { return handleTrialExit(); }
+    // Flag the active strand so question routing favors this floor's topic
+    gameState._trialStrand = def.strand;
+    gameState._inTrialBattle = true;
+    const t = trainersDB[def.trainerId];
+    const party = t.creature.map(c => createcreature(c.species, c.level));
+    startDialogue(t.preBattle, () => {
+        startBattle(party, t.name, def.trainerId);
+    });
+    return null;
+}
+
+function handleTrialExit() {
+    if (gameState.trialsRunActive) {
+        return showChoices("Leave the Trials? Your current run will end and you'll start from Floor 1 next time.", [
+            { text: "Leave the Trials", callback: () => {
+                gameState.trialsRunActive = false;
+                gameState.trialsCurrentFloor = 0;
+                gameState._inTrialBattle = false;
+                gameState._trialStrand = null;
+                changeMap('citySewers', 13, 6);
+                startDialogue("You climb back up to the sewer. The deep will wait.");
+            }},
+            { text: "Stay", callback: () => startDialogue("You steady yourself and turn back to the chamber.") }
+        ]);
+    }
+    changeMap('citySewers', 13, 6);
+    return null;
+}
+
+// Called from endBattle when a Trial battle is WON
+function onTrialFloorCleared() {
+    const cur = gameState.trialsCurrentFloor || 1;
+    gameState.trialsBestFloor = Math.max(gameState.trialsBestFloor || 0, cur);
+    gameState._inTrialBattle = false;
+    gameState._trialStrand = null;
+    if (cur >= 5) {
+        // FINISHED ALL FIVE
+        gameState.trialsRunActive = false;
+        gameState.trialsCurrentFloor = 0;
+        gameState.lexiconMaster = true;
+        try { checkAndToastAchievements(); } catch(e) {}
+        let rewardLines = [];
+        if (!gameState.trialsShinyClaimed) {
+            gameState.trialsShinyClaimed = true;
+            const shiny = createcreature('Synonymouse', 50);
+            shiny.isFirstEdition = true;
+            shiny.name = 'Synonymouse ✨';
+            if (gameState.playerParty.length < 6) gameState.playerParty.push(shiny);
+            else gameState.creatureBox.push(shiny);
+            if (!gameState.journal['Synonymouse']) gameState.journal['Synonymouse'] = { seen: true, caught: true };
+            rewardLines = [
+                "From the still water rises a creature of pure gold — a First Edition Synonymouse.",
+                "✨ It bonds to you instantly, as if it had been waiting in the deep all along.",
+                "✨ You received a First Edition Synonymouse! (Lv. 50)"
+            ];
+        } else {
+            rewardLines = ["The deep has nothing left to give but its respect. You have earned it before."];
+        }
+        try { saveGame(true); } catch(e) {}
+        startDialogue([
+            "Trial Master of the Craft: 'It is done. Rise, Lexicon Master.'",
+            ...rewardLines,
+            "🏆 You are now a LEXICON MASTER. The title is yours forever."
+        ], () => changeMap('citySewers', 13, 6));
+    } else {
+        // ADVANCE TO NEXT FLOOR
+        gameState.trialsCurrentFloor = cur + 1;
+        const next = TRIAL_FLOORS[cur];
+        try { saveGame(true); } catch(e) {}
+        startDialogue([
+            `Floor ${cur} cleared. The water drains, revealing stairs going down.`,
+            `Floor ${cur + 1}: ${next.label}.`
+        ], () => changeMap('trialChamber', 8, 9));
+    }
+}
+
+// Called from handleAnswer when a WRONG answer is given during a Trial battle
+function onTrialFailed() {
+    const reached = gameState.trialsCurrentFloor || 1;
+    gameState.trialsRunActive = false;
+    gameState.trialsCurrentFloor = 0;
+    gameState._inTrialBattle = false;
+    gameState._trialStrand = null;
+// End the battle immediately (no creature death — the trial just ends)
+    try { if (typeof currentBattle !== 'undefined' && currentBattle) currentBattle = null; } catch(e) {}
+    gameState.inBattle = false;
+    battleScene.classList.add('hidden');
+    startDialogue([
+        "WRONG. The water surges up around you.",
+        `You reached Floor ${reached} of 5.`,
+        "The deep carries you back to the surface. The Trials reset — begin again from Floor 1 when you're ready."
+    ], () => { changeMap('citySewers', 13, 6); });
+}
+    
     function handleFathomAbleBattle() {
         // Already caught
         if (gameState.journal['Fathom-able']?.caught) {
@@ -14206,6 +14464,7 @@ function handleLegendaryBattle() {
         ], () => {
 // Mark as "encountered" so rematch dialogue works even if player fled/fainted
             gameState.fathomAbleDefeated = true;
+    gameState.trialsUnlocked = true; // the shaft south of the pool now opens
             startBattle([createcreature('Fathom-able', 75)], "Wild Fathom-able");
         });
     }
@@ -16597,8 +16856,57 @@ function presentQuestion() {
     // Each zone favors questions from certain index ranges, matching the
     // educational difficulty curve of the game's geography.
     // A 30% wild-card chance always keeps the full pool in play.
-    const map = gameState.currentMap || '';
-    let preferredIndices = null;
+const map = gameState.currentMap || '';
+let preferredIndices = null;
+
+// ── Deep Lexicon Trials: force the strand for the current floor, harder half ──
+if (gameState._inTrialBattle && gameState._trialStrand) {
+    const _g  = elaQuestions.findIndex(q => q.q.startsWith("A sentence containing two independent clauses"));
+    const _r  = elaQuestions.findIndex(q => q.q.startsWith("The root 'scrib/script'"));
+    const _f  = elaQuestions.findIndex(q => q.q.startsWith("A humorous imitation"));
+    const _ge = elaQuestions.findIndex(q => q.q.startsWith("A word that joins words"));
+    const _s  = elaQuestions.findIndex(q => q.q.startsWith("A character that changes significantly"));
+    const _w  = elaQuestions.findIndex(q => q.q.startsWith("Which stage of the writing process comes FIRST"));
+    const _end = elaQuestions.length - 1;
+    const bands = {
+        grammar: [_g, _r - 1],
+        roots:   [_r, _f - 1],
+        figlang: [_f, _ge - 1],
+        story:   [_s, _w - 1],
+        writing: [_w, _end],
+    };
+    const band = bands[gameState._trialStrand];
+    if (band && band[0] >= 0 && band[1] >= band[0]) {
+        // Bias to the harder SECOND HALF of the band
+        const mid = Math.floor((band[0] + band[1]) / 2);
+        const lo = mid, hi = band[1];
+        let tpool = elaQuestions.filter((_, i) => i >= lo && i <= hi);
+        if (tpool.length === 0) tpool = elaQuestions.filter((_, i) => i >= band[0] && i <= band[1]);
+        const tchosen = tpool[Math.floor(Math.random() * tpool.length)];
+        const tIdx = elaQuestions.indexOf(tchosen);
+        currentBattle._lastQuestionIdx = tIdx;
+        currentBattle.currentQuestion = tchosen;
+        battleText.textContent = tchosen.q;
+        battleGrid.innerHTML = '';
+        const _tl = ['A', 'B', 'C', 'D'];
+        [...tchosen.a].sort(() => Math.random() - 0.5).forEach((answer, _i) => {
+            const tb = document.createElement('button');
+            tb.className = 'bb bb-move';
+            tb.textContent = `${_tl[_i]}. ${answer}`;
+            tb.dataset.rawAnswer = answer;
+            tb.onclick = () => {
+                battleGrid.querySelectorAll('button').forEach(b => {
+                    b.disabled = true;
+                    if (b.dataset.rawAnswer === tchosen.c) b.style.background = '#16a34a';
+                    else if (b === tb) b.style.background = '#dc2626';
+                });
+                setTimeout(() => handleAnswer(tchosen.c === answer ? tchosen.c : answer), 650);
+            };
+            battleGrid.appendChild(tb);
+        });
+        return; // skip normal question selection
+    }
+}
 
 // Anchor indices to sentinel questions so insertions/deletions don't break routing
     const _iGrammar   = elaQuestions.findIndex(q => q.q.startsWith("A sentence containing two independent clauses"));
@@ -16827,6 +17135,12 @@ if (result.isCrit) {
         }
         messages.push(...applyAttackEffect(currentBattle.chosenAttack, currentBattle.playercreature, opponent));
 } else {
+        // ── Deep Lexicon Trials: one wrong answer ends the run ──
+    if (gameState._inTrialBattle) {
+        SFX.wrong();
+        return onTrialFailed();
+    }
+        
         showFloatingText('player-sprite', "MISS", 'damage');
         SFX.wrong();
         const _teachLines = [
@@ -16896,9 +17210,10 @@ const heldOffMult = (attacker === currentBattle?.playercreature)
 const heldDefMult = (defender === currentBattle?.playercreature)
         ? getHeldItemDefenseMultiplier(defender) : 1;
 
-// Gen 1-style damage formula: ((2*L/5+2) * Atk * Power / Def) / 50 + 2
+// Gen 1-inspired damage formula: ((2*L/5+2) * Atk * Power / Def) / 20 + 2
+    // We use /20 instead of Blue's /50 — produces faster fights (4-5 turns vs 9-10),
+    // which works better for a quiz-driven battle system where each turn is slower.
     // The +2 buffer means underleveled attackers still deal meaningful (not 1) damage.
-    // It also eliminates the zero-damage bug when damageMult penalties are applied later.
     const levelFactor = (2 * attacker.level / 5 + 2);
     const baseDamage = ((levelFactor * attack.power * critMultiplier * heldOffMult * (attackStat / defenseStat)) / 20 + 2) * multiplier;
     const finalDamage = Math.max(1, Math.floor(baseDamage * (heldDefMult || 1)));
@@ -18372,8 +18687,8 @@ function handleSenseiWu() {
         const hasPoetry = playerTypes.includes('Poetry');
 
         // Counter picks: Sensei Wu reads your team
-        const counterSlot2 = hasFire ? 'Stalag-might'    // Water beats Fire
-                           : hasWater ? 'VerbViper'       // Fire beats Water (kinda)
+const counterSlot2 = hasFire ? 'Stalag-might'    // Water beats Fire
+                           : hasWater ? 'Rhyth-mite'      // Grass beats Water
                            : hasGrass ? 'VerbViper'       // Fire beats Grass
                            : 'VerbViper';                 // Default
 
@@ -18924,6 +19239,15 @@ function useFastTravel() {
     if ((gameState.inventory.LH02LyricalHightail || 0) <= 0) {
         closeAllMenus();
         startDialogue("You need the 'Lyrical Hightail' item to fly!");
+        return;
+    }
+    // Trials lock: can't fast-travel out mid-run — the deep doesn't let go.
+    if (gameState.currentMap === 'trialChamber' || gameState.trialsRunActive) {
+        closeAllMenus();
+        startDialogue([
+            "You try to recite the verse, but the words won't form.",
+            "The deep holds language differently. You must climb out the way you came in."
+        ]);
         return;
     }
 
@@ -23892,8 +24216,21 @@ async function endBattle(ranAway = false, caught = false) {
         const blackoutLines = oldBattle.trainerId
             ? [`You were defeated by ${oldBattle.opponentName}!`, "Your team blacked out...", "You wake up at the Word Center.", "Professor Lexicon's voice echoes: 'Every loss is a lesson. Study your opponent's type.'"]
             : ["Your team blacked out...", "You wake up at the Word Center.", "Tip: Lower a wild creature's HP before throwing a Word Ball — it raises your catch rate!"];
-        // Fully exit battle state BEFORE starting dialogue so taps advance it
+// Fully exit battle state BEFORE starting dialogue so taps advance it
         gameState.inBattle = false;
+// If the player blacked out DURING a Deep Trial, clear the trial state
+        // so the next battle doesn't think they're still on a floor.
+        if (gameState._inTrialBattle || gameState.trialsRunActive || gameState.currentMap === 'trialChamber') {
+            gameState._inTrialBattle = false;
+            gameState._trialStrand = null;
+            gameState.trialsRunActive = false;
+            gameState.trialsCurrentFloor = 0;
+            // Send the player back to the sewer (NOT back to the Trial chamber)
+            // when they leave the Word Center. The chamber requires a fresh run.
+            gameState.currentMap = 'citySewers';
+            gameState.player.x = 13;
+            gameState.player.y = 6;
+        }
         battleScene.classList.add('hidden');
         messageBox.classList.remove('hidden');
 gameState.battleWinStreak = 0;
@@ -24185,10 +24522,18 @@ if (oldBattle.trainerId === 'finalBoss2') {
     gameState.finalBossDefeated = true;
 }        }
 
-if (oldBattle.trainerId === 'goblinBoss' && gameState.inventory.boatPart === 0) {
-    gameState.inventory.boatPart = 1;
-    await new Promise(res => startBattleDialogue(["The Goblin dropped something...", "You found the Engine Cog!"], res));
-}
+// ── Deep Lexicon Trials: a Trial floor was just cleared ──
+    if (oldBattle.trainerId && oldBattle.trainerId.startsWith('trial') && gameState.trialsRunActive) {
+        const t = trainersDB[oldBattle.trainerId];
+        await new Promise(res => startBattleDialogue(t.postBattle || ["The Trial Master bows."], res));
+        battleScene.classList.add('hidden');
+        onTrialFloorCleared();
+        return;
+    }
+    if (oldBattle.trainerId === 'goblinBoss' && gameState.inventory.boatPart === 0) {
+        gameState.inventory.boatPart = 1;
+        await new Promise(res => startBattleDialogue(["The Goblin dropped something...", "You found the Engine Cog!"], res));
+    }
         
         // --- THIS FIXES THE VILLAGE GATE ---
 if (oldBattle.trainerId === 'villageRival' && !gameState.rivalDefeated) {
